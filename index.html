@@ -51,8 +51,27 @@
       touch-action: none;
     }
 
-    #clockCanvas {
+    #stageRoot {
       position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    body.force-landscape #stageRoot {
+      width: 100vh;
+      height: 100vw;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(90deg);
+      transform-origin: center center;
+    }
+
+    #clockCanvas {
+      position: absolute;
       top: 0;
       left: 0;
       width: 100%;
@@ -190,15 +209,6 @@
       color: #2B1810;
     }
 
-    .hint-line {
-      margin-top: 6px;
-      font-family: var(--font-round);
-      font-size: 13px;
-      font-weight: 800;
-      opacity: 0.78;
-      text-align: center;
-    }
-
     .hidden {
       display: none !important;
     }
@@ -231,30 +241,6 @@
       transform: scale(0.96);
     }
 
-    #toast {
-      position: fixed;
-      top: 64px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-8px);
-      z-index: 40;
-      padding: 6px 14px;
-      border-radius: 12px;
-      background: rgba(35, 24, 18, 0.92);
-      color: #FFFDF9;
-      font-family: var(--font-round);
-      font-size: 13px;
-      font-weight: 800;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s ease, transform 0.2s ease;
-      white-space: nowrap;
-    }
-
-    #toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
     #titleModal {
       position: fixed;
       inset: 0;
@@ -272,7 +258,7 @@
 
     .modal-box {
       width: 100%;
-      max-width: 440px;
+      max-width: 450px;
       max-height: 88vh;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
@@ -309,12 +295,29 @@
       cursor: pointer;
     }
 
+    .section-card {
+      margin-bottom: 13px;
+      padding: 11px 12px;
+      border-radius: 14px;
+      background: rgba(128, 128, 128, 0.06);
+      border: 1px solid rgba(128, 128, 128, 0.2);
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 900;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
     .preview-panel {
       background: var(--card-bg);
       border: 1.5px dashed rgba(128, 128, 128, 0.42);
       border-radius: 14px;
       padding: 10px;
-      margin-bottom: 12px;
+      margin-bottom: 11px;
       text-align: center;
     }
 
@@ -375,21 +378,22 @@
     }
 
     .field-group {
-      margin-bottom: 13px;
-      padding-bottom: 11px;
-      border-bottom: 1px solid rgba(128, 128, 128, 0.18);
+      margin-bottom: 11px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(128, 128, 128, 0.16);
     }
 
-    .field-group:last-of-type {
+    .field-group:last-child {
       border-bottom: none;
-      margin-bottom: 6px;
+      margin-bottom: 0;
+      padding-bottom: 0;
     }
 
     .field-label-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 800;
       margin-bottom: 6px;
     }
@@ -610,6 +614,32 @@
       flex-shrink: 0;
     }
 
+    .custom-source-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .custom-source-thumbs {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .custom-source-thumbs img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+      border-radius: 6px;
+      background: #FFFDF9;
+      border: 1px solid rgba(128, 128, 128, 0.3);
+      padding: 2px;
+    }
+
     .modal-actions {
       display: flex;
       justify-content: space-between;
@@ -628,10 +658,12 @@
   </style>
 </head>
 <body>
-  <canvas id="clockCanvas"></canvas>
+  <div id="stageRoot">
+    <canvas id="clockCanvas"></canvas>
+  </div>
 
   <header id="topBar">
-    <button id="titleTrigger" type="button" title="點擊修改標題、顯示狀態與後方小圖示">
+    <button id="titleTrigger" type="button" title="不理不理左衛門時鐘">
       <span id="titleText">不理不理左衛門時鐘</span>
       <span id="titleIcon"></span>
       <img id="titleIconImg" alt="標題小圖示" />
@@ -639,29 +671,24 @@
     </button>
   </header>
 
-  <div id="toast"></div>
-
   <footer id="bottomBar">
     <div class="toolbar-row">
-      <button id="btnToggleGather" type="button" class="pill-btn">散開 / 集合 (已集合)</button>
-      <button id="btnToggleSize" type="button" class="pill-btn">時間：特大</button>
-      <button id="btnToggleNight" type="button" class="pill-btn">夜間模式</button>
+      <button id="btnToggleGather" type="button" class="pill-btn">時鐘</button>
+      <button id="btnGuestShow" type="button" class="pill-btn">特別來賓表演</button>
       <button id="btnWakeLock" type="button" class="pill-btn">螢幕常亮</button>
-      <button id="btnHourEaster" type="button" class="pill-btn">整點彩蛋</button>
-      <button id="btnCustomSticker" type="button" class="pill-btn">自訂小豬貼圖</button>
-      <button id="btnResetSticker" type="button" class="pill-btn hidden">恢復預設小豬</button>
-      <button id="btnOpenSettings" type="button" class="pill-btn">✎ 標題與圖示</button>
+      <button id="btnToggleNight" type="button" class="pill-btn">夜間模式</button>
+      <button id="btnOpenSettings" type="button" class="pill-btn">進來看看</button>
       <button id="btnHideBar" type="button" class="pill-btn">
         <span id="hideBtnIcon" class="ctrl-btn-icon"></span>
-        <img id="hideBtnImg" class="ctrl-btn-img" alt="隱藏選項圖示" />
-        <span>隱藏選項</span>
+        <img id="hideBtnImg" class="ctrl-btn-img" alt="都躲起來圖示" />
+        <span>都躲起來</span>
       </button>
     </div>
-    <div class="hint-line">點角色觸發互動彩蛋（再點可換動作／拖曳移動）；雙擊空白處可切換散開或集合！</div>
-    <input id="fileStickerInput" type="file" accept="image/*" multiple class="hidden" />
+    <input id="fileRoamerInput" type="file" accept="image/*" multiple class="hidden" />
+    <input id="fileGuestInput" type="file" accept="image/*" multiple class="hidden" />
   </footer>
 
-  <button id="btnShowBar" type="button" class="hidden" title="顯示底部控制列">
+  <button id="btnShowBar" type="button" class="hidden" title="顯示選項">
     <span id="showBtnIcon" class="ctrl-btn-icon"></span>
     <img id="showBtnImg" class="ctrl-btn-img" alt="顯示選項圖示" />
     <span>顯示選項</span>
@@ -670,133 +697,192 @@
   <div id="titleModal" role="dialog" aria-modal="true">
     <div class="modal-box">
       <div class="modal-head">
-        <h2>✎ 標題與按鈕圖示設定</h2>
+        <h2>進來看看</h2>
         <button id="btnCloseModal" type="button" class="close-btn">✕</button>
       </div>
 
-      <div class="preview-panel">
-        <span class="preview-tag">頂部標題與按鈕即時預覽</span>
-        <div id="modalPreview">
-          <span id="previewText">不理不理左衛門時鐘</span>
-          <span id="previewIcon"></span>
-          <img id="previewImg" alt="預覽圖示" />
-        </div>
-        <div class="preview-btns-bar">
-          <span class="preview-mini-pill">
-            <span id="prevHideEmoji"></span>
-            <img id="prevHideImg" class="preview-mini-img" alt="" />
-            <span>隱藏選項</span>
-          </span>
-          <span class="preview-mini-pill">
-            <span id="prevShowEmoji"></span>
-            <img id="prevShowImg" class="preview-mini-img" alt="" />
-            <span>顯示選項</span>
-          </span>
-        </div>
-      </div>
-
-      <div class="field-group">
-        <div class="field-label-row">
-          <span>1. 頂部標題顯示狀態</span>
+      <!-- 1. 畫面轉向（自動／強制橫向） -->
+      <div class="section-card">
+        <div class="section-title">
+          <span>1. 畫面轉向（自動／強制橫向）</span>
         </div>
         <div class="segmented-row">
-          <button type="button" id="btnTitleVisibleOn" class="seg-btn active">顯示標題</button>
-          <button type="button" id="btnTitleVisibleOff" class="seg-btn">隱藏標題</button>
+          <button type="button" id="btnOrientAuto" class="seg-btn active">自動轉向</button>
+          <button type="button" id="btnOrientForceLandscape" class="seg-btn">強制橫向</button>
         </div>
       </div>
 
-      <div class="field-group">
-        <div class="field-label-row">
-          <label for="inputTitle">2. 標題文字內容</label>
-          <button id="btnClearTitle" type="button" class="chip">清空文字</button>
+      <!-- 2. 時鐘數字大小 -->
+      <div class="section-card">
+        <div class="section-title">
+          <span>2. 時鐘數字大小</span>
         </div>
-        <input id="inputTitle" type="text" maxlength="24" class="text-box" placeholder="輸入標題文字（可留空只顯示圖示）" />
-        <div class="chip-wrap">
-          <button type="button" class="chip preset-title" data-val="不理不理左衛門時鐘">不理不理左衛門時鐘</button>
-          <button type="button" class="chip preset-title" data-val="豬豬時鐘">豬豬時鐘</button>
-          <button type="button" class="chip preset-title" data-val="午休時間">午休時間</button>
-          <button type="button" class="chip preset-title" data-val="起床囉！">起床囉！</button>
+        <div class="segmented-row">
+          <button type="button" id="btnSizeLarge" class="seg-btn">大</button>
+          <button type="button" id="btnSizeExtraLarge" class="seg-btn active">特大</button>
         </div>
       </div>
 
-      <div class="field-group">
-        <div class="field-label-row">
-          <label for="inputFontSize">3. 標題字型大小</label>
-          <span id="fontSizeBadge" class="chip">26px</span>
+      <!-- 3. 頂部標題與按鈕圖示設定 -->
+      <div class="section-card">
+        <div class="section-title">
+          <span>3. 頂部標題與按鈕圖示設定</span>
         </div>
-        <div class="size-row">
-          <button type="button" class="size-btn" data-size="18">小 18px</button>
-          <button type="button" class="size-btn" data-size="22">適中 22px</button>
-          <button type="button" class="size-btn" data-size="26">標準 26px</button>
-          <button type="button" class="size-btn" data-size="32">大 32px</button>
-          <button type="button" class="size-btn" data-size="40">特大 40px</button>
+
+        <div class="preview-panel">
+          <span class="preview-tag">頂部標題與按鈕即時預覽</span>
+          <div id="modalPreview">
+            <span id="previewText">不理不理左衛門時鐘</span>
+            <span id="previewIcon"></span>
+            <img id="previewImg" alt="預覽圖示" />
+          </div>
+          <div class="preview-btns-bar">
+            <span class="preview-mini-pill">
+              <span id="prevHideEmoji"></span>
+              <img id="prevHideImg" class="preview-mini-img" alt="" />
+              <span>都躲起來</span>
+            </span>
+            <span class="preview-mini-pill">
+              <span id="prevShowEmoji"></span>
+              <img id="prevShowImg" class="preview-mini-img" alt="" />
+              <span>顯示選項</span>
+            </span>
+          </div>
         </div>
-        <div class="slider-row">
-          <span style="font-size:12px;font-weight:900;opacity:0.65;">A</span>
-          <input id="inputFontSize" type="range" min="16" max="44" step="1" value="26" />
-          <span style="font-size:18px;font-weight:900;">A</span>
+
+        <div class="field-group">
+          <div class="field-label-row">
+            <span>頂部標題顯示狀態</span>
+          </div>
+          <div class="segmented-row">
+            <button type="button" id="btnTitleVisibleOn" class="seg-btn active">顯示標題</button>
+            <button type="button" id="btnTitleVisibleOff" class="seg-btn">隱藏標題</button>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label-row">
+            <label for="inputTitle">標題文字內容</label>
+            <button id="btnClearTitle" type="button" class="chip">清空文字</button>
+          </div>
+          <input id="inputTitle" type="text" maxlength="24" class="text-box" placeholder="輸入標題文字" />
+          <div class="chip-wrap">
+            <button type="button" class="chip preset-title" data-val="不理不理左衛門時鐘">不理不理左衛門時鐘</button>
+            <button type="button" class="chip preset-title" data-val="豬豬時鐘">豬豬時鐘</button>
+            <button type="button" class="chip preset-title" data-val="午休時間">午休時間</button>
+            <button type="button" class="chip preset-title" data-val="起床囉！">起床囉！</button>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label-row">
+            <label for="inputFontSize">標題字型大小</label>
+            <span id="fontSizeBadge" class="chip">26px</span>
+          </div>
+          <div class="size-row">
+            <button type="button" class="size-btn" data-size="18">小 18px</button>
+            <button type="button" class="size-btn" data-size="22">適中 22px</button>
+            <button type="button" class="size-btn" data-size="26">標準 26px</button>
+            <button type="button" class="size-btn" data-size="32">大 32px</button>
+            <button type="button" class="size-btn" data-size="40">特大 40px</button>
+          </div>
+          <div class="slider-row">
+            <span style="font-size:12px;font-weight:900;opacity:0.65;">A</span>
+            <input id="inputFontSize" type="range" min="16" max="44" step="1" value="26" />
+            <span style="font-size:18px;font-weight:900;">A</span>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label-row">
+            <span>標題後方小圖示</span>
+            <button id="btnNoIcon" type="button" class="chip">無圖示</button>
+          </div>
+          <div class="sticker-grid" id="titleStickerGrid"></div>
+          <input id="inputCustomIcon" type="text" maxlength="8" class="text-box" placeholder="輸入文字 / Emoji..." />
+          <div class="btn-icon-upload-bar">
+            <div class="btn-icon-upload-left">
+              <img id="titleIconThumb" class="btn-icon-thumb" alt="標題小圖示縮圖" />
+              <span id="titleIconImgStatus">自訂圖片</span>
+            </div>
+            <div class="btn-icon-actions">
+              <button id="btnTriggerIconUpload" type="button" class="chip">上傳圖片</button>
+              <button id="btnClearTitleIconImg" type="button" class="chip hidden">改回原圖</button>
+              <input id="fileIconInput" type="file" accept="image/*" class="hidden" />
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label-row">
+            <span>「都躲起來」按鈕圖示</span>
+          </div>
+          <div class="icon-pick-row" id="hideIconGroup"></div>
+          <div class="btn-icon-upload-bar">
+            <div class="btn-icon-upload-left">
+              <img id="hideBtnThumb" class="btn-icon-thumb" alt="都躲起來圖示預覽" />
+              <span id="hideBtnImgStatus">自訂圖片</span>
+            </div>
+            <div class="btn-icon-actions">
+              <button id="btnUploadHideIcon" type="button" class="chip">上傳圖片</button>
+              <button id="btnClearHideIconImg" type="button" class="chip hidden">改回原圖</button>
+              <input id="fileHideIconInput" type="file" accept="image/*" class="hidden" />
+            </div>
+          </div>
+
+          <div class="field-label-row" style="margin-top:10px;">
+            <span>「顯示選項」按鈕圖示</span>
+          </div>
+          <div class="icon-pick-row" id="showIconGroup"></div>
+          <div class="btn-icon-upload-bar">
+            <div class="btn-icon-upload-left">
+              <img id="showBtnThumb" class="btn-icon-thumb" alt="顯示圖示預覽" />
+              <span id="showBtnImgStatus">自訂圖片</span>
+            </div>
+            <div class="btn-icon-actions">
+              <button id="btnUploadShowIcon" type="button" class="chip">上傳圖片</button>
+              <button id="btnClearShowIconImg" type="button" class="chip hidden">改回原圖</button>
+              <input id="fileShowIconInput" type="file" accept="image/*" class="hidden" />
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="field-group">
-        <div class="field-label-row">
-          <span>4. 標題後方小圖示（點選原圖預選）</span>
-          <button id="btnNoIcon" type="button" class="chip">無圖示 (隱藏)</button>
+      <!-- 4. 自訂誰來玩耍 -->
+      <div class="section-card">
+        <div class="section-title">
+          <span>4. 自訂誰來玩耍</span>
         </div>
-        <div class="sticker-grid" id="titleStickerGrid"></div>
-        <input id="inputCustomIcon" type="text" maxlength="8" class="text-box" placeholder="或直接輸入任何文字 / Emoji 符號..." />
-        <div class="btn-icon-upload-bar">
-          <div class="btn-icon-upload-left">
-            <img id="titleIconThumb" class="btn-icon-thumb" alt="標題小圖示縮圖" />
-            <span id="titleIconImgStatus">也可從手機相簿選擇小圖片（自動去背）</span>
-          </div>
-          <div class="btn-icon-actions">
-            <button id="btnTriggerIconUpload" type="button" class="chip">📁 上傳圖片</button>
-            <button id="btnClearTitleIconImg" type="button" class="chip hidden">改回原圖</button>
-            <input id="fileIconInput" type="file" accept="image/*" class="hidden" />
+        <div class="custom-source-row">
+          <span id="roamerSourceStatus" style="font-size:12.5px;font-weight:700;">預設（108 隻）</span>
+          <div style="display:flex;gap:6px;">
+            <button type="button" id="btnPickRoamerImgs" class="chip">選擇圖片</button>
+            <button type="button" id="btnResetRoamerImgs" class="chip hidden">恢復預設</button>
           </div>
         </div>
+        <div id="roamerThumbs" class="custom-source-thumbs"></div>
       </div>
 
-      <div class="field-group">
-        <div class="field-label-row">
-          <span>5. 「隱藏選項」按鈕圖示</span>
+      <!-- 5. 邀請特別來賓 -->
+      <div class="section-card">
+        <div class="section-title">
+          <span>5. 邀請特別來賓</span>
         </div>
-        <div class="icon-pick-row" id="hideIconGroup"></div>
-        <div class="btn-icon-upload-bar">
-          <div class="btn-icon-upload-left">
-            <img id="hideBtnThumb" class="btn-icon-thumb" alt="隱藏圖示預覽" />
-            <span id="hideBtnImgStatus">已連結 icons/PIG 原圖自動去背</span>
-          </div>
-          <div class="btn-icon-actions">
-            <button id="btnUploadHideIcon" type="button" class="chip">📁 上傳圖片</button>
-            <button id="btnClearHideIconImg" type="button" class="chip hidden">改回原圖</button>
-            <input id="fileHideIconInput" type="file" accept="image/*" class="hidden" />
+        <div class="custom-source-row">
+          <span id="guestSourceStatus" style="font-size:12.5px;font-weight:700;">預設特別來賓</span>
+          <div style="display:flex;gap:6px;">
+            <button type="button" id="btnPickGuestImgs" class="chip">選擇圖片</button>
+            <button type="button" id="btnResetGuestImgs" class="chip hidden">恢復預設</button>
           </div>
         </div>
-
-        <div class="field-label-row" style="margin-top:10px;">
-          <span>6. 「顯示選項」按鈕圖示</span>
-        </div>
-        <div class="icon-pick-row" id="showIconGroup"></div>
-        <div class="btn-icon-upload-bar">
-          <div class="btn-icon-upload-left">
-            <img id="showBtnThumb" class="btn-icon-thumb" alt="顯示圖示預覽" />
-            <span id="showBtnImgStatus">已連結 icons/PIG 原圖自動去背</span>
-          </div>
-          <div class="btn-icon-actions">
-            <button id="btnUploadShowIcon" type="button" class="chip">📁 上傳圖片</button>
-            <button id="btnClearShowIconImg" type="button" class="chip hidden">改回原圖</button>
-            <input id="fileShowIconInput" type="file" accept="image/*" class="hidden" />
-          </div>
-        </div>
+        <div id="guestThumbs" class="custom-source-thumbs"></div>
       </div>
 
       <div class="modal-actions">
-        <button id="btnResetDefaults" type="button" class="chip">↺ 恢復預設值</button>
+        <button id="btnResetDefaults" type="button" class="chip">恢復預設值</button>
         <div class="modal-actions-right">
           <button id="btnCancelModal" type="button" class="pill-btn">取消</button>
-          <button id="btnApplyModal" type="button" class="pill-btn primary">✓ 確認套用</button>
+          <button id="btnApplyModal" type="button" class="pill-btn primary">確認套用</button>
         </div>
       </div>
     </div>
@@ -1049,15 +1135,18 @@
         }
       }
 
-      var STORAGE_KEY = 'buriburi_pig_clock_settings_v6';
+      var STORAGE_KEY = 'buriburi_pig_clock_settings_v7';
       var TOTAL_PIGS = 108;
       var DEFAULT_POSE_COUNT = 12;
-      var W = Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0, 320);
-      var H = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0, 480);
+
+      var W = 360;
+      var H = 640;
       var DPR = Math.min(window.devicePixelRatio || 1, 2);
 
       function getDefaultSettings() {
         return {
+          forceLandscape: false,
+          extraLarge: true,
           visible: true,
           text: '不理不理左衛門時鐘',
           fontSize: 26,
@@ -1102,6 +1191,8 @@
           : (src.showBtnImageData || '');
 
         return {
+          forceLandscape: typeof src.forceLandscape === 'boolean' ? src.forceLandscape : false,
+          extraLarge: typeof src.extraLarge === 'boolean' ? src.extraLarge : true,
           visible: typeof src.visible === 'boolean' ? src.visible : true,
           text: typeof src.text === 'string' ? src.text : def.text,
           fontSize: typeof src.fontSize === 'number' ? Math.min(44, Math.max(16, src.fontSize)) : 26,
@@ -1125,7 +1216,6 @@
 
       var state = {
         gathered: true,
-        extraLarge: true,
         nightMode: false,
         wakeLock: null,
         barHidden: false,
@@ -1138,35 +1228,46 @@
       var ctx = canvas.getContext('2d');
       var fallbackSprites = [];
       var repoClockSprites = [];
-      var customClockSprites = [];
+      var customRoamerSprites = [];
+      var customRoamerUrls = [];
+      var usingCustomRoamer = false;
+
       var weirdoSprites = [];
       var hourSprites = [];
       var clickSprites = [];
-      var usingCustomStickers = false;
+      var customGuestSprites = [];
+      var customGuestUrls = [];
+      var usingCustomGuest = false;
+
       var pigs = [];
       var paradeVisitors = [];
-      var toastTimer = null;
 
-      // 拖曳與互動狀態
       var draggingPig = null;
       var pointerDownPos = { x: 0, y: 0 };
       var pointerMoved = false;
 
-      function showToast(msg) {
-        var el = document.getElementById('toast');
-        if (!el) return;
-        el.textContent = msg;
-        el.classList.add('show');
-        if (toastTimer) clearTimeout(toastTimer);
-        toastTimer = setTimeout(function () {
-          el.classList.remove('show');
-        }, 2500);
-      }
-
-      function getCurrentClockPool() {
-        if (usingCustomStickers && customClockSprites.length > 0) return customClockSprites;
+      function getCurrentRoamerPool() {
+        if (usingCustomRoamer && customRoamerSprites.length > 0) return customRoamerSprites;
         if (repoClockSprites.length > 0) return repoClockSprites;
         return fallbackSprites;
+      }
+
+      function getWeirdoPool() {
+        if (usingCustomGuest && customGuestSprites.length > 0) return customGuestSprites;
+        return weirdoSprites;
+      }
+
+      function getHourPool() {
+        if (usingCustomGuest && customGuestSprites.length > 0) return customGuestSprites;
+        if (hourSprites.length > 0) return hourSprites;
+        if (weirdoSprites.length > 0) return weirdoSprites;
+        return getCurrentRoamerPool();
+      }
+
+      function getClickEggPool() {
+        if (usingCustomGuest && customGuestSprites.length > 0) return customGuestSprites;
+        if (clickSprites.length > 0) return clickSprites;
+        return weirdoSprites;
       }
 
       function createHandDrawnPigSprite(poseIdx) {
@@ -1447,16 +1548,15 @@
             scale: 0.42,
             isWeirdo: false,
             overrideSprite: null,
-            eggTimer: 0,        // 彩蛋焦點停留時間（秒）
-            eggAction: 0,       // 0: 彈跳, 1: 翻面定格, 2: 搞笑圖示, 3: 高速扭動
-            eggLabel: '',
+            eggTimer: 0,
+            eggAction: 0,
             clickFlip: 1
           });
         }
       }
 
-      function triggerHourParade(msg) {
-        var pool = hourSprites.length > 0 ? hourSprites : (weirdoSprites.length > 0 ? weirdoSprites : getCurrentClockPool());
+      function triggerGuestParade() {
+        var pool = getHourPool();
         if (!pool || pool.length === 0) return;
 
         var count = Math.min(5, Math.max(3, pool.length));
@@ -1472,14 +1572,12 @@
             baseY: yBase,
             size: sz,
             vx: fromLeft ? 135 : -135,
-            baseSpeed: 135,
             phase: Math.random() * Math.PI * 2,
             facing: fromLeft ? 1 : -1,
             pauseTimer: 0,
             hasPausedAtMid: false
           });
         }
-        showToast(msg || '✨ 整點／特殊時刻彩蛋：角色進場逛街囉！');
       }
 
       function computeClockTargets() {
@@ -1488,7 +1586,7 @@
         var curHour = now.getHours();
         if (curMin === 0 && now.getSeconds() === 0 && curHour !== state.lastHourTriggered) {
           state.lastHourTriggered = curHour;
-          triggerHourParade(String(curHour).padStart(2, '0') + ':00 整點彩蛋登場！');
+          triggerGuestParade();
         }
         state.lastMinute = curMin;
 
@@ -1496,29 +1594,33 @@
         var mm = String(curMin).padStart(2, '0');
         var digits = [hh[0], hh[1], mm[0], mm[1]];
 
+        var isExtraLarge = currentSettings ? currentSettings.extraLarge : true;
+        var isLandscape = W > H;
+
         var topBarEl = document.getElementById('topBar');
         var bottomBarEl = document.getElementById('bottomBar');
         var topBottom = 18;
         if (currentSettings && currentSettings.visible && topBarEl) {
           topBottom = 68;
           var tr = topBarEl.getBoundingClientRect();
-          if (tr && tr.bottom > 20) topBottom = tr.bottom;
+          if (tr && tr.bottom > 20) topBottom = Math.min(tr.bottom, H * 0.25);
         }
         var bottomTop = H - 18;
         if (!state.barHidden && bottomBarEl) {
           var br = bottomBarEl.getBoundingClientRect();
-          if (br && br.top > 120) bottomTop = br.top;
+          if (br && br.top > 120) bottomTop = Math.max(br.top, H * 0.72);
         }
 
         var safeTop = topBottom + 14;
-        var safeBottom = Math.max(safeTop + 140, bottomTop - 14);
+        var safeBottom = Math.max(safeTop + 120, bottomTop - 14);
         var safeH = safeBottom - safeTop;
 
-        var clockW = W * (state.extraLarge ? 0.91 : 0.79);
+        var clockW = W * (isExtraLarge ? (isLandscape ? 0.84 : 0.91) : (isLandscape ? 0.72 : 0.79));
         var colonW = clockW * 0.095;
         var digitGap = clockW * 0.045;
         var digitW = (clockW - colonW - digitGap * 2) / 4;
-        var digitH = Math.min(safeH * (state.extraLarge ? 0.85 : 0.68), digitW * 1.92);
+        var ratioCap = isLandscape ? 1.35 : 1.92;
+        var digitH = Math.min(safeH * (isExtraLarge ? 0.85 : 0.68), digitW * ratioCap);
 
         var startX = (W - clockW) / 2;
         var centerY = (safeTop + safeBottom) / 2;
@@ -1596,7 +1698,7 @@
       }
 
       function applyWeirdoMix(enable) {
-        var wPool = weirdoSprites;
+        var wPool = getWeirdoPool();
         for (var i = 0; i < pigs.length; i++) {
           pigs[i].isWeirdo = false;
           if (pigs[i].eggTimer <= 0) pigs[i].overrideSprite = null;
@@ -1616,12 +1718,11 @@
         state.gathered = !!val;
         var btn = document.getElementById('btnToggleGather');
         if (btn) {
-          btn.textContent = state.gathered ? '散開 / 集合 (已集合)' : '散開 / 集合 (自由中)';
+          btn.textContent = state.gathered ? '時鐘' : '玩耍中';
         }
         if (state.gathered) {
           applyWeirdoMix(false);
           computeClockTargets();
-          showToast('已集合排時鐘（108 隻）');
         } else {
           applyWeirdoMix(true);
           for (var i = 0; i < pigs.length; i++) {
@@ -1632,7 +1733,6 @@
             pigs[i].vx = Math.cos(angle) * spd;
             pigs[i].vy = Math.sin(angle) * spd;
           }
-          showToast('已散開自由走動，怪咖角色混入中！');
         }
       }
 
@@ -1641,25 +1741,17 @@
         pig.eggAction = nextAction;
         pig.eggTimer = 3.6;
         pig.clickFlip *= -1;
+        pig.overrideSprite = null;
 
         if (nextAction === 0) {
-          pig.eggLabel = '跳一下！';
           pig.vy = -150;
-          showToast('🦘 彩蛋 #' + (pig.id + 1) + '：原地彈跳中（再點可換動作或拖曳）');
-        } else if (nextAction === 1) {
-          pig.eggLabel = '翻面定格';
-          showToast('🔄 彩蛋 #' + (pig.id + 1) + '：翻面定格展示中！');
         } else if (nextAction === 2) {
-          var pool = clickSprites.length > 0 ? clickSprites : weirdoSprites;
+          var pool = getClickEggPool();
           if (pool.length > 0) {
             pig.overrideSprite = pool[Math.floor(Math.random() * pool.length)];
           }
-          pig.eggLabel = '誇張反應';
-          showToast('⚡ 彩蛋 #' + (pig.id + 1) + '：切換誇張反應圖示！');
-        } else {
-          pig.eggLabel = '高速扭動';
+        } else if (nextAction === 3) {
           pig.wiggleFreq = 16;
-          showToast('🌀 彩蛋 #' + (pig.id + 1) + '：高速扭動中！');
         }
       }
 
@@ -1674,10 +1766,25 @@
         return null;
       }
 
+      function toStageCoords(clientX, clientY) {
+        var vw = window.innerWidth || document.documentElement.clientWidth || 320;
+        var vh = window.innerHeight || document.documentElement.clientHeight || 480;
+        if (currentSettings && currentSettings.forceLandscape) {
+          return {
+            x: clientY,
+            y: vw - clientX
+          };
+        }
+        return {
+          x: clientX,
+          y: clientY
+        };
+      }
+
       function handlePointerDown(clientX, clientY) {
-        var rect = canvas.getBoundingClientRect();
-        var px = clientX - rect.left;
-        var py = clientY - rect.top;
+        var pt = toStageCoords(clientX, clientY);
+        var px = pt.x;
+        var py = pt.y;
         pointerDownPos = { x: px, y: py };
         pointerMoved = false;
 
@@ -1687,11 +1794,16 @@
             vis.vx = -vis.vx;
             vis.facing *= -1;
             vis.pauseTimer = 1.2;
-            showToast('🎭 抓到逛街彩蛋，停留一下再調頭！');
             return;
           }
         }
 
+        // 散開（玩耍中）時：點擊只形成時間，不觸發角色互動
+        if (!state.gathered) {
+          return;
+        }
+
+        // 集合（時鐘）狀態：點擊角色才觸發互動彩蛋與拖曳
         var hit = findPigAt(px, py);
         if (hit) {
           draggingPig = hit;
@@ -1700,10 +1812,10 @@
       }
 
       function handlePointerMove(clientX, clientY) {
-        if (!draggingPig) return;
-        var rect = canvas.getBoundingClientRect();
-        var px = clientX - rect.left;
-        var py = clientY - rect.top;
+        if (!draggingPig || !state.gathered) return;
+        var pt = toStageCoords(clientX, clientY);
+        var px = pt.x;
+        var py = pt.y;
         if (Math.hypot(px - pointerDownPos.x, py - pointerDownPos.y) > 6) {
           pointerMoved = true;
         }
@@ -1716,14 +1828,20 @@
       }
 
       function handlePointerUp(clientX, clientY) {
+        if (!state.gathered) {
+          var pt = toStageCoords(clientX, clientY);
+          if (Math.hypot(pt.x - pointerDownPos.x, pt.y - pointerDownPos.y) <= 10) {
+            setGathered(true);
+          }
+          return;
+        }
+
         if (!draggingPig) return;
         var targetPig = draggingPig;
         draggingPig = null;
 
         if (!pointerMoved) {
           triggerPigEgg(targetPig, targetPig.eggTimer > 0.2);
-        } else {
-          showToast('✋ 放開了彩蛋 #' + (targetPig.id + 1) + '，點擊可切換動作');
         }
       }
 
@@ -1754,7 +1872,7 @@
 
         var box = state.clockBox;
         var minTopY = (currentSettings && currentSettings.visible) ? 64 : 26;
-        var pool = getCurrentClockPool();
+        var pool = getCurrentRoamerPool();
 
         for (var i = 0; i < pigs.length; i++) {
           var p = pigs[i];
@@ -1765,16 +1883,14 @@
             p.eggTimer -= dt;
             if (p.eggTimer <= 0) {
               p.eggTimer = 0;
-              p.eggLabel = '';
               p.wiggleFreq = 3.6 + (i % 5) * 0.45;
               if (!p.isWeirdo) p.overrideSprite = null;
             }
           }
 
           if (p === draggingPig) {
-            // 正在拖曳中，保持在手指位置
+            // 拖曳中
           } else if (isFocusedEgg && p.eggAction === 1) {
-            // 翻面定格：稍微上下輕晃，不跑掉
             p.y += Math.sin(sec * 8 + p.id) * 0.4;
           } else if (state.gathered && !isFocusedEgg && (p.role === 'digit' || p.role === 'colon')) {
             var dx = p.tx - p.x;
@@ -1838,17 +1954,6 @@
 
           ctx.save();
           ctx.translate(p.x, p.y + bobY);
-
-          if (isFocusedEgg) {
-            ctx.save();
-            ctx.strokeStyle = '#FF7675';
-            ctx.lineWidth = 2.5;
-            ctx.beginPath();
-            ctx.arc(0, 0, 44 * drawScale, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.restore();
-          }
-
           ctx.rotate(wiggleAngle);
           ctx.scale(p.flipX * p.clickFlip * drawScale, drawScale);
 
@@ -1866,20 +1971,6 @@
           ctx.drawImage(sprite, -48, -48, 96, 96);
           ctx.shadowBlur = 0;
           ctx.restore();
-
-          if (isFocusedEgg && p.eggLabel) {
-            ctx.save();
-            ctx.font = '900 12px "Noto Sans TC", sans-serif';
-            ctx.textAlign = 'center';
-            var labelW = ctx.measureText(p.eggLabel).width + 12;
-            var ly = p.y + bobY - 46 * drawScale;
-            ctx.fillStyle = 'rgba(59, 35, 24, 0.88)';
-            drawRoundRect(ctx, p.x - labelW / 2, ly - 15, labelW, 20, 8);
-            ctx.fill();
-            ctx.fillStyle = '#FFFDF9';
-            ctx.fillText(p.eggLabel, p.x, ly - 1);
-            ctx.restore();
-          }
         }
 
         for (var v = paradeVisitors.length - 1; v >= 0; v--) {
@@ -1962,7 +2053,7 @@
           hInp.type = 'text';
           hInp.maxLength = 4;
           hInp.className = 'mini-icon-input';
-          hInp.placeholder = '自訂文字';
+          hInp.placeholder = '文字';
           hideGroup.appendChild(hInp);
         }
 
@@ -1988,7 +2079,7 @@
           sInp.type = 'text';
           sInp.maxLength = 4;
           sInp.className = 'mini-icon-input';
-          sInp.placeholder = '自訂文字';
+          sInp.placeholder = '文字';
           showGroup.appendChild(sInp);
         }
       }
@@ -2024,8 +2115,19 @@
         }
       }
 
+      function applyOrientationClass(forceLand) {
+        document.body.classList.toggle('force-landscape', !!forceLand);
+        if (forceLand && screen && screen.orientation && typeof screen.orientation.lock === 'function') {
+          try { screen.orientation.lock('landscape').catch(function () {}); } catch (e) {}
+        } else if (!forceLand && screen && screen.orientation && typeof screen.orientation.unlock === 'function') {
+          try { screen.orientation.unlock(); } catch (e) {}
+        }
+      }
+
       function applySettingsToScreen() {
         var s = currentSettings;
+        applyOrientationClass(s.forceLandscape);
+
         var topBarEl = document.getElementById('topBar');
         var trigger = document.getElementById('titleTrigger');
         var textEl = document.getElementById('titleText');
@@ -2070,9 +2172,7 @@
         syncButtonIconDisplay(hideIconEl, hideImgEl, s.hideBtnIconType, s.hideBtnIcon, s.hideBtnImageData);
         syncButtonIconDisplay(showIconEl, showImgEl, s.showBtnIconType, s.showBtnIcon, s.showBtnImageData);
 
-        if (state.gathered) {
-          setTimeout(computeClockTargets, 30);
-        }
+        resize();
       }
 
       function syncModalUploadBar(thumbEl, statusEl, clearBtnEl, isUploadedImg, imgData, defaultMsg) {
@@ -2085,16 +2185,62 @@
           }
         }
         if (statusEl) {
-          statusEl.textContent = isUploadedImg && imgData ? '已套用相簿上傳圖片' : defaultMsg;
+          statusEl.textContent = isUploadedImg && imgData ? '已套用圖片' : defaultMsg;
         }
         if (clearBtnEl) {
           clearBtnEl.classList.toggle('hidden', !(isUploadedImg && imgData));
         }
       }
 
+      function refreshCustomSourceUI() {
+        var rStatus = document.getElementById('roamerSourceStatus');
+        var rReset = document.getElementById('btnResetRoamerImgs');
+        var rThumbs = document.getElementById('roamerThumbs');
+        if (rStatus) {
+          rStatus.textContent = usingCustomRoamer ? ('自訂中（' + customRoamerSprites.length + ' 張）') : '預設（108 隻）';
+        }
+        if (rReset) rReset.classList.toggle('hidden', !usingCustomRoamer);
+        if (rThumbs) {
+          rThumbs.innerHTML = '';
+          for (var i = 0; i < customRoamerUrls.length; i++) {
+            var im = document.createElement('img');
+            im.src = customRoamerUrls[i];
+            im.alt = '';
+            rThumbs.appendChild(im);
+          }
+        }
+
+        var gStatus = document.getElementById('guestSourceStatus');
+        var gReset = document.getElementById('btnResetGuestImgs');
+        var gThumbs = document.getElementById('guestThumbs');
+        if (gStatus) {
+          gStatus.textContent = usingCustomGuest ? ('自訂中（' + customGuestSprites.length + ' 張）') : '預設特別來賓';
+        }
+        if (gReset) gReset.classList.toggle('hidden', !usingCustomGuest);
+        if (gThumbs) {
+          gThumbs.innerHTML = '';
+          for (var j = 0; j < customGuestUrls.length; j++) {
+            var gim = document.createElement('img');
+            gim.src = customGuestUrls[j];
+            gim.alt = '';
+            gThumbs.appendChild(gim);
+          }
+        }
+      }
+
       function updateModalPreview() {
         var d = draftSettings;
         if (!d) return;
+
+        var btnOriAuto = document.getElementById('btnOrientAuto');
+        var btnOriForce = document.getElementById('btnOrientForceLandscape');
+        if (btnOriAuto) btnOriAuto.classList.toggle('active', !d.forceLandscape);
+        if (btnOriForce) btnOriForce.classList.toggle('active', !!d.forceLandscape);
+
+        var btnSzL = document.getElementById('btnSizeLarge');
+        var btnSzXL = document.getElementById('btnSizeExtraLarge');
+        if (btnSzL) btnSzL.classList.toggle('active', !d.extraLarge);
+        if (btnSzXL) btnSzXL.classList.toggle('active', !!d.extraLarge);
 
         var prevBox = document.getElementById('modalPreview');
         var prevText = document.getElementById('previewText');
@@ -2117,9 +2263,9 @@
 
         if (prevText) {
           if (!d.visible) {
-            prevText.textContent = '（目前設為隱藏標題）';
+            prevText.textContent = '已隱藏';
           } else {
-            prevText.textContent = d.text || (d.iconType === 'none' ? '（空白標題）' : '');
+            prevText.textContent = d.text || '';
           }
           prevText.style.opacity = (d.text && d.visible) ? '1' : '0.55';
         }
@@ -2151,7 +2297,7 @@
           document.getElementById('btnClearTitleIconImg'),
           d.iconType === 'image',
           d.iconImage,
-          '也可從手機相簿選擇小圖片（自動去背）'
+          '自訂圖片'
         );
 
         var sizeBtns = document.querySelectorAll('.size-btn');
@@ -2177,7 +2323,7 @@
           document.getElementById('btnClearHideIconImg'),
           d.hideBtnIconType === 'image',
           d.hideBtnImageData,
-          '已連結 icons/PIG 原圖自動去背'
+          '自訂圖片'
         );
         syncButtonIconDisplay(
           document.getElementById('prevHideEmoji'),
@@ -2198,7 +2344,7 @@
           document.getElementById('btnClearShowIconImg'),
           d.showBtnIconType === 'image',
           d.showBtnImageData,
-          '已連結 icons/PIG 原圖自動去背'
+          '自訂圖片'
         );
         syncButtonIconDisplay(
           document.getElementById('prevShowEmoji'),
@@ -2207,6 +2353,8 @@
           d.showBtnIcon,
           d.showBtnImageData
         );
+
+        refreshCustomSourceUI();
       }
 
       function openTitleModal() {
@@ -2238,8 +2386,15 @@
       }
 
       function resize() {
-        W = Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0, 320);
-        H = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0, 480);
+        var vw = Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0, 320);
+        var vh = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0, 480);
+        if (currentSettings && currentSettings.forceLandscape) {
+          W = Math.max(vh, 320);
+          H = Math.max(vw, 320);
+        } else {
+          W = vw;
+          H = vh;
+        }
         DPR = Math.min(window.devicePixelRatio || 1, 2);
 
         canvas.width = Math.round(W * DPR);
@@ -2256,6 +2411,40 @@
         }
       }
 
+      function processMultiImageUpload(files, onDone) {
+        if (!files || !files.length) return;
+        var loadedSprites = [];
+        var loadedUrls = [];
+        var pending = Math.min(files.length, 16);
+
+        for (var i = 0; i < pending; i++) {
+          (function (file) {
+            var reader = new FileReader();
+            reader.onload = function (ev) {
+              var img = new Image();
+              img.onload = function () {
+                removeBackgroundAndTrim(img, 96, function (spr) {
+                  if (spr) {
+                    loadedSprites.push(spr);
+                    try {
+                      loadedUrls.push(spr.toDataURL('image/png'));
+                    } catch (e) {}
+                  }
+                  pending--;
+                  if (pending <= 0) onDone(loadedSprites, loadedUrls);
+                });
+              };
+              img.onerror = function () {
+                pending--;
+                if (pending <= 0) onDone(loadedSprites, loadedUrls);
+              };
+              img.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+          })(files[i]);
+        }
+      }
+
       function bindUI() {
         canvas.addEventListener('pointerdown', function (e) {
           handlePointerDown(e.clientX, e.clientY);
@@ -2265,12 +2454,6 @@
         });
         window.addEventListener('pointerup', function (e) {
           handlePointerUp(e.clientX, e.clientY);
-        });
-        canvas.addEventListener('dblclick', function (e) {
-          var rect = canvas.getBoundingClientRect();
-          if (!findPigAt(e.clientX - rect.left, e.clientY - rect.top)) {
-            setGathered(!state.gathered);
-          }
         });
 
         document.getElementById('titleTrigger').addEventListener('click', function (e) {
@@ -2283,12 +2466,32 @@
           setGathered(!state.gathered);
         });
 
-        document.getElementById('btnToggleSize').addEventListener('click', function (e) {
+        document.getElementById('btnGuestShow').addEventListener('click', function (e) {
           e.stopPropagation();
-          state.extraLarge = !state.extraLarge;
-          this.textContent = state.extraLarge ? '時間：特大' : '時間：大';
-          if (state.gathered) computeClockTargets();
-          showToast(state.extraLarge ? '時鐘尺寸：特大' : '時鐘尺寸：大');
+          triggerGuestParade();
+        });
+
+        document.getElementById('btnWakeLock').addEventListener('click', function (e) {
+          e.stopPropagation();
+          var btn = this;
+          if (!('wakeLock' in navigator) || !navigator.wakeLock) return;
+          if (state.wakeLock) {
+            try { state.wakeLock.release(); } catch (err) {}
+            state.wakeLock = null;
+            btn.textContent = '螢幕常亮';
+            btn.classList.remove('primary');
+          } else {
+            navigator.wakeLock.request('screen').then(function (sentinel) {
+              state.wakeLock = sentinel;
+              btn.textContent = '螢幕常亮 (開啟中)';
+              btn.classList.add('primary');
+              sentinel.addEventListener('release', function () {
+                state.wakeLock = null;
+                btn.textContent = '螢幕常亮';
+                btn.classList.remove('primary');
+              });
+            }).catch(function () {});
+          }
         });
 
         document.getElementById('btnToggleNight').addEventListener('click', function (e) {
@@ -2298,90 +2501,6 @@
           this.textContent = state.nightMode ? '日間模式' : '夜間模式';
           var meta = document.getElementById('metaTheme');
           if (meta) meta.setAttribute('content', state.nightMode ? '#050505' : '#FDF6EC');
-          showToast(state.nightMode ? '已切換為 OLED 純黑夜間模式' : '已切換為日間暖紙模式');
-        });
-
-        document.getElementById('btnWakeLock').addEventListener('click', function (e) {
-          e.stopPropagation();
-          var btn = this;
-          if (!('wakeLock' in navigator) || !navigator.wakeLock) {
-            showToast('此瀏覽器不支援自動螢幕常亮，請調長手機休眠時間');
-            return;
-          }
-          if (state.wakeLock) {
-            try { state.wakeLock.release(); } catch (err) {}
-            state.wakeLock = null;
-            btn.textContent = '螢幕常亮';
-            btn.classList.remove('primary');
-            showToast('已關閉螢幕常亮');
-          } else {
-            navigator.wakeLock.request('screen').then(function (sentinel) {
-              state.wakeLock = sentinel;
-              btn.textContent = '螢幕常亮 (開啟中)';
-              btn.classList.add('primary');
-              showToast('已開啟螢幕常亮！');
-              sentinel.addEventListener('release', function () {
-                state.wakeLock = null;
-                btn.textContent = '螢幕常亮';
-                btn.classList.remove('primary');
-              });
-            }).catch(function () {
-              showToast('無法啟用螢幕常亮（可能處於省電模式或嵌入視窗）');
-            });
-          }
-        });
-
-        document.getElementById('btnHourEaster').addEventListener('click', function (e) {
-          e.stopPropagation();
-          triggerHourParade('🎉 整點／特殊時刻彩蛋：角色進場逛街囉！');
-        });
-
-        var fileStickerInput = document.getElementById('fileStickerInput');
-        var btnResetSticker = document.getElementById('btnResetSticker');
-
-        document.getElementById('btnCustomSticker').addEventListener('click', function (e) {
-          e.stopPropagation();
-          fileStickerInput.value = '';
-          fileStickerInput.click();
-        });
-
-        fileStickerInput.addEventListener('change', function () {
-          var files = this.files;
-          if (!files || !files.length) return;
-          var loadedSprites = [];
-          var pending = Math.min(files.length, 16);
-
-          for (var i = 0; i < pending; i++) {
-            (function (file) {
-              var reader = new FileReader();
-              reader.onload = function (ev) {
-                var img = new Image();
-                img.onload = function () {
-                  removeBackgroundAndTrim(img, 96, function (spr) {
-                    if (spr) loadedSprites.push(spr);
-                    pending--;
-                    if (pending <= 0 && loadedSprites.length > 0) {
-                      customClockSprites = loadedSprites;
-                      usingCustomStickers = true;
-                      btnResetSticker.classList.remove('hidden');
-                      showToast('已套用 ' + loadedSprites.length + ' 張自訂排時鐘貼圖！');
-                    }
-                  });
-                };
-                img.onerror = function () { pending--; };
-                img.src = ev.target.result;
-              };
-              reader.readAsDataURL(file);
-            })(files[i]);
-          }
-        });
-
-        btnResetSticker.addEventListener('click', function (e) {
-          e.stopPropagation();
-          usingCustomStickers = false;
-          customClockSprites = [];
-          btnResetSticker.classList.add('hidden');
-          showToast('已恢復預設排時鐘小豬！');
         });
 
         document.getElementById('btnOpenSettings').addEventListener('click', function (e) {
@@ -2398,7 +2517,6 @@
           bottomBarEl.classList.add('hidden');
           btnShowBar.classList.remove('hidden');
           if (state.gathered) computeClockTargets();
-          showToast('已隱藏底部選項，點右下角可恢復');
         });
 
         btnShowBar.addEventListener('click', function (e) {
@@ -2409,6 +2527,85 @@
           if (state.gathered) computeClockTargets();
         });
 
+        // 彈窗內 1. 畫面轉向
+        document.getElementById('btnOrientAuto').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.forceLandscape = false;
+          updateModalPreview();
+        });
+
+        document.getElementById('btnOrientForceLandscape').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.forceLandscape = true;
+          updateModalPreview();
+        });
+
+        // 彈窗內 2. 時鐘數字大小
+        document.getElementById('btnSizeLarge').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.extraLarge = false;
+          updateModalPreview();
+        });
+
+        document.getElementById('btnSizeExtraLarge').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.extraLarge = true;
+          updateModalPreview();
+        });
+
+        // 彈窗內 4. 自訂誰來玩耍
+        var fileRoamerInput = document.getElementById('fileRoamerInput');
+        document.getElementById('btnPickRoamerImgs').addEventListener('click', function () {
+          fileRoamerInput.value = '';
+          fileRoamerInput.click();
+        });
+
+        fileRoamerInput.addEventListener('change', function () {
+          processMultiImageUpload(this.files, function (sprites, urls) {
+            if (sprites.length > 0) {
+              customRoamerSprites = sprites;
+              customRoamerUrls = urls;
+              usingCustomRoamer = true;
+              refreshCustomSourceUI();
+            }
+          });
+        });
+
+        document.getElementById('btnResetRoamerImgs').addEventListener('click', function () {
+          usingCustomRoamer = false;
+          customRoamerSprites = [];
+          customRoamerUrls = [];
+          refreshCustomSourceUI();
+        });
+
+        // 彈窗內 5. 邀請特別來賓
+        var fileGuestInput = document.getElementById('fileGuestInput');
+        document.getElementById('btnPickGuestImgs').addEventListener('click', function () {
+          fileGuestInput.value = '';
+          fileGuestInput.click();
+        });
+
+        fileGuestInput.addEventListener('change', function () {
+          processMultiImageUpload(this.files, function (sprites, urls) {
+            if (sprites.length > 0) {
+              customGuestSprites = sprites;
+              customGuestUrls = urls;
+              usingCustomGuest = true;
+              if (!state.gathered) applyWeirdoMix(true);
+              refreshCustomSourceUI();
+            }
+          });
+        });
+
+        document.getElementById('btnResetGuestImgs').addEventListener('click', function () {
+          usingCustomGuest = false;
+          customGuestSprites = [];
+          customGuestUrls = [];
+          if (!state.gathered) applyWeirdoMix(true);
+          refreshCustomSourceUI();
+        });
+
+        // 彈窗內 3. 頂部標題與按鈕圖示設定
         var modalEl = document.getElementById('titleModal');
         var modalBoxEl = modalEl.querySelector('.modal-box');
         modalBoxEl.addEventListener('click', function (e) {
@@ -2528,7 +2725,6 @@
                   draftSettings.iconType = 'image';
                   draftSettings.iconImage = spr.toDataURL('image/png');
                   updateModalPreview();
-                  showToast('已載入標題小圖片（按確認套用生效）');
                 }
               });
             };
@@ -2679,7 +2875,6 @@
           if (hInp) hInp.value = '';
           if (sInp) sInp.value = '';
           updateModalPreview();
-          showToast('已重設為預設值（按「確認套用」生效）');
         });
 
         document.getElementById('btnApplyModal').addEventListener('click', function () {
@@ -2702,7 +2897,6 @@
             currentSettings = cloneSettings(draftSettings);
             saveSettings();
             applySettingsToScreen();
-            showToast('已套用標題與圖示設定！');
           }
           closeTitleModal();
         });
