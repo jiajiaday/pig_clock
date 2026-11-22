@@ -9,9 +9,6 @@
   <title>不理不理左衛門時鐘</title>
   <meta name="mobile-web-app-capable" content="yes" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Hachi+Maru+Pop&family=Kiwi+Maru:wght@400;500&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg: #FDF6EC;
@@ -21,8 +18,7 @@
       --modal-bg: #FDF6EC;
       --card-bg: #FFFFFF;
       --accent: #F4B89C;
-      --font-hand: "Hachi Maru Pop", "Kiwi Maru", "Zen Maru Gothic", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
-      --font-ui: "Zen Maru Gothic", "Kiwi Maru", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", sans-serif;
+      --font-round: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "Hiragino Maru Gothic ProN", sans-serif;
     }
 
     body.night {
@@ -50,7 +46,7 @@
       overflow: hidden;
       background-color: var(--bg);
       color: var(--ink);
-      font-family: var(--font-ui);
+      font-family: var(--font-round);
       transition: background-color 0.25s ease, color 0.25s ease;
       touch-action: manipulation;
     }
@@ -76,7 +72,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 12px 14px;
+      padding: 10px 12px;
       pointer-events: none;
     }
 
@@ -87,24 +83,20 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      max-width: 94vw;
+      max-width: 95vw;
       padding: 6px 14px;
-      border: 1.5px solid transparent;
-      border-radius: 999px;
-      background: transparent;
+      border: 1.8px solid var(--pill-border);
+      border-radius: 16px;
+      background: var(--pill-bg);
       color: var(--ink);
-      font-family: var(--font-hand);
-      font-size: 24px;
+      font-family: var(--font-round);
+      font-size: 26px;
       font-weight: 900;
-      line-height: 1.25;
+      line-height: 1.2;
       letter-spacing: 0.03em;
       cursor: pointer;
+      box-shadow: 0 2px 0 var(--pill-border);
       transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
-    }
-
-    #titleTrigger:hover {
-      background-color: rgba(128, 128, 128, 0.1);
-      border-color: rgba(128, 128, 128, 0.25);
     }
 
     #titleTrigger:active {
@@ -143,22 +135,22 @@
     }
 
     .edit-badge {
-      font-size: 0.62em;
-      opacity: 0.55;
+      font-size: 0.6em;
+      opacity: 0.6;
       margin-left: 2px;
     }
 
-    /* 底部控制工具列 */
+    /* 底部控制工具列：字體稍大、邊框更貼合 */
     #bottomBar {
       position: fixed;
-      bottom: 12px;
+      bottom: 10px;
       left: 0;
       right: 0;
       z-index: 20;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 0 10px;
+      padding: 0 8px;
       pointer-events: none;
     }
 
@@ -168,23 +160,24 @@
       flex-wrap: wrap;
       justify-content: center;
       align-items: center;
-      gap: 7px;
-      max-width: 96vw;
+      gap: 6px;
+      max-width: 98vw;
     }
 
     .pill-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 5px;
-      padding: 7px 13px;
+      gap: 4px;
+      padding: 6px 10px;
       border: 1.8px solid var(--pill-border);
-      border-radius: 18px 14px 20px 15px / 15px 19px 14px 18px;
+      border-radius: 12px;
       background-color: var(--pill-bg);
       color: var(--ink);
-      font-family: var(--font-hand);
-      font-size: 13px;
-      font-weight: 800;
+      font-family: var(--font-round);
+      font-size: 14.5px;
+      line-height: 1.2;
+      font-weight: 900;
       cursor: pointer;
       box-shadow: 0 2px 0 var(--pill-border);
       white-space: nowrap;
@@ -201,11 +194,11 @@
     }
 
     .hint-line {
-      margin-top: 7px;
-      font-family: var(--font-hand);
-      font-size: 12px;
-      font-weight: 700;
-      opacity: 0.72;
+      margin-top: 6px;
+      font-family: var(--font-round);
+      font-size: 13px;
+      font-weight: 800;
+      opacity: 0.78;
       text-align: center;
     }
 
@@ -213,49 +206,49 @@
       display: none !important;
     }
 
-    /* 隱藏底部工具列後的右下角半透明恢復按鈕 */
+    /* 隱藏選項後的右下角恢復按鈕 */
     #btnShowBar {
       position: fixed;
-      right: 14px;
-      bottom: 14px;
+      right: 12px;
+      bottom: 12px;
       z-index: 25;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      padding: 6px 12px;
-      border: 1.5px solid var(--pill-border);
-      border-radius: 999px;
+      gap: 4px;
+      padding: 6px 10px;
+      border: 1.8px solid var(--pill-border);
+      border-radius: 12px;
       background-color: var(--pill-bg);
       color: var(--ink);
-      font-family: var(--font-hand);
-      font-size: 12px;
-      font-weight: 800;
-      opacity: 0.65;
+      font-family: var(--font-round);
+      font-size: 14px;
+      line-height: 1.2;
+      font-weight: 900;
+      opacity: 0.85;
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
       transition: opacity 0.2s ease, transform 0.1s ease;
     }
 
-    #btnShowBar:hover,
     #btnShowBar:active {
-      opacity: 0.96;
+      opacity: 1;
       transform: scale(0.96);
     }
 
     /* 輕量提示氣泡 */
     #toast {
       position: fixed;
-      top: 66px;
+      top: 64px;
       left: 50%;
       transform: translateX(-50%) translateY(-8px);
       z-index: 40;
       padding: 6px 14px;
-      border-radius: 999px;
+      border-radius: 12px;
       background: rgba(35, 24, 18, 0.92);
       color: #FFFDF9;
-      font-family: var(--font-hand);
-      font-size: 12px;
-      font-weight: 700;
+      font-family: var(--font-round);
+      font-size: 13px;
+      font-weight: 800;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.2s ease, transform 0.2s ease;
@@ -293,7 +286,7 @@
       background-color: var(--modal-bg);
       color: var(--ink);
       border: 2px solid var(--pill-border);
-      border-radius: 20px;
+      border-radius: 18px;
       padding: 16px;
       box-shadow: 0 14px 36px rgba(0, 0, 0, 0.3);
     }
@@ -307,14 +300,14 @@
 
     .modal-head h2 {
       margin: 0;
-      font-size: 16px;
+      font-size: 17px;
       font-weight: 900;
     }
 
     .close-btn {
       width: 32px;
       height: 32px;
-      border-radius: 50%;
+      border-radius: 10px;
       border: 1.5px solid var(--pill-border);
       background: var(--card-bg);
       color: var(--ink);
@@ -345,7 +338,7 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      font-family: var(--font-hand);
+      font-family: var(--font-round);
       font-size: 24px;
       font-weight: 900;
       line-height: 1.25;
@@ -377,7 +370,7 @@
       align-items: center;
       gap: 4px;
       padding: 3px 9px;
-      border-radius: 999px;
+      border-radius: 10px;
       border: 1px solid rgba(128, 128, 128, 0.35);
     }
 
@@ -456,7 +449,7 @@
     .chip {
       padding: 5px 10px;
       border: 1.4px solid var(--pill-border);
-      border-radius: 999px;
+      border-radius: 10px;
       background: var(--card-bg);
       color: var(--ink);
       font-family: inherit;
@@ -665,7 +658,7 @@
     <input id="fileStickerInput" type="file" accept="image/*" multiple class="hidden" />
   </footer>
 
-  <!-- 隱藏選項後的右下角半透明恢復按鈕 -->
+  <!-- 隱藏選項後的右下角恢復按鈕 -->
   <button id="btnShowBar" type="button" class="hidden" title="顯示底部控制列">
     <span id="showBtnIcon" class="ctrl-btn-icon">👁️</span>
     <img id="showBtnImg" class="ctrl-btn-img" alt="顯示選項圖示" />
@@ -732,18 +725,18 @@
       <div class="field-group">
         <div class="field-label-row">
           <label for="inputFontSize">3. 標題字型大小</label>
-          <span id="fontSizeBadge" class="chip">24px</span>
+          <span id="fontSizeBadge" class="chip">26px</span>
         </div>
         <div class="size-row">
-          <button type="button" class="size-btn" data-size="16">小 16px</button>
-          <button type="button" class="size-btn" data-size="20">適中 20px</button>
-          <button type="button" class="size-btn" data-size="24">標準 24px</button>
-          <button type="button" class="size-btn" data-size="30">大 30px</button>
-          <button type="button" class="size-btn" data-size="38">特大 38px</button>
+          <button type="button" class="size-btn" data-size="18">小 18px</button>
+          <button type="button" class="size-btn" data-size="22">適中 22px</button>
+          <button type="button" class="size-btn" data-size="26">標準 26px</button>
+          <button type="button" class="size-btn" data-size="32">大 32px</button>
+          <button type="button" class="size-btn" data-size="40">特大 40px</button>
         </div>
         <div class="slider-row">
           <span style="font-size:12px;font-weight:900;opacity:0.65;">A</span>
-          <input id="inputFontSize" type="range" min="14" max="42" step="1" value="24" />
+          <input id="inputFontSize" type="range" min="16" max="44" step="1" value="26" />
           <span style="font-size:18px;font-weight:900;">A</span>
         </div>
       </div>
@@ -853,7 +846,7 @@
     (function () {
       'use strict';
 
-      var HAND_FONT = '"Hachi Maru Pop", "Kiwi Maru", "Zen Maru Gothic", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
+      var CANVAS_FONT = 'sans-serif';
 
       // =========================================================================
       // 1. 安全儲存存取
@@ -898,7 +891,7 @@
       var DEFAULT_SETTINGS = {
         visible: true,
         text: '不理不理左衛門時鐘',
-        fontSize: 24,
+        fontSize: 26,
         iconType: 'emoji',
         iconEmoji: '🐷',
         iconImage: '',
@@ -914,7 +907,7 @@
         return {
           visible: typeof src.visible === 'boolean' ? src.visible : true,
           text: typeof src.text === 'string' ? src.text : DEFAULT_SETTINGS.text,
-          fontSize: typeof src.fontSize === 'number' ? Math.min(42, Math.max(14, src.fontSize)) : 24,
+          fontSize: typeof src.fontSize === 'number' ? Math.min(44, Math.max(16, src.fontSize)) : 26,
           iconType: (src.iconType === 'emoji' || src.iconType === 'image' || src.iconType === 'none') ? src.iconType : 'emoji',
           iconEmoji: typeof src.iconEmoji === 'string' ? src.iconEmoji : (typeof src.emoji === 'string' ? src.emoji : '🐷'),
           iconImage: typeof src.iconImage === 'string' ? src.iconImage : (typeof src.imageData === 'string' ? src.imageData : ''),
@@ -997,7 +990,6 @@
         c.lineJoin = 'round';
         c.lineCap = 'round';
 
-        // 尖尖豬耳朵
         c.beginPath();
         c.moveTo(-17, -10);
         c.lineTo(-22, -26);
@@ -1014,13 +1006,11 @@
         c.fill();
         c.stroke();
 
-        // 圓滾滾臉型
         c.beginPath();
         c.ellipse(0, 0, 21, 18, 0, 0, Math.PI * 2);
         c.fill();
         c.stroke();
 
-        // 招牌粗眉毛
         c.lineWidth = 3.2;
         if (mood === 'sad') {
           c.beginPath();
@@ -1038,7 +1028,6 @@
           c.stroke();
         }
 
-        // 眼睛
         c.fillStyle = ink;
         if (mood === 'sleepy') {
           c.lineWidth = 2;
@@ -1055,7 +1044,6 @@
           c.fill();
         }
 
-        // 大豬鼻子
         c.fillStyle = snoutCol;
         c.strokeStyle = ink;
         c.lineWidth = 2.2;
@@ -1064,7 +1052,6 @@
         c.fill();
         c.stroke();
 
-        // 兩個鼻孔
         c.fillStyle = ink;
         c.beginPath();
         c.ellipse(-4.5, 6, 2.2, 3.4, 0, 0, Math.PI * 2);
@@ -1087,7 +1074,6 @@
         c.lineJoin = 'round';
 
         if (pose === 0) {
-          // 姿勢 0：站立比 OK 手勢
           c.fillStyle = skin;
           c.strokeStyle = ink;
           c.lineWidth = 2.4;
@@ -1126,11 +1112,10 @@
           drawPigHead(c, 48, 30, 0.92, 'normal');
 
           c.fillStyle = '#DC2626';
-          c.font = '900 13px ' + HAND_FONT;
+          c.font = '900 13px ' + CANVAS_FONT;
           c.fillText('ok', 63, 17);
 
         } else if (pose === 1) {
-          // 姿勢 1：趴地單手撐頭發懶
           c.fillStyle = purple;
           c.strokeStyle = ink;
           c.lineWidth = 2.4;
@@ -1155,7 +1140,6 @@
           drawPigHead(c, 32, 46, 0.9, 'sleepy');
 
         } else if (pose === 2) {
-          // 姿勢 2：流汗下跪土下座道歉
           c.fillStyle = purple;
           c.strokeStyle = ink;
           c.lineWidth = 2.4;
@@ -1181,11 +1165,10 @@
           c.fill();
 
           c.fillStyle = '#2563EB';
-          c.font = '800 11px ' + HAND_FONT;
-          c.fillText('すみません', 16, 22);
+          c.font = '800 10px ' + CANVAS_FONT;
+          c.fillText('すみません', 14, 22);
 
         } else if (pose === 3) {
-          // 姿勢 3：紫褲武術高側踢
           c.fillStyle = skin;
           c.strokeStyle = ink;
           c.lineWidth = 2.4;
@@ -1218,7 +1201,6 @@
           drawPigHead(c, 40, 29, 0.9, 'normal');
 
         } else if (pose === 4) {
-          // 姿勢 4：深情捧著鮮紅玫瑰
           c.fillStyle = skin;
           c.strokeStyle = ink;
           c.lineWidth = 2.4;
@@ -1264,7 +1246,6 @@
           c.stroke();
 
         } else if (pose === 5) {
-          // 姿勢 5：紫色圓點睡衣睡帽抱枕頭
           c.fillStyle = purple;
           c.strokeStyle = ink;
           c.lineWidth = 2.4;
@@ -1305,7 +1286,6 @@
           c.stroke();
 
         } else if (pose === 6) {
-          // 姿勢 6：風衣禮帽墨鏡偵探
           c.fillStyle = '#E5E7EB';
           c.strokeStyle = ink;
           c.lineWidth = 2.3;
@@ -1347,7 +1327,6 @@
           c.stroke();
 
         } else if (pose === 7) {
-          // 姿勢 7：開心跳躍撒粉紅愛心
           c.fillStyle = skin;
           c.strokeStyle = ink;
           c.lineWidth = 2.4;
@@ -1397,7 +1376,6 @@
           c.fill();
 
         } else if (pose === 8) {
-          // 姿勢 8：側躺挖鼻孔「へー」
           c.fillStyle = purple;
           c.strokeStyle = ink;
           c.lineWidth = 2.4;
@@ -1415,7 +1393,6 @@
           drawKatana(c, 60, 62, 0.12);
           drawPigHead(c, 34, 49, 0.9, 'normal');
 
-          // 手指靠近鼻孔
           c.strokeStyle = ink;
           c.lineWidth = 2.2;
           c.beginPath();
@@ -1424,11 +1401,10 @@
           c.stroke();
 
           c.fillStyle = '#A855F7';
-          c.font = '800 12px ' + HAND_FONT;
+          c.font = '800 12px ' + CANVAS_FONT;
           c.fillText('へー', 24, 21);
 
         } else if (pose === 9) {
-          // 姿勢 9：背影側頭看武士刀「ふっふっふっ」
           c.fillStyle = skin;
           c.strokeStyle = ink;
           c.lineWidth = 2.4;
@@ -1450,10 +1426,8 @@
           c.fill();
           c.stroke();
 
-          // 背後斜插武士刀
           drawKatana(c, 35, 62, -0.65);
 
-          // 後腦勺與回眸側臉
           c.fillStyle = skin;
           c.beginPath();
           c.arc(48, 30, 17, 0, Math.PI * 2);
@@ -1462,15 +1436,1310 @@
           drawPigHead(c, 42, 31, 0.82, 'normal');
 
           c.fillStyle = '#0284C7';
-          c.font = '800 11px ' + HAND_FONT;
+          c.font = '800 10px ' + CANVAS_FONT;
           c.fillText('ふっふっふっ', 22, 16);
 
         } else if (pose === 10) {
-          // 姿勢 10：坐著拿手機「読んだ?」
           c.fillStyle = skin;
           c.strokeStyle = ink;
           c.lineWidth = 2.4;
           c.beginPath();
           c.ellipse(44, 57, 15, 14, 0, 0, Math.PI * 2);
           c.fill();
-          c.
+          c.stroke();
+
+          c.fillStyle = purple;
+          c.beginPath();
+          c.ellipse(46, 73, 21, 10, 0, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+
+          c.fillStyle = '#1E3A8A';
+          c.strokeStyle = ink;
+          c.lineWidth = 2;
+          drawRoundRect(c, 60, 42, 13, 21, 2.5);
+          c.fill();
+          c.stroke();
+
+          drawKatana(c, 30, 62, -0.35);
+          drawPigHead(c, 44, 32, 0.88, 'normal');
+
+          c.fillStyle = '#22C55E';
+          c.strokeStyle = ink;
+          c.lineWidth = 1.6;
+          drawRoundRect(c, 26, 5, 38, 15, 7);
+          c.fill();
+          c.stroke();
+          c.fillStyle = '#FFFFFF';
+          c.font = '800 10px ' + CANVAS_FONT;
+          c.fillText('読んだ?', 30, 16);
+
+        } else if (pose === 11) {
+          c.fillStyle = '#FEF3C7';
+          c.strokeStyle = ink;
+          c.lineWidth = 2;
+          c.fillRect(14, 22, 30, 58);
+          c.strokeRect(14, 22, 30, 58);
+
+          c.fillStyle = skin;
+          c.beginPath();
+          c.ellipse(54, 58, 14, 15, 0, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+
+          c.fillStyle = purple;
+          c.beginPath();
+          c.moveTo(42, 66);
+          c.lineTo(66, 66);
+          c.lineTo(65, 84);
+          c.lineTo(43, 84);
+          c.closePath();
+          c.fill();
+          c.stroke();
+
+          drawPigHead(c, 53, 34, 0.88, 'normal');
+
+        } else if (pose === 12) {
+          c.fillStyle = '#0284C7';
+          c.font = '800 11px ' + CANVAS_FONT;
+          c.fillText('はあ...', 34, 17);
+
+          drawPigHead(c, 48, 34, 0.84, 'sad');
+
+          c.fillStyle = '#93C5FD';
+          c.strokeStyle = ink;
+          c.lineWidth = 1.8;
+          drawRoundRect(c, 31, 20, 34, 6, 3);
+          c.fill();
+          c.stroke();
+
+          c.fillStyle = '#CBD5E1';
+          c.strokeStyle = ink;
+          c.lineWidth = 2.2;
+          drawRoundRect(c, 24, 46, 48, 28, 5);
+          c.fill();
+          c.stroke();
+          c.fillRect(19, 49, 5, 4);
+          c.fillRect(72, 49, 5, 4);
+
+          c.fillStyle = '#F97316';
+          c.beginPath();
+          c.arc(36, 80, 5, 0, Math.PI * 2);
+          c.arc(48, 81, 6, 0, Math.PI * 2);
+          c.arc(60, 80, 5, 0, Math.PI * 2);
+          c.fill();
+
+        } else if (pose === 13) {
+          c.fillStyle = '#EC4899';
+          c.font = '800 11px ' + CANVAS_FONT;
+          c.fillText('しりません', 22, 17);
+
+          c.fillStyle = purple;
+          c.strokeStyle = ink;
+          c.lineWidth = 2.4;
+          c.beginPath();
+          c.ellipse(54, 62, 18, 13, -0.25, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+
+          c.fillStyle = skin;
+          c.beginPath();
+          c.ellipse(40, 56, 13, 13, 0, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+
+          c.beginPath();
+          c.moveTo(34, 68);
+          c.lineTo(32, 84);
+          c.moveTo(46, 68);
+          c.lineTo(48, 84);
+          c.stroke();
+
+          drawPigHead(c, 36, 32, 0.86, 'normal');
+
+        } else if (pose === 14) {
+          c.fillStyle = '#DC2626';
+          c.font = '800 10px ' + CANVAS_FONT;
+          c.fillText('お助け料1億円', 14, 16);
+
+          c.fillStyle = skin;
+          c.strokeStyle = ink;
+          c.lineWidth = 2.4;
+          c.beginPath();
+          c.ellipse(48, 56, 16, 14, 0, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+
+          c.beginPath();
+          c.moveTo(33, 52);
+          c.quadraticCurveTo(22, 58, 33, 63);
+          c.moveTo(63, 52);
+          c.quadraticCurveTo(74, 58, 63, 63);
+          c.stroke();
+
+          c.fillStyle = purple;
+          c.beginPath();
+          c.moveTo(34, 62);
+          c.lineTo(62, 62);
+          c.lineTo(60, 84);
+          c.lineTo(51, 84);
+          c.lineTo(48, 72);
+          c.lineTo(45, 84);
+          c.lineTo(36, 84);
+          c.closePath();
+          c.fill();
+          c.stroke();
+
+          drawPigHead(c, 48, 32, 0.88, 'normal');
+
+        } else {
+          c.fillStyle = '#EC4899';
+          c.font = '800 11px ' + CANVAS_FONT;
+          c.fillText('おやすみ', 54, 20);
+
+          c.fillStyle = purple;
+          c.strokeStyle = ink;
+          c.lineWidth = 2.4;
+          c.beginPath();
+          c.ellipse(44, 58, 16, 18, 0, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+
+          c.fillStyle = '#FFFFFF';
+          c.beginPath();
+          c.arc(39, 55, 2, 0, Math.PI * 2);
+          c.arc(49, 63, 2, 0, Math.PI * 2);
+          c.fill();
+
+          drawPigHead(c, 44, 33, 0.86, 'sleepy');
+
+          c.fillStyle = purple;
+          c.strokeStyle = ink;
+          c.lineWidth = 2.1;
+          c.beginPath();
+          c.moveTo(28, 22);
+          c.quadraticCurveTo(44, 5, 62, 18);
+          c.lineTo(58, 24);
+          c.closePath();
+          c.fill();
+          c.stroke();
+
+          c.fillStyle = '#FFFDF9';
+          c.beginPath();
+          c.ellipse(68, 64, 11, 13, 0.2, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+        }
+
+        return off;
+      }
+
+      function buildDefaultSprites() {
+        defaultSprites = [];
+        for (var i = 0; i < DEFAULT_POSE_COUNT; i++) {
+          defaultSprites.push(createPigSprite(i));
+        }
+        if (!usingCustomStickers) {
+          activeSprites = defaultSprites.slice();
+        }
+      }
+
+      function processImageStripWhite(img, outSize, callback) {
+        try {
+          var rawW = Math.max(img.width, 1);
+          var rawH = Math.max(img.height, 1);
+          var tmp = document.createElement('canvas');
+          tmp.width = rawW;
+          tmp.height = rawH;
+          var tc = tmp.getContext('2d');
+          tc.drawImage(img, 0, 0, rawW, rawH);
+
+          var imgData = tc.getImageData(0, 0, rawW, rawH);
+          var d = imgData.data;
+          var minX = rawW, minY = rawH, maxX = 0, maxY = 0;
+          var foundOpaque = false;
+
+          for (var y = 0; y < rawH; y++) {
+            for (var x = 0; x < rawW; x++) {
+              var idx = (y * rawW + x) * 4;
+              var r = d[idx], g = d[idx + 1], b = d[idx + 2];
+              if (r > 235 && g > 235 && b > 235) {
+                d[idx + 3] = 0;
+              } else if (r > 218 && g > 218 && b > 218) {
+                d[idx + 3] = Math.round(d[idx + 3] * 0.35);
+              }
+              if (d[idx + 3] > 20) {
+                foundOpaque = true;
+                if (x < minX) minX = x;
+                if (x > maxX) maxX = x;
+                if (y < minY) minY = y;
+                if (y > maxY) maxY = y;
+              }
+            }
+          }
+          tc.putImageData(imgData, 0, 0);
+
+          var cropX = foundOpaque ? minX : 0;
+          var cropY = foundOpaque ? minY : 0;
+          var cropW = foundOpaque ? Math.max(1, maxX - minX + 1) : rawW;
+          var cropH = foundOpaque ? Math.max(1, maxY - minY + 1) : rawH;
+
+          var off = document.createElement('canvas');
+          off.width = outSize;
+          off.height = outSize;
+          var c = off.getContext('2d');
+          var pad = Math.max(4, Math.round(outSize * 0.06));
+          var scale = Math.min((outSize - pad * 2) / cropW, (outSize - pad * 2) / cropH);
+          var dw = cropW * scale;
+          var dh = cropH * scale;
+          c.drawImage(tmp, cropX, cropY, cropW, cropH, (outSize - dw) / 2, (outSize - dh) / 2, dw, dh);
+
+          callback(off);
+        } catch (err) {
+          callback(null);
+        }
+      }
+
+      // =========================================================================
+      // 4. 高辨識度寬幅數位時鐘向量路徑 (0-9)
+      // =========================================================================
+      var DIGIT_POLYLINES = {
+        '0': [
+          [0.32, 0.05], [0.68, 0.05], [0.86, 0.22], [0.88, 0.50],
+          [0.86, 0.78], [0.68, 0.95], [0.32, 0.95], [0.14, 0.78],
+          [0.12, 0.50], [0.14, 0.22], [0.32, 0.05]
+        ],
+        '1': [
+          [0.30, 0.20], [0.54, 0.05], [0.54, 0.95], [0.28, 0.95], [0.80, 0.95]
+        ],
+        '2': [
+          [0.16, 0.22], [0.32, 0.06], [0.70, 0.06], [0.86, 0.22],
+          [0.84, 0.42], [0.14, 0.94], [0.88, 0.94]
+        ],
+        '3': [
+          [0.18, 0.10], [0.72, 0.06], [0.86, 0.24], [0.72, 0.46],
+          [0.44, 0.48], [0.74, 0.52], [0.86, 0.74], [0.72, 0.94], [0.18, 0.90]
+        ],
+        '4': [
+          [0.72, 0.95], [0.72, 0.05], [0.12, 0.66], [0.90, 0.66]
+        ],
+        '5': [
+          [0.84, 0.06], [0.20, 0.06], [0.18, 0.44], [0.70, 0.44],
+          [0.86, 0.64], [0.72, 0.94], [0.16, 0.90]
+        ],
+        '6': [
+          [0.76, 0.08], [0.34, 0.08], [0.14, 0.44], [0.14, 0.76],
+          [0.36, 0.94], [0.72, 0.94], [0.86, 0.72], [0.70, 0.50], [0.18, 0.50]
+        ],
+        '7': [
+          [0.14, 0.06], [0.88, 0.06], [0.40, 0.95]
+        ],
+        '8': [
+          [0.48, 0.48], [0.22, 0.40], [0.18, 0.20], [0.36, 0.05],
+          [0.64, 0.05], [0.82, 0.20], [0.78, 0.40], [0.52, 0.48],
+          [0.82, 0.58], [0.86, 0.78], [0.66, 0.95], [0.34, 0.95],
+          [0.14, 0.78], [0.18, 0.58], [0.48, 0.48]
+        ],
+        '9': [
+          [0.82, 0.48], [0.28, 0.48], [0.14, 0.28], [0.28, 0.06],
+          [0.66, 0.06], [0.86, 0.28], [0.84, 0.68], [0.62, 0.94], [0.22, 0.94]
+        ]
+      };
+
+      function samplePolyline(pts, count) {
+        var segLengths = [];
+        var totalLen = 0;
+        for (var i = 0; i < pts.length - 1; i++) {
+          var dx = pts[i + 1][0] - pts[i][0];
+          var dy = pts[i + 1][1] - pts[i][1];
+          var len = Math.sqrt(dx * dx + dy * dy);
+          segLengths.push(len);
+          totalLen += len;
+        }
+        var out = [];
+        if (totalLen <= 0 || count <= 1) {
+          out.push({ x: pts[0][0], y: pts[0][1] });
+          return out;
+        }
+        for (var k = 0; k < count; k++) {
+          var targetDist = (k / (count - 1)) * totalLen;
+          var acc = 0;
+          var placed = false;
+          for (var s = 0; s < segLengths.length; s++) {
+            var sl = segLengths[s];
+            if (acc + sl >= targetDist || s === segLengths.length - 1) {
+              var t = sl > 0 ? Math.min(1, Math.max(0, (targetDist - acc) / sl)) : 0;
+              out.push({
+                x: pts[s][0] + (pts[s + 1][0] - pts[s][0]) * t,
+                y: pts[s][1] + (pts[s + 1][1] - pts[s][1]) * t
+              });
+              placed = true;
+              break;
+            }
+            acc += sl;
+          }
+          if (!placed) {
+            var last = pts[pts.length - 1];
+            out.push({ x: last[0], y: last[1] });
+          }
+        }
+        return out;
+      }
+
+      // =========================================================================
+      // 5. 105 隻小豬角色群體生成與時鐘排隊演算法
+      // =========================================================================
+      function initPigs() {
+        pigs = [];
+        for (var i = 0; i < TOTAL_PIGS; i++) {
+          pigs.push({
+            x: Math.random() * (W - 60) + 30,
+            y: Math.random() * (H - 140) + 80,
+            vx: (Math.random() - 0.5) * 70,
+            vy: (Math.random() - 0.5) * 70,
+            pose: i % DEFAULT_POSE_COUNT,
+            poseTimer: 1 + Math.random() * 4,
+            wigglePhase: Math.random() * Math.PI * 2,
+            flipX: Math.random() > 0.5 ? 1 : -1,
+            role: 'roamer',
+            tx: 0,
+            ty: 0,
+            scale: 0.42
+          });
+        }
+      }
+
+      function computeClockTargets() {
+        var now = new Date();
+        state.lastMinute = now.getMinutes();
+        var hh = String(now.getHours()).padStart(2, '0');
+        var mm = String(now.getMinutes()).padStart(2, '0');
+        var digits = [hh[0], hh[1], mm[0], mm[1]];
+
+        var topBarEl = document.getElementById('topBar');
+        var bottomBarEl = document.getElementById('bottomBar');
+        var topBottom = 18;
+        if (currentSettings.visible && topBarEl) {
+          topBottom = 68;
+          var tr = topBarEl.getBoundingClientRect();
+          if (tr && tr.bottom > 20) topBottom = tr.bottom;
+        }
+        var bottomTop = H - 18;
+        if (!state.barHidden && bottomBarEl) {
+          var br = bottomBarEl.getBoundingClientRect();
+          if (br && br.top > 120) bottomTop = br.top;
+        }
+
+        var safeTop = topBottom + 14;
+        var safeBottom = Math.max(safeTop + 140, bottomTop - 14);
+        var safeH = safeBottom - safeTop;
+
+        var clockW = W * (state.extraLarge ? 0.91 : 0.79);
+        var colonW = clockW * 0.095;
+        var digitGap = clockW * 0.045;
+        var digitW = (clockW - colonW - digitGap * 2) / 4;
+        var digitH = Math.min(safeH * (state.extraLarge ? 0.85 : 0.68), digitW * 1.92);
+
+        var startX = (W - clockW) / 2;
+        var centerY = (safeTop + safeBottom) / 2;
+        var topY = centerY - digitH / 2;
+
+        state.clockBox = {
+          left: startX - 18,
+          right: startX + clockW + 18,
+          top: topY - 18,
+          bottom: topY + digitH + 18
+        };
+
+        var xOffsets = [
+          startX,
+          startX + digitW + digitGap,
+          startX + digitW * 2 + digitGap + colonW,
+          startX + digitW * 3 + digitGap * 2 + colonW
+        ];
+
+        var targets = [];
+        var ptsPerDigit = 20;
+
+        for (var d = 0; d < 4; d++) {
+          var poly = DIGIT_POLYLINES[digits[d]] || DIGIT_POLYLINES['0'];
+          var samples = samplePolyline(poly, ptsPerDigit);
+          for (var s = 0; s < samples.length; s++) {
+            targets.push({
+              x: xOffsets[d] + samples[s].x * digitW,
+              y: topY + samples[s].y * digitH,
+              role: 'digit'
+            });
+          }
+        }
+
+        var colonX = startX + digitW * 2 + digitGap + colonW * 0.5;
+        targets.push({ x: colonX, y: topY + digitH * 0.34, role: 'colon' });
+        targets.push({ x: colonX, y: topY + digitH * 0.68, role: 'colon' });
+
+        for (var i = 0; i < pigs.length; i++) {
+          pigs[i].role = 'roamer';
+        }
+
+        var used = new Array(pigs.length);
+        var pigScale = Math.max(0.30, Math.min(0.46, (digitW / 96) * 0.62));
+
+        for (var t = 0; t < targets.length; t++) {
+          var bestIdx = -1;
+          var bestDist = Infinity;
+          for (var p = 0; p < pigs.length; p++) {
+            if (used[p]) continue;
+            var dx = pigs[p].x - targets[t].x;
+            var dy = pigs[p].y - targets[t].y;
+            var dist = dx * dx + dy * dy;
+            if (dist < bestDist) {
+              bestDist = dist;
+              bestIdx = p;
+            }
+          }
+          if (bestIdx !== -1) {
+            used[bestIdx] = true;
+            pigs[bestIdx].role = targets[t].role;
+            pigs[bestIdx].tx = targets[t].x;
+            pigs[bestIdx].ty = targets[t].y;
+            pigs[bestIdx].scale = targets[t].role === 'colon' ? pigScale * 1.12 : pigScale;
+          }
+        }
+
+        for (var r = 0; r < pigs.length; r++) {
+          if (pigs[r].role === 'roamer') {
+            pigs[r].scale = 0.42;
+            pigs[r].vx = (Math.random() - 0.5) * 75;
+            pigs[r].vy = (Math.random() - 0.5) * 75;
+          }
+        }
+      }
+
+      function setGathered(val) {
+        state.gathered = !!val;
+        var btn = document.getElementById('btnToggleGather');
+        if (btn) {
+          btn.textContent = state.gathered ? '散開 / 集合 (已集合)' : '散開 / 集合 (自由中)';
+        }
+        if (state.gathered) {
+          computeClockTargets();
+        } else {
+          for (var i = 0; i < pigs.length; i++) {
+            pigs[i].role = 'roamer';
+            pigs[i].scale = 0.44;
+            var angle = Math.random() * Math.PI * 2;
+            var spd = 45 + Math.random() * 55;
+            pigs[i].vx = Math.cos(angle) * spd;
+            pigs[i].vy = Math.sin(angle) * spd;
+          }
+        }
+      }
+
+      // =========================================================================
+      // 6. 主動畫迴圈
+      // =========================================================================
+      var lastTime = 0;
+      function animate(now) {
+        requestAnimationFrame(animate);
+        if (!lastTime) lastTime = now;
+        var dt = Math.min((now - lastTime) / 1000, 0.05);
+        lastTime = now;
+        var sec = now / 1000;
+
+        var curMin = new Date().getMinutes();
+        if (state.gathered && curMin !== state.lastMinute) {
+          computeClockTargets();
+        }
+
+        ctx.fillStyle = state.nightMode ? '#050505' : '#FDF6EC';
+        ctx.fillRect(0, 0, W, H);
+
+        if (!state.nightMode) {
+          ctx.fillStyle = 'rgba(59, 35, 24, 0.05)';
+          for (var gx = 16; gx < W; gx += 28) {
+            for (var gy = 16; gy < H; gy += 28) {
+              ctx.fillRect(gx, gy, 1.5, 1.5);
+            }
+          }
+        }
+
+        var box = state.clockBox;
+        var minTopY = currentSettings.visible ? 64 : 26;
+
+        for (var i = 0; i < pigs.length; i++) {
+          var p = pigs[i];
+          p.wigglePhase += dt * 4.5;
+
+          if (state.gathered && (p.role === 'digit' || p.role === 'colon')) {
+            var dx = p.tx - p.x;
+            var dy = p.ty - p.y;
+            p.x += dx * Math.min(1, dt * 7.5);
+            p.y += dy * Math.min(1, dt * 7.5);
+            if (Math.abs(dx) > 1.5) {
+              p.flipX = dx >= 0 ? 1 : -1;
+            }
+          } else {
+            p.poseTimer -= dt;
+            if (p.poseTimer <= 0) {
+              p.pose = Math.floor(Math.random() * activeSprites.length);
+              p.poseTimer = 2 + Math.random() * 4;
+              var ang = Math.random() * Math.PI * 2;
+              var speed = 35 + Math.random() * 55;
+              p.vx = Math.cos(ang) * speed;
+              p.vy = Math.sin(ang) * speed;
+            }
+
+            p.x += p.vx * dt;
+            p.y += p.vy * dt;
+            if (Math.abs(p.vx) > 2) p.flipX = p.vx >= 0 ? 1 : -1;
+
+            var margin = 24;
+            if (p.x < margin) { p.x = margin; p.vx = Math.abs(p.vx); }
+            if (p.x > W - margin) { p.x = W - margin; p.vx = -Math.abs(p.vx); }
+            if (p.y < minTopY) { p.y = minTopY; p.vy = Math.abs(p.vy); }
+            if (p.y > H - 36) { p.y = H - 36; p.vy = -Math.abs(p.vy); }
+
+            if (state.gathered && p.x > box.left && p.x < box.right && p.y > box.top && p.y < box.bottom) {
+              var dLeft = p.x - box.left;
+              var dRight = box.right - p.x;
+              var dTop = p.y - box.top;
+              var dBot = box.bottom - p.y;
+              var minD = Math.min(dLeft, dRight, dTop, dBot);
+              if (minD === dLeft) { p.x = box.left; p.vx = -Math.abs(p.vx); }
+              else if (minD === dRight) { p.x = box.right; p.vx = Math.abs(p.vx); }
+              else if (minD === dTop) { p.y = box.top; p.vy = -Math.abs(p.vy); }
+              else { p.y = box.bottom; p.vy = Math.abs(p.vy); }
+            }
+          }
+
+          var sprite = activeSprites[p.pose % activeSprites.length] || defaultSprites[0];
+          if (!sprite) continue;
+
+          var drawScale = p.scale;
+          if (state.gathered && p.role === 'colon') {
+            drawScale *= (1 + 0.16 * Math.sin(sec * Math.PI * 2));
+          }
+          var wiggleAngle = Math.sin(p.wigglePhase) * 0.06;
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(wiggleAngle);
+          ctx.scale(p.flipX * drawScale, drawScale);
+
+          if (state.nightMode) {
+            ctx.shadowColor = 'rgba(255, 245, 225, 0.62)';
+            ctx.shadowBlur = 9;
+          }
+
+          ctx.drawImage(sprite, -48, -48, 96, 96);
+          ctx.shadowBlur = 0;
+          ctx.restore();
+        }
+      }
+
+      // =========================================================================
+      // 7. 頂部標題、後方小圖示與按鈕圖示同步機制
+      // =========================================================================
+      function loadSettings() {
+        var raw = safeGet(STORAGE_KEY, '');
+        if (!raw) return;
+        try {
+          var parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') {
+            currentSettings = cloneSettings(parsed);
+          }
+        } catch (e) {}
+      }
+
+      function saveSettings() {
+        try {
+          safeSet(STORAGE_KEY, JSON.stringify(currentSettings));
+        } catch (e) {}
+      }
+
+      function syncButtonIconDisplay(iconEl, imgEl, iconType, iconText, imgData) {
+        if (!iconEl || !imgEl) return;
+        if (iconType === 'image' && imgData) {
+          iconEl.style.display = 'none';
+          imgEl.src = imgData;
+          imgEl.style.display = 'inline-block';
+        } else {
+          imgEl.style.display = 'none';
+          iconEl.textContent = iconText || '🙈';
+          iconEl.style.display = 'inline-flex';
+        }
+      }
+
+      function applySettingsToScreen() {
+        var s = currentSettings;
+        var topBarEl = document.getElementById('topBar');
+        var trigger = document.getElementById('titleTrigger');
+        var textEl = document.getElementById('titleText');
+        var iconEl = document.getElementById('titleIcon');
+        var imgEl = document.getElementById('titleIconImg');
+        var hideIconEl = document.getElementById('hideBtnIcon');
+        var hideImgEl = document.getElementById('hideBtnImg');
+        var showIconEl = document.getElementById('showBtnIcon');
+        var showImgEl = document.getElementById('showBtnImg');
+
+        if (topBarEl) {
+          topBarEl.classList.toggle('hidden', !s.visible);
+        }
+
+        if (trigger) {
+          trigger.style.fontSize = s.fontSize + 'px';
+        }
+
+        if (textEl) {
+          textEl.textContent = s.text;
+          textEl.style.display = s.text ? 'inline' : 'none';
+        }
+
+        if (iconEl && imgEl) {
+          if (s.iconType === 'none') {
+            iconEl.style.display = 'none';
+            imgEl.style.display = 'none';
+          } else if (s.iconType === 'image' && s.iconImage) {
+            iconEl.style.display = 'none';
+            imgEl.src = s.iconImage;
+            imgEl.style.display = 'inline-block';
+            var dim = Math.round(s.fontSize * 1.18);
+            imgEl.style.width = dim + 'px';
+            imgEl.style.height = dim + 'px';
+          } else {
+            imgEl.style.display = 'none';
+            iconEl.textContent = s.iconEmoji || '🐷';
+            iconEl.style.display = 'inline-flex';
+          }
+        }
+
+        syncButtonIconDisplay(hideIconEl, hideImgEl, s.hideBtnIconType, s.hideBtnIcon, s.hideBtnImageData);
+        syncButtonIconDisplay(showIconEl, showImgEl, s.showBtnIconType, s.showBtnIcon, s.showBtnImageData);
+
+        if (state.gathered) {
+          setTimeout(computeClockTargets, 30);
+        }
+      }
+
+      function syncModalUploadBar(thumbEl, statusEl, clearBtnEl, isImage, imgData, defaultMsg) {
+        if (thumbEl) {
+          if (isImage && imgData) {
+            thumbEl.src = imgData;
+            thumbEl.style.display = 'inline-block';
+          } else {
+            thumbEl.style.display = 'none';
+          }
+        }
+        if (statusEl) {
+          statusEl.textContent = isImage && imgData ? '已套用自訂去背圖片' : defaultMsg;
+        }
+        if (clearBtnEl) {
+          clearBtnEl.classList.toggle('hidden', !(isImage && imgData));
+        }
+      }
+
+      function updateModalPreview() {
+        var d = draftSettings;
+        if (!d) return;
+
+        var prevBox = document.getElementById('modalPreview');
+        var prevText = document.getElementById('previewText');
+        var prevIcon = document.getElementById('previewIcon');
+        var prevImg = document.getElementById('previewImg');
+        var badge = document.getElementById('fontSizeBadge');
+        var slider = document.getElementById('inputFontSize');
+        var btnVisOn = document.getElementById('btnTitleVisibleOn');
+        var btnVisOff = document.getElementById('btnTitleVisibleOff');
+
+        if (btnVisOn) btnVisOn.classList.toggle('active', d.visible);
+        if (btnVisOff) btnVisOff.classList.toggle('active', !d.visible);
+
+        if (prevBox) {
+          prevBox.style.fontSize = d.fontSize + 'px';
+          prevBox.style.opacity = d.visible ? '1' : '0.45';
+        }
+        if (badge) badge.textContent = d.fontSize + 'px';
+        if (slider) slider.value = String(d.fontSize);
+
+        if (prevText) {
+          if (!d.visible) {
+            prevText.textContent = '（目前設為隱藏標題）';
+          } else {
+            prevText.textContent = d.text || (d.iconType === 'none' ? '（空白標題）' : '');
+          }
+          prevText.style.opacity = (d.text && d.visible) ? '1' : '0.55';
+        }
+
+        if (prevIcon && prevImg) {
+          if (!d.visible || d.iconType === 'none') {
+            prevIcon.style.display = 'none';
+            prevImg.style.display = 'none';
+          } else if (d.iconType === 'image' && d.iconImage) {
+            prevIcon.style.display = 'none';
+            prevImg.src = d.iconImage;
+            prevImg.style.display = 'inline-block';
+            var dim = Math.round(d.fontSize * 1.18);
+            prevImg.style.width = dim + 'px';
+            prevImg.style.height = dim + 'px';
+          } else {
+            prevImg.style.display = 'none';
+            prevIcon.textContent = d.iconEmoji || '🐷';
+            prevIcon.style.display = 'inline-flex';
+          }
+        }
+
+        var btnNoIcon = document.getElementById('btnNoIcon');
+        if (btnNoIcon) btnNoIcon.classList.toggle('active', d.iconType === 'none');
+
+        syncModalUploadBar(
+          document.getElementById('titleIconThumb'),
+          document.getElementById('titleIconImgStatus'),
+          document.getElementById('btnClearTitleIconImg'),
+          d.iconType === 'image',
+          d.iconImage,
+          '從手機相簿選擇小圖片（自動去背）'
+        );
+
+        var sizeBtns = document.querySelectorAll('.size-btn');
+        for (var i = 0; i < sizeBtns.length; i++) {
+          var sz = Number(sizeBtns[i].getAttribute('data-size'));
+          sizeBtns[i].classList.toggle('active', sz === d.fontSize);
+        }
+
+        var emojiBtns = document.querySelectorAll('.emoji-item');
+        for (var j = 0; j < emojiBtns.length; j++) {
+          var em = emojiBtns[j].getAttribute('data-emoji');
+          emojiBtns[j].classList.toggle('active', d.iconType === 'emoji' && d.iconEmoji === em);
+        }
+
+        var hideOpts = document.querySelectorAll('.hide-icon-opt');
+        for (var h1 = 0; h1 < hideOpts.length; h1++) {
+          var matchHide = d.hideBtnIconType !== 'image' && hideOpts[h1].getAttribute('data-icon') === d.hideBtnIcon;
+          hideOpts[h1].classList.toggle('active', matchHide);
+        }
+        syncModalUploadBar(
+          document.getElementById('hideBtnThumb'),
+          document.getElementById('hideBtnImgStatus'),
+          document.getElementById('btnClearHideIconImg'),
+          d.hideBtnIconType === 'image',
+          d.hideBtnImageData,
+          '目前使用文字/Emoji'
+        );
+        syncButtonIconDisplay(
+          document.getElementById('prevHideEmoji'),
+          document.getElementById('prevHideImg'),
+          d.hideBtnIconType,
+          d.hideBtnIcon,
+          d.hideBtnImageData
+        );
+
+        var showOpts = document.querySelectorAll('.show-icon-opt');
+        for (var s1 = 0; s1 < showOpts.length; s1++) {
+          var matchShow = d.showBtnIconType !== 'image' && showOpts[s1].getAttribute('data-icon') === d.showBtnIcon;
+          showOpts[s1].classList.toggle('active', matchShow);
+        }
+        syncModalUploadBar(
+          document.getElementById('showBtnThumb'),
+          document.getElementById('showBtnImgStatus'),
+          document.getElementById('btnClearShowIconImg'),
+          d.showBtnIconType === 'image',
+          d.showBtnImageData,
+          '目前使用文字/Emoji'
+        );
+        syncButtonIconDisplay(
+          document.getElementById('prevShowEmoji'),
+          document.getElementById('prevShowImg'),
+          d.showBtnIconType,
+          d.showBtnIcon,
+          d.showBtnImageData
+        );
+      }
+
+      function openTitleModal() {
+        draftSettings = cloneSettings(currentSettings);
+
+        var inputTitle = document.getElementById('inputTitle');
+        var inputCustomIcon = document.getElementById('inputCustomIcon');
+        var inputHideBtnIcon = document.getElementById('inputHideBtnIcon');
+        var inputShowBtnIcon = document.getElementById('inputShowBtnIcon');
+
+        if (inputTitle) inputTitle.value = draftSettings.text;
+        if (inputCustomIcon) {
+          inputCustomIcon.value = draftSettings.iconType === 'emoji' ? draftSettings.iconEmoji : '';
+        }
+        if (inputHideBtnIcon) inputHideBtnIcon.value = draftSettings.hideBtnIcon;
+        if (inputShowBtnIcon) inputShowBtnIcon.value = draftSettings.showBtnIcon;
+
+        updateModalPreview();
+        var modal = document.getElementById('titleModal');
+        if (modal) modal.classList.add('open');
+      }
+
+      function closeTitleModal() {
+        var modal = document.getElementById('titleModal');
+        if (modal) modal.classList.remove('open');
+      }
+
+      // =========================================================================
+      // 8. 響應式畫布尺寸重設
+      // =========================================================================
+      function resize() {
+        W = Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0, 320);
+        H = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0, 480);
+        DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+        canvas.width = Math.round(W * DPR);
+        canvas.height = Math.round(H * DPR);
+        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+        for (var i = 0; i < pigs.length; i++) {
+          pigs[i].x = Math.min(Math.max(pigs[i].x, 24), W - 24);
+          pigs[i].y = Math.min(Math.max(pigs[i].y, 26), H - 36);
+        }
+
+        if (state.gathered && pigs.length > 0) {
+          computeClockTargets();
+        }
+      }
+
+      // =========================================================================
+      // 9. 完整 UI 事件綁定與啟動流程
+      // =========================================================================
+      function bindUI() {
+        canvas.addEventListener('click', function () {
+          setGathered(!state.gathered);
+        });
+
+        document.getElementById('titleTrigger').addEventListener('click', function (e) {
+          e.stopPropagation();
+          openTitleModal();
+        });
+
+        document.getElementById('btnToggleGather').addEventListener('click', function (e) {
+          e.stopPropagation();
+          setGathered(!state.gathered);
+        });
+
+        document.getElementById('btnToggleSize').addEventListener('click', function (e) {
+          e.stopPropagation();
+          state.extraLarge = !state.extraLarge;
+          this.textContent = state.extraLarge ? '時間：特大' : '時間：大';
+          if (state.gathered) computeClockTargets();
+          showToast(state.extraLarge ? '時鐘尺寸：特大' : '時鐘尺寸：大');
+        });
+
+        document.getElementById('btnToggleNight').addEventListener('click', function (e) {
+          e.stopPropagation();
+          state.nightMode = !state.nightMode;
+          document.body.classList.toggle('night', state.nightMode);
+          this.textContent = state.nightMode ? '日間模式' : '夜間模式';
+          var meta = document.getElementById('metaTheme');
+          if (meta) meta.setAttribute('content', state.nightMode ? '#050505' : '#FDF6EC');
+          showToast(state.nightMode ? '已切換為 OLED 純黑夜間模式' : '已切換為日間暖紙模式');
+        });
+
+        document.getElementById('btnWakeLock').addEventListener('click', function (e) {
+          e.stopPropagation();
+          var btn = this;
+          if (!('wakeLock' in navigator) || !navigator.wakeLock) {
+            showToast('此瀏覽器不支援自動螢幕常亮，請調長手機休眠時間');
+            return;
+          }
+          if (state.wakeLock) {
+            try { state.wakeLock.release(); } catch (err) {}
+            state.wakeLock = null;
+            btn.textContent = '螢幕常亮';
+            btn.classList.remove('primary');
+            showToast('已關閉螢幕常亮');
+          } else {
+            navigator.wakeLock.request('screen').then(function (sentinel) {
+              state.wakeLock = sentinel;
+              btn.textContent = '螢幕常亮 (開啟中)';
+              btn.classList.add('primary');
+              showToast('已開啟螢幕常亮！');
+              sentinel.addEventListener('release', function () {
+                state.wakeLock = null;
+                btn.textContent = '螢幕常亮';
+                btn.classList.remove('primary');
+              });
+            }).catch(function () {
+              showToast('無法啟用螢幕常亮（可能處於省電模式或嵌入視窗）');
+            });
+          }
+        });
+
+        var fileStickerInput = document.getElementById('fileStickerInput');
+        var btnResetSticker = document.getElementById('btnResetSticker');
+
+        document.getElementById('btnCustomSticker').addEventListener('click', function (e) {
+          e.stopPropagation();
+          fileStickerInput.value = '';
+          fileStickerInput.click();
+        });
+
+        fileStickerInput.addEventListener('change', function () {
+          var files = this.files;
+          if (!files || !files.length) return;
+          var loadedSprites = [];
+          var pending = Math.min(files.length, 16);
+
+          for (var i = 0; i < pending; i++) {
+            (function (file) {
+              var reader = new FileReader();
+              reader.onload = function (ev) {
+                var img = new Image();
+                img.onload = function () {
+                  processImageStripWhite(img, 96, function (spr) {
+                    if (spr) loadedSprites.push(spr);
+                    pending--;
+                    if (pending <= 0 && loadedSprites.length > 0) {
+                      activeSprites = loadedSprites;
+                      usingCustomStickers = true;
+                      btnResetSticker.classList.remove('hidden');
+                      showToast('已套用 ' + loadedSprites.length + ' 張自訂貼圖！');
+                    }
+                  });
+                };
+                img.onerror = function () { pending--; };
+                img.src = ev.target.result;
+              };
+              reader.readAsDataURL(file);
+            })(files[i]);
+          }
+        });
+
+        btnResetSticker.addEventListener('click', function (e) {
+          e.stopPropagation();
+          usingCustomStickers = false;
+          activeSprites = defaultSprites.slice();
+          btnResetSticker.classList.add('hidden');
+          showToast('已恢復預設 ' + DEFAULT_POSE_COUNT + ' 款不理不理左衛門小豬！');
+        });
+
+        document.getElementById('btnOpenSettings').addEventListener('click', function (e) {
+          e.stopPropagation();
+          openTitleModal();
+        });
+
+        var bottomBarEl = document.getElementById('bottomBar');
+        var btnShowBar = document.getElementById('btnShowBar');
+
+        document.getElementById('btnHideBar').addEventListener('click', function (e) {
+          e.stopPropagation();
+          state.barHidden = true;
+          bottomBarEl.classList.add('hidden');
+          btnShowBar.classList.remove('hidden');
+          if (state.gathered) computeClockTargets();
+          showToast('已隱藏底部選項，點右下角可恢復');
+        });
+
+        btnShowBar.addEventListener('click', function (e) {
+          e.stopPropagation();
+          state.barHidden = false;
+          btnShowBar.classList.add('hidden');
+          bottomBarEl.classList.remove('hidden');
+          if (state.gathered) computeClockTargets();
+        });
+
+        var modalEl = document.getElementById('titleModal');
+        var modalBoxEl = modalEl.querySelector('.modal-box');
+        modalBoxEl.addEventListener('click', function (e) {
+          e.stopPropagation();
+        });
+
+        document.getElementById('btnCloseModal').addEventListener('click', closeTitleModal);
+        document.getElementById('btnCancelModal').addEventListener('click', closeTitleModal);
+        modalEl.addEventListener('click', function (e) {
+          if (e.target === modalEl) closeTitleModal();
+        });
+
+        document.getElementById('btnTitleVisibleOn').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.visible = true;
+          updateModalPreview();
+        });
+
+        document.getElementById('btnTitleVisibleOff').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.visible = false;
+          updateModalPreview();
+        });
+
+        document.getElementById('inputTitle').addEventListener('input', function () {
+          if (!draftSettings) return;
+          draftSettings.text = this.value;
+          updateModalPreview();
+        });
+
+        document.getElementById('btnClearTitle').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.text = '';
+          document.getElementById('inputTitle').value = '';
+          updateModalPreview();
+        });
+
+        var presetTitles = document.querySelectorAll('.preset-title');
+        for (var i = 0; i < presetTitles.length; i++) {
+          presetTitles[i].addEventListener('click', function () {
+            if (!draftSettings) return;
+            var val = this.getAttribute('data-val') || '';
+            draftSettings.text = val;
+            document.getElementById('inputTitle').value = val;
+            updateModalPreview();
+          });
+        }
+
+        var sizeBtns = document.querySelectorAll('.size-btn');
+        for (var sb = 0; sb < sizeBtns.length; sb++) {
+          sizeBtns[sb].addEventListener('click', function () {
+            if (!draftSettings) return;
+            var sz = Number(this.getAttribute('data-size')) || 26;
+            draftSettings.fontSize = Math.min(44, Math.max(16, sz));
+            updateModalPreview();
+          });
+        }
+
+        document.getElementById('inputFontSize').addEventListener('input', function () {
+          if (!draftSettings) return;
+          var sz = Number(this.value) || 26;
+          draftSettings.fontSize = Math.min(44, Math.max(16, sz));
+          updateModalPreview();
+        });
+
+        document.getElementById('btnNoIcon').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.iconType = 'none';
+          draftSettings.iconImage = '';
+          document.getElementById('inputCustomIcon').value = '';
+          updateModalPreview();
+        });
+
+        document.getElementById('emojiGrid').addEventListener('click', function (e) {
+          var target = e.target;
+          while (target && target !== this && !target.classList.contains('emoji-item')) {
+            target = target.parentNode;
+          }
+          if (!target || !target.classList.contains('emoji-item') || !draftSettings) return;
+          var em = target.getAttribute('data-emoji') || '🐷';
+          draftSettings.iconType = 'emoji';
+          draftSettings.iconEmoji = em;
+          draftSettings.iconImage = '';
+          document.getElementById('inputCustomIcon').value = em;
+          updateModalPreview();
+        });
+
+        document.getElementById('inputCustomIcon').addEventListener('input', function () {
+          if (!draftSettings) return;
+          var val = this.value.trim();
+          if (!val) {
+            draftSettings.iconType = 'none';
+            draftSettings.iconImage = '';
+          } else {
+            draftSettings.iconType = 'emoji';
+            draftSettings.iconEmoji = val;
+            draftSettings.iconImage = '';
+          }
+          updateModalPreview();
+        });
+
+        var fileIconInput = document.getElementById('fileIconInput');
+        document.getElementById('btnTriggerIconUpload').addEventListener('click', function () {
+          fileIconInput.value = '';
+          fileIconInput.click();
+        });
+
+        fileIconInput.addEventListener('change', function () {
+          var file = this.files && this.files[0];
+          if (!file || !draftSettings) return;
+          var reader = new FileReader();
+          reader.onload = function (ev) {
+            var img = new Image();
+            img.onload = function () {
+              processImageStripWhite(img, 96, function (spr) {
+                if (spr && draftSettings) {
+                  draftSettings.iconType = 'image';
+                  draftSettings.iconImage = spr.toDataURL('image/png');
+                  updateModalPreview();
+                  showToast('已載入標題小圖片（按確認套用生效）');
+                }
+              });
+            };
+            img.src = ev.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+
+        document.getElementById('btnClearTitleIconImg').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.iconType = 'emoji';
+          draftSettings.iconImage = '';
+          if (!draftSettings.iconEmoji) draftSettings.iconEmoji = '🐷';
+          document.getElementById('inputCustomIcon').value = draftSettings.iconEmoji;
+          updateModalPreview();
+        });
+
+        document.getElementById('hideIconGroup').addEventListener('click', function (e) {
+          var target = e.target;
+          while (target && target !== this && !target.classList.contains('hide-icon-opt')) {
+            target = target.parentNode;
+          }
+          if (!target || !target.classList.contains('hide-icon-opt') || !draftSettings) return;
+          var ic = target.getAttribute('data-icon') || '🙈';
+          draftSettings.hideBtnIconType = 'emoji';
+          draftSettings.hideBtnIcon = ic;
+          document.getElementById('inputHideBtnIcon').value = ic;
+          updateModalPreview();
+        });
+
+        document.getElementById('inputHideBtnIcon').addEventListener('input', function () {
+          if (!draftSettings) return;
+          var val = this.value.trim();
+          draftSettings.hideBtnIconType = 'emoji';
+          draftSettings.hideBtnIcon = val || '🙈';
+          updateModalPreview();
+        });
+
+        var fileHideIconInput = document.getElementById('fileHideIconInput');
+        document.getElementById('btnUploadHideIcon').addEventListener('click', function () {
+          fileHideIconInput.value = '';
+          fileHideIconInput.click();
+        });
+
+        fileHideIconInput.addEventListener('change', function () {
+          var file = this.files && this.files[0];
+          if (!file || !draftSettings) return;
+          var reader = new FileReader();
+          reader.onload = function (ev) {
+            var img = new Image();
+            img.onload = function () {
+              processImageStripWhite(img, 64, function (spr) {
+                if (spr && draftSettings) {
+                  draftSettings.hideBtnIconType = 'image';
+                  draftSettings.hideBtnImageData = spr.toDataURL('image/png');
+                  updateModalPreview();
+                }
+              });
+            };
+            img.src = ev.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+
+        document.getElementById('btnClearHideIconImg').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.hideBtnIconType = 'emoji';
+          updateModalPreview();
+        });
+
+        document.getElementById('showIconGroup').addEventListener('click', function (e) {
+          var target = e.target;
+          while (target && target !== this && !target.classList.contains('show-icon-opt')) {
+            target = target.parentNode;
+          }
+          if (!target || !target.classList.contains('show-icon-opt') || !draftSettings) return;
+          var ic = target.getAttribute('data-icon') || '👁️';
+          draftSettings.showBtnIconType = 'emoji';
+          draftSettings.showBtnIcon = ic;
+          document.getElementById('inputShowBtnIcon').value = ic;
+          updateModalPreview();
+        });
+
+        document.getElementById('inputShowBtnIcon').addEventListener('input', function () {
+          if (!draftSettings) return;
+          var val = this.value.trim();
+          draftSettings.showBtnIconType = 'emoji';
+          draftSettings.showBtnIcon = val || '👁️';
+          updateModalPreview();
+        });
+
+        var fileShowIconInput = document.getElementById('fileShowIconInput');
+        document.getElementById('btnUploadShowIcon').addEventListener('click', function () {
+          fileShowIconInput.value = '';
+          fileShowIconInput.click();
+        });
+
+        fileShowIconInput.addEventListener('change', function () {
+          var file = this.files && this.files[0];
+          if (!file || !draftSettings) return;
+          var reader = new FileReader();
+          reader.onload = function (ev) {
+            var img = new Image();
+            img.onload = function () {
+              processImageStripWhite(img, 64, function (spr) {
+                if (spr && draftSettings) {
+                  draftSettings.showBtnIconType = 'image';
+                  draftSettings.showBtnImageData = spr.toDataURL('image/png');
+                  updateModalPreview();
+                }
+              });
+            };
+            img.src = ev.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+
+        document.getElementById('btnClearShowIconImg').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.showBtnIconType = 'emoji';
+          updateModalPreview();
+        });
+
+        document.getElementById('btnResetDefaults').addEventListener('click', function () {
+          draftSettings = cloneSettings(DEFAULT_SETTINGS);
+          document.getElementById('inputTitle').value = draftSettings.text;
+          document.getElementById('inputCustomIcon').value = draftSettings.iconEmoji;
+          document.getElementById('inputHideBtnIcon').value = draftSettings.hideBtnIcon;
+          document.getElementById('inputShowBtnIcon').value = draftSettings.showBtnIcon;
+          updateModalPreview();
+          showToast('已重設為預設值（按「確認套用」生效）');
+        });
+
+        document.getElementById('btnApplyModal').addEventListener('click', function () {
+          if (draftSettings) {
+            if (draftSettings.iconType === 'image' && !draftSettings.iconImage) {
+              draftSettings.iconType = 'emoji';
+            }
+            if (draftSettings.hideBtnIconType === 'image' && !draftSettings.hideBtnImageData) {
+              draftSettings.hideBtnIconType = 'emoji';
+            }
+            if (draftSettings.showBtnIconType === 'image' && !draftSettings.showBtnImageData) {
+              draftSettings.showBtnIconType = 'emoji';
+            }
+            currentSettings = cloneSettings(draftSettings);
+            saveSettings();
+            applySettingsToScreen();
+            showToast('已套用標題與圖示設定！');
+          }
+          closeTitleModal();
+        });
+
+        window.addEventListener('resize', resize);
+        if (typeof ResizeObserver !== 'undefined') {
+          try {
+            var ro = new ResizeObserver(resize);
+            ro.observe(document.body);
+          } catch (e) {}
+        }
+        setTimeout(resize, 150);
+      }
+
+      function bootstrap() {
+        loadSettings();
+        applySettingsToScreen();
+        buildDefaultSprites();
+        initPigs();
+        bindUI();
+        resize();
+        setGathered(true);
+        requestAnimationFrame(animate);
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bootstrap);
+      } else {
+        bootstrap();
+      }
+    })();
+  </script>
+</body>
+</html>
