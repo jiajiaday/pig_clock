@@ -104,34 +104,33 @@
     }
 
     #titleIcon {
-      display: inline-flex;
+      display: none;
       align-items: center;
       justify-content: center;
       line-height: 1;
     }
 
     #titleIconImg {
-      display: none;
-      width: 28px;
-      height: 28px;
+      display: inline-block;
+      width: 32px;
+      height: 32px;
       object-fit: contain;
-      border-radius: 6px;
       vertical-align: middle;
     }
 
     .ctrl-btn-icon {
-      display: inline-flex;
+      display: none;
       align-items: center;
       justify-content: center;
       line-height: 1;
     }
 
     .ctrl-btn-img {
-      display: none;
-      width: 16px;
-      height: 16px;
+      display: inline-block;
+      width: 21px;
+      height: 21px;
       object-fit: contain;
-      border-radius: 4px;
+      vertical-align: middle;
     }
 
     .edit-badge {
@@ -140,7 +139,7 @@
       margin-left: 2px;
     }
 
-    /* 底部控制工具列：字體稍大、邊框更貼合 */
+    /* 底部控制工具列 */
     #bottomBar {
       position: fixed;
       bottom: 10px;
@@ -224,7 +223,7 @@
       font-size: 14px;
       line-height: 1.2;
       font-weight: 900;
-      opacity: 0.85;
+      opacity: 0.9;
       cursor: pointer;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
       transition: opacity 0.2s ease, transform 0.1s ease;
@@ -278,7 +277,7 @@
 
     .modal-box {
       width: 100%;
-      max-width: 430px;
+      max-width: 440px;
       max-height: 88vh;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
@@ -342,15 +341,14 @@
       font-size: 24px;
       font-weight: 900;
       line-height: 1.25;
-      min-height: 34px;
+      min-height: 36px;
     }
 
     #previewImg {
-      display: none;
-      width: 28px;
-      height: 28px;
+      display: inline-block;
+      width: 30px;
+      height: 30px;
       object-fit: contain;
-      border-radius: 6px;
     }
 
     .preview-btns-bar {
@@ -375,11 +373,10 @@
     }
 
     .preview-mini-img {
-      display: none;
-      width: 15px;
-      height: 15px;
+      display: inline-block;
+      width: 19px;
+      height: 19px;
       object-fit: contain;
-      border-radius: 3px;
     }
 
     .field-group {
@@ -498,30 +495,38 @@
       accent-color: #D97757;
     }
 
-    .emoji-grid {
+    /* 16 款預選小豬頭像網格 */
+    .sticker-grid {
       display: grid;
       grid-template-columns: repeat(8, 1fr);
       gap: 5px;
       margin-bottom: 8px;
     }
 
-    .emoji-item {
+    .sticker-item {
       aspect-ratio: 1;
-      border: 1.4px solid rgba(128, 128, 128, 0.35);
+      border: 1.5px solid rgba(128, 128, 128, 0.35);
       border-radius: 10px;
-      background: var(--card-bg);
-      font-size: 19px;
+      background: #FFFDF9;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      padding: 0;
+      padding: 3px;
       touch-action: manipulation;
     }
 
-    .emoji-item.active {
+    .sticker-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    .sticker-item.active {
       border-color: var(--pill-border);
       background: var(--accent);
+      box-shadow: 0 1px 0 var(--pill-border);
     }
 
     .icon-pick-row {
@@ -533,22 +538,29 @@
     }
 
     .mini-icon-btn {
-      width: 34px;
-      height: 34px;
-      border: 1.4px solid rgba(128, 128, 128, 0.35);
+      width: 38px;
+      height: 38px;
+      border: 1.5px solid rgba(128, 128, 128, 0.35);
       border-radius: 10px;
-      background: var(--card-bg);
-      font-size: 17px;
+      background: #FFFDF9;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      padding: 0;
+      padding: 3px;
+    }
+
+    .mini-icon-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
     }
 
     .mini-icon-btn.active {
       border-color: var(--pill-border);
       background: var(--accent);
+      box-shadow: 0 1px 0 var(--pill-border);
     }
 
     .mini-icon-input {
@@ -559,7 +571,7 @@
       background: var(--card-bg);
       color: var(--ink);
       font-family: inherit;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 800;
       text-align: center;
       user-select: text;
@@ -741,39 +753,22 @@
         </div>
       </div>
 
-      <!-- 4. 標題後方小圖示 -->
+      <!-- 4. 標題後方小圖示（16款不理不理左衛門預選頭像） -->
       <div class="field-group">
         <div class="field-label-row">
-          <span>4. 標題後方小圖示</span>
+          <span>4. 標題後方小圖示（點選預選頭像）</span>
           <button id="btnNoIcon" type="button" class="chip">無圖示 (隱藏)</button>
         </div>
-        <div class="emoji-grid" id="emojiGrid">
-          <button type="button" class="emoji-item" data-emoji="🐷">🐷</button>
-          <button type="button" class="emoji-item" data-emoji="🐽">🐽</button>
-          <button type="button" class="emoji-item" data-emoji="⏰">⏰</button>
-          <button type="button" class="emoji-item" data-emoji="✨">✨</button>
-          <button type="button" class="emoji-item" data-emoji="💖">💖</button>
-          <button type="button" class="emoji-item" data-emoji="👑">👑</button>
-          <button type="button" class="emoji-item" data-emoji="🌟">🌟</button>
-          <button type="button" class="emoji-item" data-emoji="🍀">🍀</button>
-          <button type="button" class="emoji-item" data-emoji="💤">💤</button>
-          <button type="button" class="emoji-item" data-emoji="🔥">🔥</button>
-          <button type="button" class="emoji-item" data-emoji="🎉">🎉</button>
-          <button type="button" class="emoji-item" data-emoji="🍓">🍓</button>
-          <button type="button" class="emoji-item" data-emoji="🧸">🧸</button>
-          <button type="button" class="emoji-item" data-emoji="🐾">🐾</button>
-          <button type="button" class="emoji-item" data-emoji="🌙">🌙</button>
-          <button type="button" class="emoji-item" data-emoji="☀️">☀️</button>
-        </div>
-        <input id="inputCustomIcon" type="text" maxlength="8" class="text-box" placeholder="或直接輸入任何 Emoji / 符號..." />
+        <div class="sticker-grid" id="titleStickerGrid"></div>
+        <input id="inputCustomIcon" type="text" maxlength="8" class="text-box" placeholder="或直接輸入任何文字 / Emoji 符號..." />
         <div class="btn-icon-upload-bar">
           <div class="btn-icon-upload-left">
             <img id="titleIconThumb" class="btn-icon-thumb" alt="標題小圖示縮圖" />
-            <span id="titleIconImgStatus">從手機相簿選擇小圖片（自動去背）</span>
+            <span id="titleIconImgStatus">也可從手機相簿選擇小圖片（自動去背）</span>
           </div>
           <div class="btn-icon-actions">
-            <button id="btnTriggerIconUpload" type="button" class="chip">📁 上傳小圖片</button>
-            <button id="btnClearTitleIconImg" type="button" class="chip hidden">改用 Emoji</button>
+            <button id="btnTriggerIconUpload" type="button" class="chip">📁 上傳圖片</button>
+            <button id="btnClearTitleIconImg" type="button" class="chip hidden">改回預設</button>
             <input id="fileIconInput" type="file" accept="image/*" class="hidden" />
           </div>
         </div>
@@ -784,23 +779,15 @@
         <div class="field-label-row">
           <span>5. 「隱藏選項」按鈕圖示</span>
         </div>
-        <div class="icon-pick-row" id="hideIconGroup">
-          <button type="button" class="mini-icon-btn hide-icon-opt" data-icon="🙈">🙈</button>
-          <button type="button" class="mini-icon-btn hide-icon-opt" data-icon="🔽">🔽</button>
-          <button type="button" class="mini-icon-btn hide-icon-opt" data-icon="🫥">🫥</button>
-          <button type="button" class="mini-icon-btn hide-icon-opt" data-icon="🌙">🌙</button>
-          <button type="button" class="mini-icon-btn hide-icon-opt" data-icon="🐷">🐷</button>
-          <button type="button" class="mini-icon-btn hide-icon-opt" data-icon="🐾">🐾</button>
-          <input id="inputHideBtnIcon" type="text" maxlength="4" class="mini-icon-input" placeholder="自訂" title="輸入自訂圖示" />
-        </div>
+        <div class="icon-pick-row" id="hideIconGroup"></div>
         <div class="btn-icon-upload-bar">
           <div class="btn-icon-upload-left">
             <img id="hideBtnThumb" class="btn-icon-thumb" alt="隱藏圖示預覽" />
-            <span id="hideBtnImgStatus">目前使用文字/Emoji</span>
+            <span id="hideBtnImgStatus">已內建 6 款不理不理小圖示</span>
           </div>
           <div class="btn-icon-actions">
-            <button id="btnUploadHideIcon" type="button" class="chip">📁 上傳圖示</button>
-            <button id="btnClearHideIconImg" type="button" class="chip hidden">改用 Emoji</button>
+            <button id="btnUploadHideIcon" type="button" class="chip">📁 上傳圖片</button>
+            <button id="btnClearHideIconImg" type="button" class="chip hidden">改回預設</button>
             <input id="fileHideIconInput" type="file" accept="image/*" class="hidden" />
           </div>
         </div>
@@ -809,23 +796,15 @@
         <div class="field-label-row" style="margin-top:10px;">
           <span>6. 「顯示選項」按鈕圖示</span>
         </div>
-        <div class="icon-pick-row" id="showIconGroup">
-          <button type="button" class="mini-icon-btn show-icon-opt" data-icon="👁️">👁️</button>
-          <button type="button" class="mini-icon-btn show-icon-opt" data-icon="🔼">🔼</button>
-          <button type="button" class="mini-icon-btn show-icon-opt" data-icon="⚙️">⚙️</button>
-          <button type="button" class="mini-icon-btn show-icon-opt" data-icon="✨">✨</button>
-          <button type="button" class="mini-icon-btn show-icon-opt" data-icon="🎛️">🎛️</button>
-          <button type="button" class="mini-icon-btn show-icon-opt" data-icon="🐷">🐷</button>
-          <input id="inputShowBtnIcon" type="text" maxlength="4" class="mini-icon-input" placeholder="自訂" title="輸入自訂圖示" />
-        </div>
+        <div class="icon-pick-row" id="showIconGroup"></div>
         <div class="btn-icon-upload-bar">
           <div class="btn-icon-upload-left">
             <img id="showBtnThumb" class="btn-icon-thumb" alt="顯示圖示預覽" />
-            <span id="showBtnImgStatus">目前使用文字/Emoji</span>
+            <span id="showBtnImgStatus">已內建 6 款不理不理小圖示</span>
           </div>
           <div class="btn-icon-actions">
-            <button id="btnUploadShowIcon" type="button" class="chip">📁 上傳圖示</button>
-            <button id="btnClearShowIconImg" type="button" class="chip hidden">改用 Emoji</button>
+            <button id="btnUploadShowIcon" type="button" class="chip">📁 上傳圖片</button>
+            <button id="btnClearShowIconImg" type="button" class="chip hidden">改回預設</button>
             <input id="fileShowIconInput" type="file" accept="image/*" class="hidden" />
           </div>
         </div>
@@ -849,7 +828,7 @@
       var CANVAS_FONT = 'sans-serif';
 
       // =========================================================================
-      // 1. 安全儲存存取
+      // 1. 安全儲存存取與輔助繪圖
       // =========================================================================
       var memStore = {};
       function safeGet(key, fallback) {
@@ -879,48 +858,566 @@
       }
 
       // =========================================================================
-      // 2. 應用程式狀態與視窗尺寸初始化
+      // 2. 預先產生 16 款不理不理左衛門預選頭像與符號（去背 PNG DataURL）
       // =========================================================================
-      var STORAGE_KEY = 'buriburi_pig_clock_settings_v4';
+      var PRESET_ICONS = [];
+      var PRESET_NAMES = [
+        '呆萌臉', '張嘴笑', '愛心眼', '閉眼大喊',
+        '水汪汪', '抱大愛心', '睡帽打盹', '愛心眨眼',
+        '吐舌頭', '推眼鏡', '頭頂閃亮', '墨鏡白帽',
+        '毛帽圍巾', '小豬太陽', '粉紅音符', '蝴蝶結褲'
+      ];
+      // 隱藏選項預選索引：6(睡帽打盹), 3(閉眼大喊), 8(吐舌頭), 11(墨鏡白帽), 13(小豬太陽), 15(蝴蝶結褲)
+      var HIDE_PRESET_INDICES = [6, 3, 8, 11, 13, 15];
+      // 顯示選項預選索引：4(水汪汪), 10(頭頂閃亮), 9(推眼鏡), 0(呆萌臉), 5(抱大愛心), 14(粉紅音符)
+      var SHOW_PRESET_INDICES = [4, 10, 9, 0, 5, 14];
+
+      function drawFaceBase(c, cx, cy, scale, opts) {
+        opts = opts || {};
+        c.save();
+        c.translate(cx, cy);
+        c.scale(scale, scale);
+
+        var skin = opts.skin || '#F6C198';
+        var snout = opts.snout || '#F17A7E';
+        var ink = '#331A12';
+
+        c.lineCap = 'round';
+        c.lineJoin = 'round';
+
+        if (!opts.noEars) {
+          c.fillStyle = ink;
+          c.beginPath();
+          c.moveTo(-18, -14);
+          c.quadraticCurveTo(-30, -24, -33, -13);
+          c.quadraticCurveTo(-29, -8, -21, -9);
+          c.closePath();
+          c.fill();
+
+          c.beginPath();
+          c.moveTo(18, -14);
+          c.quadraticCurveTo(30, -24, 33, -13);
+          c.quadraticCurveTo(29, -8, 21, -9);
+          c.closePath();
+          c.fill();
+        }
+
+        // 臉輪廓
+        c.fillStyle = skin;
+        c.strokeStyle = ink;
+        c.lineWidth = 3.2;
+        c.beginPath();
+        c.ellipse(0, 2, 26, 22, 0, 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+
+        // 腮紅
+        if (opts.blush) {
+          c.fillStyle = 'rgba(244, 114, 128, 0.48)';
+          c.beginPath();
+          c.ellipse(-16, 7, 5.5, 3.2, 0, 0, Math.PI * 2);
+          c.ellipse(16, 7, 5.5, 3.2, 0, 0, Math.PI * 2);
+          c.fill();
+          if (opts.blushLines) {
+            c.strokeStyle = '#EF6C75';
+            c.lineWidth = 1.5;
+            c.beginPath();
+            c.moveTo(-19, 6); c.lineTo(-16, 9);
+            c.moveTo(-15, 6); c.lineTo(-12, 9);
+            c.moveTo(12, 6); c.lineTo(15, 9);
+            c.moveTo(16, 6); c.lineTo(19, 9);
+            c.stroke();
+          }
+        }
+
+        // 眼睛
+        var eyeMode = opts.eyes || 'round';
+        if (eyeMode === 'round') {
+          c.fillStyle = '#FFFFFF';
+          c.strokeStyle = ink;
+          c.lineWidth = 2.2;
+          c.beginPath();
+          c.arc(-14, -2, 5.5, 0, Math.PI * 2);
+          c.arc(14, -2, 5.5, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+
+          c.fillStyle = ink;
+          c.beginPath();
+          c.arc(-14, -2, 3.6, 0, Math.PI * 2);
+          c.arc(14, -2, 3.6, 0, Math.PI * 2);
+          c.fill();
+        } else if (eyeMode === 'sparkle') {
+          c.fillStyle = '#FFFFFF';
+          c.strokeStyle = ink;
+          c.lineWidth = 2.2;
+          c.beginPath();
+          c.arc(-14, -2, 6, 0, Math.PI * 2);
+          c.arc(14, -2, 6, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+
+          c.fillStyle = ink;
+          c.beginPath();
+          c.arc(-14, -2, 4.1, 0, Math.PI * 2);
+          c.arc(14, -2, 4.1, 0, Math.PI * 2);
+          c.fill();
+
+          c.fillStyle = '#FFFFFF';
+          c.beginPath();
+          c.arc(-15.5, -3.6, 1.7, 0, Math.PI * 2);
+          c.arc(-12.5, -0.8, 0.9, 0, Math.PI * 2);
+          c.arc(12.5, -3.6, 1.7, 0, Math.PI * 2);
+          c.arc(15.5, -0.8, 0.9, 0, Math.PI * 2);
+          c.fill();
+        } else if (eyeMode === 'heart') {
+          c.fillStyle = '#DC2626';
+          var hxList = [-14, 14];
+          for (var hi = 0; hi < hxList.length; hi++) {
+            var hx = hxList[hi];
+            c.beginPath();
+            c.moveTo(hx, 3.5);
+            c.bezierCurveTo(hx - 8, -2, hx - 7, -9, hx, -5);
+            c.bezierCurveTo(hx + 7, -9, hx + 8, -2, hx, 3.5);
+            c.fill();
+          }
+        } else if (eyeMode === 'squeeze') {
+          c.strokeStyle = ink;
+          c.lineWidth = 2.8;
+          c.beginPath();
+          c.moveTo(-18, -5); c.lineTo(-12, -2); c.lineTo(-18, 1);
+          c.moveTo(18, -5); c.lineTo(12, -2); c.lineTo(18, 1);
+          c.moveTo(-12, -10); c.lineTo(-8, -7);
+          c.stroke();
+        } else if (eyeMode === 'sleep') {
+          c.strokeStyle = ink;
+          c.lineWidth = 2.8;
+          c.beginPath();
+          c.moveTo(-18, -2); c.quadraticCurveTo(-14, 0, -10, -2);
+          c.moveTo(10, -2); c.quadraticCurveTo(14, 0, 18, -2);
+          c.stroke();
+        } else if (eyeMode === 'winkLeft') {
+          c.fillStyle = '#FFFFFF';
+          c.strokeStyle = ink;
+          c.lineWidth = 2.2;
+          c.beginPath();
+          c.arc(-14, -2, 5.5, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+          c.fillStyle = ink;
+          c.beginPath();
+          c.arc(-14, -2, 3.6, 0, Math.PI * 2);
+          c.fill();
+
+          c.strokeStyle = ink;
+          c.lineWidth = 2.8;
+          c.beginPath();
+          c.moveTo(17, -5); c.lineTo(11, -2); c.lineTo(17, 1);
+          c.stroke();
+        } else if (eyeMode === 'winkBoth') {
+          c.strokeStyle = ink;
+          c.lineWidth = 2.8;
+          c.beginPath();
+          c.moveTo(-17, -5); c.lineTo(-11, -2); c.lineTo(-17, 1);
+          c.moveTo(17, -5); c.lineTo(11, -2); c.lineTo(17, 1);
+          c.stroke();
+        }
+
+        // 豬鼻子
+        c.fillStyle = snout;
+        c.strokeStyle = ink;
+        c.lineWidth = 2.6;
+        c.beginPath();
+        c.moveTo(-9, 1);
+        c.bezierCurveTo(-13, 1, -14, 10, -7, 10);
+        c.quadraticCurveTo(0, 8, 7, 10);
+        c.bezierCurveTo(14, 10, 13, 1, 9, 1);
+        c.quadraticCurveTo(0, -2, -9, 1);
+        c.closePath();
+        c.fill();
+        c.stroke();
+
+        // 鼻孔
+        c.fillStyle = ink;
+        c.beginPath();
+        c.arc(-4.2, 5.2, 1.8, 0, Math.PI * 2);
+        c.arc(4.2, 5.2, 1.8, 0, Math.PI * 2);
+        c.fill();
+
+        // 嘴巴
+        var mouth = opts.mouth || 'none';
+        if (mouth === 'open') {
+          c.fillStyle = ink;
+          c.beginPath();
+          c.moveTo(-3.5, 10);
+          c.quadraticCurveTo(0, 20, 3.5, 10);
+          c.closePath();
+          c.fill();
+        } else if (mouth === 'smallOpen') {
+          c.fillStyle = ink;
+          c.beginPath();
+          c.moveTo(-2.5, 10);
+          c.quadraticCurveTo(0, 16, 2.5, 10);
+          c.closePath();
+          c.fill();
+        } else if (mouth === 'shout') {
+          c.fillStyle = ink;
+          c.beginPath();
+          c.moveTo(-3, 10);
+          c.lineTo(-1.5, 25);
+          c.lineTo(1.5, 25);
+          c.lineTo(3, 10);
+          c.closePath();
+          c.fill();
+        } else if (mouth === 'tongue') {
+          c.fillStyle = '#F47280';
+          c.strokeStyle = ink;
+          c.lineWidth = 2;
+          c.beginPath();
+          c.arc(4.5, 12.5, 3.4, 0, Math.PI);
+          c.fill();
+          c.stroke();
+        }
+
+        c.restore();
+      }
+
+      function createPresetIconDataURL(idx) {
+        var off = document.createElement('canvas');
+        off.width = 96;
+        off.height = 96;
+        var c = off.getContext('2d');
+        var ink = '#331A12';
+
+        if (idx === 0) {
+          // 1. 基本呆萌臉
+          drawFaceBase(c, 48, 50, 1.25, { eyes: 'round', mouth: 'none' });
+        } else if (idx === 1) {
+          // 2. 張嘴開心臉
+          drawFaceBase(c, 48, 50, 1.25, { eyes: 'round', mouth: 'open' });
+        } else if (idx === 2) {
+          // 3. 愛心眼臉
+          drawFaceBase(c, 48, 50, 1.25, { eyes: 'heart', mouth: 'open', blush: true, blushLines: true });
+        } else if (idx === 3) {
+          // 4. 閉眼大喊臉
+          drawFaceBase(c, 48, 48, 1.22, { eyes: 'squeeze', mouth: 'shout', blush: true, blushLines: true });
+        } else if (idx === 4) {
+          // 5. 水汪汪大眼臉
+          drawFaceBase(c, 48, 50, 1.25, { eyes: 'sparkle', mouth: 'smallOpen', blush: true });
+        } else if (idx === 5) {
+          // 6. 抱大愛心小豬
+          drawFaceBase(c, 48, 37, 0.96, { eyes: 'sparkle', mouth: 'open', blush: true });
+          c.fillStyle = '#F47280';
+          c.strokeStyle = '#E15B69';
+          c.lineWidth = 2;
+          c.beginPath();
+          c.moveTo(48, 86);
+          c.bezierCurveTo(10, 66, 12, 42, 48, 55);
+          c.bezierCurveTo(84, 42, 86, 66, 48, 86);
+          c.fill();
+          c.stroke();
+          // 雙手扶在愛心上
+          c.fillStyle = '#F6C198';
+          c.strokeStyle = ink;
+          c.lineWidth = 2.4;
+          c.beginPath();
+          c.ellipse(32, 50, 7, 4, 0.3, 0, Math.PI * 2);
+          c.ellipse(64, 50, 7, 4, -0.3, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+        } else if (idx === 6) {
+          // 7. 戴紫睡帽打瞌睡
+          drawFaceBase(c, 50, 56, 1.15, { eyes: 'sleep', mouth: 'none' });
+          // 睡帽
+          c.fillStyle = '#A78BFA';
+          c.strokeStyle = ink;
+          c.lineWidth = 2.8;
+          c.beginPath();
+          c.moveTo(24, 38);
+          c.quadraticCurveTo(44, 10, 72, 32);
+          c.lineTo(68, 40);
+          c.closePath();
+          c.fill();
+          c.stroke();
+          // 白帽沿與球球
+          c.fillStyle = '#FFFFFF';
+          drawRoundRect(c, 22, 33, 50, 8, 4);
+          c.fill();
+          c.stroke();
+          c.beginPath();
+          c.arc(17, 47, 7, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+        } else if (idx === 7) {
+          // 8. 愛心眨眼豬
+          c.save();
+          c.translate(52, 52);
+          c.rotate(-0.18);
+          drawFaceBase(c, 0, 0, 1.05, { eyes: 'winkLeft', mouth: 'open', blush: true });
+          c.restore();
+          // 左上小愛心
+          c.fillStyle = '#F46A6E';
+          c.beginPath();
+          c.moveTo(22, 30);
+          c.bezierCurveTo(10, 20, 12, 10, 22, 16);
+          c.bezierCurveTo(32, 10, 34, 20, 22, 30);
+          c.fill();
+        } else if (idx === 8) {
+          // 9. 吐舌頭裝傻豬
+          drawFaceBase(c, 54, 54, 1.1, { eyes: 'winkBoth', mouth: 'tongue' });
+          // 粉紅星星
+          c.fillStyle = '#EC4899';
+          c.beginPath();
+          for (var st = 0; st < 5; st++) {
+            var a1 = (st * 72 - 90) * Math.PI / 180;
+            var a2 = (st * 72 - 54) * Math.PI / 180;
+            var rx1 = 22 + Math.cos(a1) * 9;
+            var ry1 = 30 + Math.sin(a1) * 9;
+            var rx2 = 22 + Math.cos(a2) * 4;
+            var ry2 = 30 + Math.sin(a2) * 4;
+            if (st === 0) c.moveTo(rx1, ry1);
+            else c.lineTo(rx1, ry1);
+            c.lineTo(rx2, ry2);
+          }
+          c.closePath();
+          c.fill();
+        } else if (idx === 9) {
+          // 10. 推眼鏡認真豬
+          drawFaceBase(c, 48, 46, 1.12, { eyes: 'round', mouth: 'open' });
+          // 方框眼鏡
+          c.fillStyle = 'rgba(191, 219, 254, 0.78)';
+          c.strokeStyle = ink;
+          c.lineWidth = 2.6;
+          c.fillRect(21, 35, 22, 15);
+          c.strokeRect(21, 35, 22, 15);
+          c.fillRect(53, 35, 22, 15);
+          c.strokeRect(53, 35, 22, 15);
+          c.beginPath();
+          c.moveTo(43, 41); c.lineTo(53, 41);
+          c.moveTo(31, 27); c.lineTo(42, 33);
+          c.moveTo(65, 27); c.lineTo(54, 33);
+          c.stroke();
+          // 白紙與小領帶
+          c.fillStyle = '#FFFFFF';
+          c.fillRect(28, 68, 40, 20);
+          c.strokeRect(28, 68, 40, 20);
+        } else if (idx === 10) {
+          // 11. 頭頂閃亮大眼豬
+          drawFaceBase(c, 48, 56, 1.18, { eyes: 'sparkle', mouth: 'open', blush: true });
+          c.fillStyle = '#FACC15';
+          var stars = [[26, 20, 6], [38, 14, 4.5], [64, 15, 6.5], [74, 24, 4]];
+          for (var si = 0; si < stars.length; si++) {
+            var sx = stars[si][0], sy = stars[si][1], sr = stars[si][2];
+            c.beginPath();
+            c.moveTo(sx, sy - sr);
+            c.quadraticCurveTo(sx, sy, sx + sr, sy);
+            c.quadraticCurveTo(sx, sy, sx, sy + sr);
+            c.quadraticCurveTo(sx, sy, sx - sr, sy);
+            c.quadraticCurveTo(sx, sy, sx, sy - sr);
+            c.fill();
+          }
+        } else if (idx === 11) {
+          // 12. 墨鏡白紳士帽豬
+          drawFaceBase(c, 48, 56, 1.12, { eyes: 'round', mouth: 'open' });
+          // 墨鏡
+          c.fillStyle = '#29150E';
+          drawRoundRect(c, 24, 46, 20, 15, 5);
+          c.fill();
+          drawRoundRect(c, 52, 46, 20, 15, 5);
+          c.fill();
+          c.strokeStyle = '#FFFFFF';
+          c.lineWidth = 2;
+          c.beginPath();
+          c.moveTo(31, 49); c.lineTo(35, 54); c.lineTo(32, 58);
+          c.moveTo(59, 49); c.lineTo(63, 54); c.lineTo(60, 58);
+          c.stroke();
+          // 白紳士帽
+          c.fillStyle = '#FFFFFF';
+          c.strokeStyle = ink;
+          c.lineWidth = 2.6;
+          c.beginPath();
+          c.moveTo(27, 36);
+          c.lineTo(35, 16);
+          c.lineTo(48, 21);
+          c.lineTo(61, 16);
+          c.lineTo(69, 36);
+          c.closePath();
+          c.fill();
+          c.stroke();
+          c.fillStyle = '#6366F1';
+          c.fillRect(28, 30, 40, 6);
+          c.fillStyle = '#FFFFFF';
+          c.beginPath();
+          c.ellipse(48, 38, 34, 7, 0.08, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+        } else if (idx === 12) {
+          // 13. 紅毛帽圍巾豬
+          drawFaceBase(c, 48, 48, 1.12, { eyes: 'round', mouth: 'none' });
+          // 紅毛帽
+          c.fillStyle = '#DC2626';
+          c.strokeStyle = ink;
+          c.lineWidth = 2.6;
+          c.beginPath();
+          c.arc(48, 35, 25, Math.PI, 0);
+          c.closePath();
+          c.fill();
+          c.stroke();
+          c.fillStyle = '#FFFFFF';
+          c.beginPath();
+          c.arc(54, 10, 6, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+          // 紅圍巾
+          c.fillStyle = '#DC2626';
+          drawRoundRect(c, 28, 69, 40, 10, 4);
+          c.fill();
+          c.stroke();
+          c.fillRect(54, 76, 11, 14);
+          c.strokeRect(54, 76, 11, 14);
+        } else if (idx === 13) {
+          // 14. 小豬太陽
+          c.fillStyle = '#F59E0B';
+          c.strokeStyle = ink;
+          c.lineWidth = 2.2;
+          for (var ray = 0; ray < 8; ray++) {
+            c.save();
+            c.translate(48, 48);
+            c.rotate((ray * 45) * Math.PI / 180);
+            c.fillStyle = ray % 2 === 0 ? '#F59E0B' : '#EA580C';
+            c.beginPath();
+            c.moveTo(-7, -23);
+            c.lineTo(0, -42);
+            c.lineTo(7, -23);
+            c.closePath();
+            c.fill();
+            c.stroke();
+            c.restore();
+          }
+          drawFaceBase(c, 48, 48, 0.92, { skin: '#F59E0B', noEars: true, eyes: 'round', mouth: 'none' });
+        } else if (idx === 14) {
+          // 15. 粉紅音符
+          c.fillStyle = '#F472B6';
+          c.strokeStyle = '#EC4899';
+          c.lineWidth = 3;
+          c.beginPath();
+          c.ellipse(38, 72, 13, 9, -0.35, 0, Math.PI * 2);
+          c.fill();
+          c.lineWidth = 7;
+          c.lineCap = 'round';
+          c.lineJoin = 'round';
+          c.beginPath();
+          c.moveTo(48, 70);
+          c.lineTo(48, 20);
+          c.quadraticCurveTo(68, 24, 66, 44);
+          c.stroke();
+        } else {
+          // 16. 蝴蝶結白色小內褲
+          c.fillStyle = '#FFFFFF';
+          c.strokeStyle = ink;
+          c.lineWidth = 3.5;
+          c.lineJoin = 'round';
+          c.beginPath();
+          c.moveTo(16, 32);
+          c.quadraticCurveTo(48, 38, 80, 32);
+          c.quadraticCurveTo(82, 68, 48, 68);
+          c.quadraticCurveTo(14, 68, 16, 32);
+          c.closePath();
+          c.fill();
+          c.stroke();
+          // 中央深色小蝴蝶結
+          c.fillStyle = ink;
+          c.beginPath();
+          c.moveTo(48, 47);
+          c.lineTo(39, 41);
+          c.lineTo(39, 53);
+          c.closePath();
+          c.moveTo(48, 47);
+          c.lineTo(57, 41);
+          c.lineTo(57, 53);
+          c.closePath();
+          c.fill();
+        }
+
+        return off.toDataURL('image/png');
+      }
+
+      function buildPresetIcons() {
+        PRESET_ICONS = [];
+        for (var i = 0; i < 16; i++) {
+          PRESET_ICONS.push(createPresetIconDataURL(i));
+        }
+      }
+
+      // =========================================================================
+      // 3. 應用程式狀態與預設值（直接使用可愛小豬圖片圖示）
+      // =========================================================================
+      var STORAGE_KEY = 'buriburi_pig_clock_settings_v5';
       var TOTAL_PIGS = 105;
       var DEFAULT_POSE_COUNT = 16;
       var W = Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0, 320);
       var H = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0, 480);
       var DPR = Math.min(window.devicePixelRatio || 1, 2);
 
-      var DEFAULT_SETTINGS = {
-        visible: true,
-        text: '不理不理左衛門時鐘',
-        fontSize: 26,
-        iconType: 'emoji',
-        iconEmoji: '🐷',
-        iconImage: '',
-        hideBtnIcon: '🙈',
-        hideBtnIconType: 'emoji',
-        hideBtnImageData: '',
-        showBtnIcon: '👁️',
-        showBtnIconType: 'emoji',
-        showBtnImageData: ''
-      };
-
-      function cloneSettings(src) {
+      function getDefaultSettings() {
         return {
-          visible: typeof src.visible === 'boolean' ? src.visible : true,
-          text: typeof src.text === 'string' ? src.text : DEFAULT_SETTINGS.text,
-          fontSize: typeof src.fontSize === 'number' ? Math.min(44, Math.max(16, src.fontSize)) : 26,
-          iconType: (src.iconType === 'emoji' || src.iconType === 'image' || src.iconType === 'none') ? src.iconType : 'emoji',
-          iconEmoji: typeof src.iconEmoji === 'string' ? src.iconEmoji : (typeof src.emoji === 'string' ? src.emoji : '🐷'),
-          iconImage: typeof src.iconImage === 'string' ? src.iconImage : (typeof src.imageData === 'string' ? src.imageData : ''),
-          hideBtnIcon: typeof src.hideBtnIcon === 'string' && src.hideBtnIcon.trim() ? src.hideBtnIcon.trim() : '🙈',
-          hideBtnIconType: (src.hideBtnIconType === 'image' && src.hideBtnImageData) ? 'image' : 'emoji',
-          hideBtnImageData: typeof src.hideBtnImageData === 'string' ? src.hideBtnImageData : '',
-          showBtnIcon: typeof src.showBtnIcon === 'string' && src.showBtnIcon.trim() ? src.showBtnIcon.trim() : '👁️',
-          showBtnIconType: (src.showBtnIconType === 'image' && src.showBtnImageData) ? 'image' : 'emoji',
-          showBtnImageData: typeof src.showBtnImageData === 'string' ? src.showBtnImageData : ''
+          visible: true,
+          text: '不理不理左衛門時鐘',
+          fontSize: 26,
+          iconType: 'preset',
+          presetIndex: 0,
+          iconEmoji: '',
+          iconImage: PRESET_ICONS[0] || '',
+          hideBtnIconType: 'preset',
+          hideBtnPresetIndex: 6,
+          hideBtnIcon: '',
+          hideBtnImageData: PRESET_ICONS[6] || '',
+          showBtnIconType: 'preset',
+          showBtnPresetIndex: 4,
+          showBtnIcon: '',
+          showBtnImageData: PRESET_ICONS[4] || ''
         };
       }
 
-      var currentSettings = cloneSettings(DEFAULT_SETTINGS);
+      function cloneSettings(src) {
+        var def = getDefaultSettings();
+        var titleType = src.iconType;
+        if (titleType !== 'preset' && titleType !== 'image' && titleType !== 'emoji' && titleType !== 'none') {
+          titleType = 'preset';
+        }
+        var titleIdx = typeof src.presetIndex === 'number' ? Math.max(0, Math.min(15, src.presetIndex)) : 0;
+        var titleImg = titleType === 'preset' ? (PRESET_ICONS[titleIdx] || def.iconImage) : (src.iconImage || '');
+
+        var hideType = src.hideBtnIconType;
+        if (hideType !== 'preset' && hideType !== 'image' && hideType !== 'emoji') hideType = 'preset';
+        var hideIdx = typeof src.hideBtnPresetIndex === 'number' ? Math.max(0, Math.min(15, src.hideBtnPresetIndex)) : 6;
+        var hideImg = hideType === 'preset' ? (PRESET_ICONS[hideIdx] || def.hideBtnImageData) : (src.hideBtnImageData || '');
+
+        var showType = src.showBtnIconType;
+        if (showType !== 'preset' && showType !== 'image' && showType !== 'emoji') showType = 'preset';
+        var showIdx = typeof src.showBtnPresetIndex === 'number' ? Math.max(0, Math.min(15, src.showBtnPresetIndex)) : 4;
+        var showImg = showType === 'preset' ? (PRESET_ICONS[showIdx] || def.showBtnImageData) : (src.showBtnImageData || '');
+
+        return {
+          visible: typeof src.visible === 'boolean' ? src.visible : true,
+          text: typeof src.text === 'string' ? src.text : def.text,
+          fontSize: typeof src.fontSize === 'number' ? Math.min(44, Math.max(16, src.fontSize)) : 26,
+          iconType: titleType,
+          presetIndex: titleIdx,
+          iconEmoji: typeof src.iconEmoji === 'string' ? src.iconEmoji : '',
+          iconImage: titleImg,
+          hideBtnIconType: hideType,
+          hideBtnPresetIndex: hideIdx,
+          hideBtnIcon: typeof src.hideBtnIcon === 'string' ? src.hideBtnIcon : '',
+          hideBtnImageData: hideImg,
+          showBtnIconType: showType,
+          showBtnPresetIndex: showIdx,
+          showBtnIcon: typeof src.showBtnIcon === 'string' ? src.showBtnIcon : '',
+          showBtnImageData: showImg
+        };
+      }
+
+      var currentSettings = null;
       var draftSettings = null;
 
       var state = {
@@ -953,7 +1450,7 @@
       }
 
       // =========================================================================
-      // 3. 預先繪製 16 款不理不理左衛門搞笑姿勢（96x96 離屏畫布）
+      // 4. 預先繪製 16 款不理不理左衛門搞笑姿勢（96x96 離屏畫布）
       // =========================================================================
       function drawKatana(c, x, y, angle) {
         c.save();
@@ -1074,561 +1571,163 @@
         c.lineJoin = 'round';
 
         if (pose === 0) {
-          c.fillStyle = skin;
-          c.strokeStyle = ink;
-          c.lineWidth = 2.4;
-          c.beginPath();
-          c.ellipse(48, 55, 16, 15, 0, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
-
-          c.beginPath();
-          c.moveTo(62, 49);
-          c.quadraticCurveTo(74, 38, 70, 28);
-          c.stroke();
-          c.beginPath();
-          c.arc(70, 26, 4.5, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
-          c.beginPath();
-          c.moveTo(34, 50);
-          c.lineTo(25, 60);
-          c.stroke();
-
+          c.fillStyle = skin; c.strokeStyle = ink; c.lineWidth = 2.4;
+          c.beginPath(); c.ellipse(48, 55, 16, 15, 0, 0, Math.PI * 2); c.fill(); c.stroke();
+          c.beginPath(); c.moveTo(62, 49); c.quadraticCurveTo(74, 38, 70, 28); c.stroke();
+          c.beginPath(); c.arc(70, 26, 4.5, 0, Math.PI * 2); c.fill(); c.stroke();
+          c.beginPath(); c.moveTo(34, 50); c.lineTo(25, 60); c.stroke();
           c.fillStyle = purple;
-          c.beginPath();
-          c.moveTo(33, 60);
-          c.lineTo(63, 60);
-          c.lineTo(61, 83);
-          c.lineTo(51, 83);
-          c.lineTo(48, 71);
-          c.lineTo(45, 83);
-          c.lineTo(35, 83);
-          c.closePath();
-          c.fill();
-          c.stroke();
-
+          c.beginPath(); c.moveTo(33, 60); c.lineTo(63, 60); c.lineTo(61, 83); c.lineTo(51, 83); c.lineTo(48, 71); c.lineTo(45, 83); c.lineTo(35, 83); c.closePath(); c.fill(); c.stroke();
           drawKatana(c, 33, 62, -0.4);
           drawPigHead(c, 48, 30, 0.92, 'normal');
-
-          c.fillStyle = '#DC2626';
-          c.font = '900 13px ' + CANVAS_FONT;
-          c.fillText('ok', 63, 17);
-
+          c.fillStyle = '#DC2626'; c.font = '900 13px ' + CANVAS_FONT; c.fillText('ok', 63, 17);
         } else if (pose === 1) {
-          c.fillStyle = purple;
-          c.strokeStyle = ink;
-          c.lineWidth = 2.4;
-          c.beginPath();
-          c.ellipse(68, 66, 19, 8, -0.1, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
-
+          c.fillStyle = purple; c.strokeStyle = ink; c.lineWidth = 2.4;
+          c.beginPath(); c.ellipse(68, 66, 19, 8, -0.1, 0, Math.PI * 2); c.fill(); c.stroke();
           c.fillStyle = skin;
-          c.beginPath();
-          c.ellipse(44, 65, 18, 10, 0, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
-
-          c.beginPath();
-          c.moveTo(26, 68);
-          c.lineTo(22, 56);
-          c.lineTo(29, 52);
-          c.stroke();
-
+          c.beginPath(); c.ellipse(44, 65, 18, 10, 0, 0, Math.PI * 2); c.fill(); c.stroke();
+          c.beginPath(); c.moveTo(26, 68); c.lineTo(22, 56); c.lineTo(29, 52); c.stroke();
           drawKatana(c, 58, 61, 0.15);
           drawPigHead(c, 32, 46, 0.9, 'sleepy');
-
         } else if (pose === 2) {
-          c.fillStyle = purple;
-          c.strokeStyle = ink;
-          c.lineWidth = 2.4;
-          c.beginPath();
-          c.ellipse(54, 71, 17, 11, 0, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
-
+          c.fillStyle = purple; c.strokeStyle = ink; c.lineWidth = 2.4;
+          c.beginPath(); c.ellipse(54, 71, 17, 11, 0, 0, Math.PI * 2); c.fill(); c.stroke();
           c.fillStyle = skin;
-          c.beginPath();
-          c.ellipse(42, 65, 17, 13, -0.2, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
-
+          c.beginPath(); c.ellipse(42, 65, 17, 13, -0.2, 0, Math.PI * 2); c.fill(); c.stroke();
           drawKatana(c, 62, 66, 0.3);
           drawPigHead(c, 32, 56, 0.86, 'sad');
-
           c.fillStyle = '#38BDF8';
-          c.beginPath();
-          c.arc(22, 36, 2.5, 0, Math.PI * 2);
-          c.arc(46, 34, 2.5, 0, Math.PI * 2);
-          c.arc(64, 44, 2.5, 0, Math.PI * 2);
-          c.fill();
-
-          c.fillStyle = '#2563EB';
-          c.font = '800 10px ' + CANVAS_FONT;
-          c.fillText('すみません', 14, 22);
-
+          c.beginPath(); c.arc(22, 36, 2.5, 0, Math.PI * 2); c.arc(46, 34, 2.5, 0, Math.PI * 2); c.arc(64, 44, 2.5, 0, Math.PI * 2); c.fill();
+          c.fillStyle = '#2563EB'; c.font = '800 10px ' + CANVAS_FONT; c.fillText('すみません', 14, 22);
         } else if (pose === 3) {
-          c.fillStyle = skin;
-          c.strokeStyle = ink;
-          c.lineWidth = 2.4;
-          c.beginPath();
-          c.ellipse(42, 53, 14, 14, -0.2, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
-
-          c.beginPath();
-          c.moveTo(30, 48);
-          c.lineTo(20, 39);
-          c.moveTo(54, 49);
-          c.lineTo(64, 41);
-          c.stroke();
-
+          c.fillStyle = skin; c.strokeStyle = ink; c.lineWidth = 2.4;
+          c.beginPath(); c.ellipse(42, 53, 14, 14, -0.2, 0, Math.PI * 2); c.fill(); c.stroke();
+          c.beginPath(); c.moveTo(30, 48); c.lineTo(20, 39); c.moveTo(54, 49); c.lineTo(64, 41); c.stroke();
           c.fillStyle = purple;
-          c.beginPath();
-          c.moveTo(30, 60);
-          c.lineTo(54, 57);
-          c.lineTo(82, 43);
-          c.lineTo(85, 52);
-          c.lineTo(52, 69);
-          c.lineTo(44, 86);
-          c.lineTo(34, 86);
-          c.closePath();
-          c.fill();
-          c.stroke();
-
+          c.beginPath(); c.moveTo(30, 60); c.lineTo(54, 57); c.lineTo(82, 43); c.lineTo(85, 52); c.lineTo(52, 69); c.lineTo(44, 86); c.lineTo(34, 86); c.closePath(); c.fill(); c.stroke();
           drawKatana(c, 31, 61, -0.5);
           drawPigHead(c, 40, 29, 0.9, 'normal');
-
         } else if (pose === 4) {
-          c.fillStyle = skin;
-          c.strokeStyle = ink;
-          c.lineWidth = 2.4;
-          c.beginPath();
-          c.ellipse(48, 55, 16, 15, 0, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
-
+          c.fillStyle = skin; c.strokeStyle = ink; c.lineWidth = 2.4;
+          c.beginPath(); c.ellipse(48, 55, 16, 15, 0, 0, Math.PI * 2); c.fill(); c.stroke();
           c.fillStyle = purple;
-          c.beginPath();
-          c.moveTo(33, 60);
-          c.lineTo(63, 60);
-          c.lineTo(61, 83);
-          c.lineTo(51, 83);
-          c.lineTo(48, 71);
-          c.lineTo(45, 83);
-          c.lineTo(35, 83);
-          c.closePath();
-          c.fill();
-          c.stroke();
-
+          c.beginPath(); c.moveTo(33, 60); c.lineTo(63, 60); c.lineTo(61, 83); c.lineTo(51, 83); c.lineTo(48, 71); c.lineTo(45, 83); c.lineTo(35, 83); c.closePath(); c.fill(); c.stroke();
           drawKatana(c, 33, 62, -0.4);
           drawPigHead(c, 48, 30, 0.92, 'normal');
-
-          c.strokeStyle = '#16A34A';
-          c.lineWidth = 3;
-          c.beginPath();
-          c.moveTo(46, 64);
-          c.lineTo(60, 46);
-          c.stroke();
-
+          c.strokeStyle = '#16A34A'; c.lineWidth = 3;
+          c.beginPath(); c.moveTo(46, 64); c.lineTo(60, 46); c.stroke();
           c.fillStyle = '#22C55E';
-          c.beginPath();
-          c.ellipse(57, 56, 5, 2.5, 0.4, 0, Math.PI * 2);
-          c.fill();
-
-          c.fillStyle = '#E11D48';
-          c.strokeStyle = ink;
-          c.lineWidth = 1.8;
-          c.beginPath();
-          c.arc(61, 44, 7, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
-
+          c.beginPath(); c.ellipse(57, 56, 5, 2.5, 0.4, 0, Math.PI * 2); c.fill();
+          c.fillStyle = '#E11D48'; c.strokeStyle = ink; c.lineWidth = 1.8;
+          c.beginPath(); c.arc(61, 44, 7, 0, Math.PI * 2); c.fill(); c.stroke();
         } else if (pose === 5) {
-          c.fillStyle = purple;
-          c.strokeStyle = ink;
-          c.lineWidth = 2.4;
-          c.beginPath();
-          c.ellipse(48, 58, 17, 18, 0, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
-
+          c.fillStyle = purple; c.strokeStyle = ink; c.lineWidth = 2.4;
+          c.beginPath(); c.ellipse(48, 58, 17, 18, 0, 0, Math.PI * 2); c.fill(); c.stroke();
           c.fillStyle = '#FFFFFF';
-          c.beginPath();
-          c.arc(42, 54, 2.2, 0, Math.PI * 2);
-          c.arc(54, 62, 2.2, 0, Math.PI * 2);
-          c.arc(44, 68, 2.2, 0, Math.PI * 2);
-          c.fill();
-
+          c.beginPath(); c.arc(42, 54, 2.2, 0, Math.PI * 2); c.arc(54, 62, 2.2, 0, Math.PI * 2); c.arc(44, 68, 2.2, 0, Math.PI * 2); c.fill();
           drawPigHead(c, 48, 33, 0.88, 'sleepy');
-
-          c.fillStyle = purple;
-          c.strokeStyle = ink;
-          c.lineWidth = 2.2;
-          c.beginPath();
-          c.moveTo(31, 22);
-          c.quadraticCurveTo(48, 4, 68, 18);
-          c.lineTo(63, 24);
-          c.closePath();
-          c.fill();
-          c.stroke();
+          c.fillStyle = purple; c.strokeStyle = ink; c.lineWidth = 2.2;
+          c.beginPath(); c.moveTo(31, 22); c.quadraticCurveTo(48, 4, 68, 18); c.lineTo(63, 24); c.closePath(); c.fill(); c.stroke();
           c.fillStyle = '#FFFFFF';
-          c.beginPath();
-          c.arc(70, 19, 4, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
-
+          c.beginPath(); c.arc(70, 19, 4, 0, Math.PI * 2); c.fill(); c.stroke();
           c.fillStyle = '#FFFDF9';
-          c.beginPath();
-          c.ellipse(72, 62, 11, 14, 0.25, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
-
+          c.beginPath(); c.ellipse(72, 62, 11, 14, 0.25, 0, Math.PI * 2); c.fill(); c.stroke();
         } else if (pose === 6) {
-          c.fillStyle = '#E5E7EB';
-          c.strokeStyle = ink;
-          c.lineWidth = 2.3;
-          c.beginPath();
-          c.moveTo(33, 42);
-          c.lineTo(27, 79);
-          c.lineTo(69, 79);
-          c.lineTo(63, 42);
-          c.closePath();
-          c.fill();
-          c.stroke();
-
-          c.fillStyle = purple;
-          c.fillRect(36, 79, 8, 6);
-          c.fillRect(52, 79, 8, 6);
-
+          c.fillStyle = '#E5E7EB'; c.strokeStyle = ink; c.lineWidth = 2.3;
+          c.beginPath(); c.moveTo(33, 42); c.lineTo(27, 79); c.lineTo(69, 79); c.lineTo(63, 42); c.closePath(); c.fill(); c.stroke();
+          c.fillStyle = purple; c.fillRect(36, 79, 8, 6); c.fillRect(52, 79, 8, 6);
           drawPigHead(c, 48, 31, 0.88, 'normal');
-
-          c.fillStyle = '#111827';
-          c.fillRect(34, 26, 12, 6);
-          c.fillRect(50, 26, 12, 6);
-          c.strokeStyle = '#111827';
-          c.lineWidth = 2;
-          c.beginPath();
-          c.moveTo(46, 28);
-          c.lineTo(50, 28);
-          c.stroke();
-
-          c.fillStyle = '#6B7280';
-          c.strokeStyle = ink;
-          c.lineWidth = 2.2;
-          c.beginPath();
-          c.ellipse(48, 20, 25, 5, 0, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
-          c.beginPath();
-          c.arc(48, 18, 14, Math.PI, 0);
-          c.fill();
-          c.stroke();
-
+          c.fillStyle = '#111827'; c.fillRect(34, 26, 12, 6); c.fillRect(50, 26, 12, 6);
+          c.strokeStyle = '#111827'; c.lineWidth = 2; c.beginPath(); c.moveTo(46, 28); c.lineTo(50, 28); c.stroke();
+          c.fillStyle = '#6B7280'; c.strokeStyle = ink; c.lineWidth = 2.2;
+          c.beginPath(); c.ellipse(48, 20, 25, 5, 0, 0, Math.PI * 2); c.fill(); c.stroke();
+          c.beginPath(); c.arc(48, 18, 14, Math.PI, 0); c.fill(); c.stroke();
         } else if (pose === 7) {
-          c.fillStyle = skin;
-          c.strokeStyle = ink;
-          c.lineWidth = 2.4;
-          c.beginPath();
-          c.ellipse(46, 53, 15, 14, -0.1, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
-
-          c.beginPath();
-          c.moveTo(32, 47);
-          c.lineTo(22, 37);
-          c.moveTo(60, 48);
-          c.lineTo(70, 39);
-          c.stroke();
-
+          c.fillStyle = skin; c.strokeStyle = ink; c.lineWidth = 2.4;
+          c.beginPath(); c.ellipse(46, 53, 15, 14, -0.1, 0, Math.PI * 2); c.fill(); c.stroke();
+          c.beginPath(); c.moveTo(32, 47); c.lineTo(22, 37); c.moveTo(60, 48); c.lineTo(70, 39); c.stroke();
           c.fillStyle = purple;
-          c.beginPath();
-          c.moveTo(32, 58);
-          c.lineTo(60, 58);
-          c.lineTo(65, 81);
-          c.lineTo(54, 82);
-          c.lineTo(46, 70);
-          c.lineTo(36, 82);
-          c.lineTo(27, 78);
-          c.closePath();
-          c.fill();
-          c.stroke();
-
+          c.beginPath(); c.moveTo(32, 58); c.lineTo(60, 58); c.lineTo(65, 81); c.lineTo(54, 82); c.lineTo(46, 70); c.lineTo(36, 82); c.lineTo(27, 78); c.closePath(); c.fill(); c.stroke();
           drawKatana(c, 32, 59, -0.45);
           drawPigHead(c, 45, 29, 0.9, 'normal');
-
           c.fillStyle = '#EC4899';
-          c.beginPath();
-          c.arc(73, 21, 3.5, 0, Math.PI * 2);
-          c.arc(78, 21, 3.5, 0, Math.PI * 2);
-          c.moveTo(70, 23);
-          c.lineTo(75.5, 30);
-          c.lineTo(81, 23);
-          c.fill();
-
-          c.beginPath();
-          c.arc(20, 22, 2.5, 0, Math.PI * 2);
-          c.arc(24, 22, 2.5, 0, Math.PI * 2);
-          c.moveTo(18, 23.5);
-          c.lineTo(22, 28.5);
-          c.lineTo(26, 23.5);
-          c.fill();
-
+          c.beginPath(); c.arc(73, 21, 3.5, 0, Math.PI * 2); c.arc(78, 21, 3.5, 0, Math.PI * 2); c.moveTo(70, 23); c.lineTo(75.5, 30); c.lineTo(81, 23); c.fill();
+          c.beginPath(); c.arc(20, 22, 2.5, 0, Math.PI * 2); c.arc(24, 22, 2.5, 0, Math.PI * 2); c.moveTo(18, 23.5); c.lineTo(22, 28.5); c.lineTo(26, 23.5); c.fill();
         } else if (pose === 8) {
-          c.fillStyle = purple;
-          c.strokeStyle = ink;
-          c.lineWidth = 2.4;
-          c.beginPath();
-          c.ellipse(66, 68, 20, 9, -0.12, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
-
+          c.fillStyle = purple; c.strokeStyle = ink; c.lineWidth = 2.4;
+          c.beginPath(); c.ellipse(66, 68, 20, 9, -0.12, 0, Math.PI * 2); c.fill(); c.stroke();
           c.fillStyle = skin;
-          c.beginPath();
-          c.ellipse(45, 65, 17, 11, 0, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
-
+          c.beginPath(); c.ellipse(45, 65, 17, 11, 0, 0, Math.PI * 2); c.fill(); c.stroke();
           drawKatana(c, 60, 62, 0.12);
           drawPigHead(c, 34, 49, 0.9, 'normal');
-
-          c.strokeStyle = ink;
-          c.lineWidth = 2.2;
-          c.beginPath();
-          c.moveTo(22, 66);
-          c.lineTo(31, 56);
-          c.stroke();
-
-          c.fillStyle = '#A855F7';
-          c.font = '800 12px ' + CANVAS_FONT;
-          c.fillText('へー', 24, 21);
-
+          c.strokeStyle = ink; c.lineWidth = 2.2; c.beginPath(); c.moveTo(22, 66); c.lineTo(31, 56); c.stroke();
+          c.fillStyle = '#A855F7'; c.font = '800 12px ' + CANVAS_FONT; c.fillText('へー', 24, 21);
         } else if (pose === 9) {
-          c.fillStyle = skin;
-          c.strokeStyle = ink;
-          c.lineWidth = 2.4;
-          c.beginPath();
-          c.ellipse(48, 56, 16, 15, 0, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
-
+          c.fillStyle = skin; c.strokeStyle = ink; c.lineWidth = 2.4;
+          c.beginPath(); c.ellipse(48, 56, 16, 15, 0, 0, Math.PI * 2); c.fill(); c.stroke();
           c.fillStyle = purple;
-          c.beginPath();
-          c.moveTo(33, 60);
-          c.lineTo(63, 60);
-          c.lineTo(62, 83);
-          c.lineTo(52, 83);
-          c.lineTo(48, 72);
-          c.lineTo(44, 83);
-          c.lineTo(34, 83);
-          c.closePath();
-          c.fill();
-          c.stroke();
-
+          c.beginPath(); c.moveTo(33, 60); c.lineTo(63, 60); c.lineTo(62, 83); c.lineTo(52, 83); c.lineTo(48, 72); c.lineTo(44, 83); c.lineTo(34, 83); c.closePath(); c.fill(); c.stroke();
           drawKatana(c, 35, 62, -0.65);
-
-          c.fillStyle = skin;
-          c.beginPath();
-          c.arc(48, 30, 17, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
+          c.fillStyle = skin; c.beginPath(); c.arc(48, 30, 17, 0, Math.PI * 2); c.fill(); c.stroke();
           drawPigHead(c, 42, 31, 0.82, 'normal');
-
-          c.fillStyle = '#0284C7';
-          c.font = '800 10px ' + CANVAS_FONT;
-          c.fillText('ふっふっふっ', 22, 16);
-
+          c.fillStyle = '#0284C7'; c.font = '800 10px ' + CANVAS_FONT; c.fillText('ふっふっふっ', 22, 16);
         } else if (pose === 10) {
-          c.fillStyle = skin;
-          c.strokeStyle = ink;
-          c.lineWidth = 2.4;
-          c.beginPath();
-          c.ellipse(44, 57, 15, 14, 0, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
-
+          c.fillStyle = skin; c.strokeStyle = ink; c.lineWidth = 2.4;
+          c.beginPath(); c.ellipse(44, 57, 15, 14, 0, 0, Math.PI * 2); c.fill(); c.stroke();
           c.fillStyle = purple;
-          c.beginPath();
-          c.ellipse(46, 73, 21, 10, 0, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
-
-          c.fillStyle = '#1E3A8A';
-          c.strokeStyle = ink;
-          c.lineWidth = 2;
-          drawRoundRect(c, 60, 42, 13, 21, 2.5);
-          c.fill();
-          c.stroke();
-
+          c.beginPath(); c.ellipse(46, 73, 21, 10, 0, 0, Math.PI * 2); c.fill(); c.stroke();
+          c.fillStyle = '#1E3A8A'; c.strokeStyle = ink; c.lineWidth = 2;
+          drawRoundRect(c, 60, 42, 13, 21, 2.5); c.fill(); c.stroke();
           drawKatana(c, 30, 62, -0.35);
           drawPigHead(c, 44, 32, 0.88, 'normal');
-
-          c.fillStyle = '#22C55E';
-          c.strokeStyle = ink;
-          c.lineWidth = 1.6;
-          drawRoundRect(c, 26, 5, 38, 15, 7);
-          c.fill();
-          c.stroke();
-          c.fillStyle = '#FFFFFF';
-          c.font = '800 10px ' + CANVAS_FONT;
-          c.fillText('読んだ?', 30, 16);
-
+          c.fillStyle = '#22C55E'; c.strokeStyle = ink; c.lineWidth = 1.6;
+          drawRoundRect(c, 26, 5, 38, 15, 7); c.fill(); c.stroke();
+          c.fillStyle = '#FFFFFF'; c.font = '800 10px ' + CANVAS_FONT; c.fillText('読んだ?', 30, 16);
         } else if (pose === 11) {
-          c.fillStyle = '#FEF3C7';
-          c.strokeStyle = ink;
-          c.lineWidth = 2;
-          c.fillRect(14, 22, 30, 58);
-          c.strokeRect(14, 22, 30, 58);
-
+          c.fillStyle = '#FEF3C7'; c.strokeStyle = ink; c.lineWidth = 2;
+          c.fillRect(14, 22, 30, 58); c.strokeRect(14, 22, 30, 58);
           c.fillStyle = skin;
-          c.beginPath();
-          c.ellipse(54, 58, 14, 15, 0, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
-
+          c.beginPath(); c.ellipse(54, 58, 14, 15, 0, 0, Math.PI * 2); c.fill(); c.stroke();
           c.fillStyle = purple;
-          c.beginPath();
-          c.moveTo(42, 66);
-          c.lineTo(66, 66);
-          c.lineTo(65, 84);
-          c.lineTo(43, 84);
-          c.closePath();
-          c.fill();
-          c.stroke();
-
+          c.beginPath(); c.moveTo(42, 66); c.lineTo(66, 66); c.lineTo(65, 84); c.lineTo(43, 84); c.closePath(); c.fill(); c.stroke();
           drawPigHead(c, 53, 34, 0.88, 'normal');
-
         } else if (pose === 12) {
-          c.fillStyle = '#0284C7';
-          c.font = '800 11px ' + CANVAS_FONT;
-          c.fillText('はあ...', 34, 17);
-
+          c.fillStyle = '#0284C7'; c.font = '800 11px ' + CANVAS_FONT; c.fillText('はあ...', 34, 17);
           drawPigHead(c, 48, 34, 0.84, 'sad');
-
-          c.fillStyle = '#93C5FD';
-          c.strokeStyle = ink;
-          c.lineWidth = 1.8;
-          drawRoundRect(c, 31, 20, 34, 6, 3);
-          c.fill();
-          c.stroke();
-
-          c.fillStyle = '#CBD5E1';
-          c.strokeStyle = ink;
-          c.lineWidth = 2.2;
-          drawRoundRect(c, 24, 46, 48, 28, 5);
-          c.fill();
-          c.stroke();
-          c.fillRect(19, 49, 5, 4);
-          c.fillRect(72, 49, 5, 4);
-
+          c.fillStyle = '#93C5FD'; c.strokeStyle = ink; c.lineWidth = 1.8;
+          drawRoundRect(c, 31, 20, 34, 6, 3); c.fill(); c.stroke();
+          c.fillStyle = '#CBD5E1'; c.strokeStyle = ink; c.lineWidth = 2.2;
+          drawRoundRect(c, 24, 46, 48, 28, 5); c.fill(); c.stroke();
+          c.fillRect(19, 49, 5, 4); c.fillRect(72, 49, 5, 4);
           c.fillStyle = '#F97316';
-          c.beginPath();
-          c.arc(36, 80, 5, 0, Math.PI * 2);
-          c.arc(48, 81, 6, 0, Math.PI * 2);
-          c.arc(60, 80, 5, 0, Math.PI * 2);
-          c.fill();
-
+          c.beginPath(); c.arc(36, 80, 5, 0, Math.PI * 2); c.arc(48, 81, 6, 0, Math.PI * 2); c.arc(60, 80, 5, 0, Math.PI * 2); c.fill();
         } else if (pose === 13) {
-          c.fillStyle = '#EC4899';
-          c.font = '800 11px ' + CANVAS_FONT;
-          c.fillText('しりません', 22, 17);
-
-          c.fillStyle = purple;
-          c.strokeStyle = ink;
-          c.lineWidth = 2.4;
-          c.beginPath();
-          c.ellipse(54, 62, 18, 13, -0.25, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
-
+          c.fillStyle = '#EC4899'; c.font = '800 11px ' + CANVAS_FONT; c.fillText('しりません', 22, 17);
+          c.fillStyle = purple; c.strokeStyle = ink; c.lineWidth = 2.4;
+          c.beginPath(); c.ellipse(54, 62, 18, 13, -0.25, 0, Math.PI * 2); c.fill(); c.stroke();
           c.fillStyle = skin;
-          c.beginPath();
-          c.ellipse(40, 56, 13, 13, 0, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
-
-          c.beginPath();
-          c.moveTo(34, 68);
-          c.lineTo(32, 84);
-          c.moveTo(46, 68);
-          c.lineTo(48, 84);
-          c.stroke();
-
+          c.beginPath(); c.ellipse(40, 56, 13, 13, 0, 0, Math.PI * 2); c.fill(); c.stroke();
+          c.beginPath(); c.moveTo(34, 68); c.lineTo(32, 84); c.moveTo(46, 68); c.lineTo(48, 84); c.stroke();
           drawPigHead(c, 36, 32, 0.86, 'normal');
-
         } else if (pose === 14) {
-          c.fillStyle = '#DC2626';
-          c.font = '800 10px ' + CANVAS_FONT;
-          c.fillText('お助け料1億円', 14, 16);
-
-          c.fillStyle = skin;
-          c.strokeStyle = ink;
-          c.lineWidth = 2.4;
-          c.beginPath();
-          c.ellipse(48, 56, 16, 14, 0, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
-
-          c.beginPath();
-          c.moveTo(33, 52);
-          c.quadraticCurveTo(22, 58, 33, 63);
-          c.moveTo(63, 52);
-          c.quadraticCurveTo(74, 58, 63, 63);
-          c.stroke();
-
+          c.fillStyle = '#DC2626'; c.font = '800 10px ' + CANVAS_FONT; c.fillText('お助け料1億円', 14, 16);
+          c.fillStyle = skin; c.strokeStyle = ink; c.lineWidth = 2.4;
+          c.beginPath(); c.ellipse(48, 56, 16, 14, 0, 0, Math.PI * 2); c.fill(); c.stroke();
+          c.beginPath(); c.moveTo(33, 52); c.quadraticCurveTo(22, 58, 33, 63); c.moveTo(63, 52); c.quadraticCurveTo(74, 58, 63, 63); c.stroke();
           c.fillStyle = purple;
-          c.beginPath();
-          c.moveTo(34, 62);
-          c.lineTo(62, 62);
-          c.lineTo(60, 84);
-          c.lineTo(51, 84);
-          c.lineTo(48, 72);
-          c.lineTo(45, 84);
-          c.lineTo(36, 84);
-          c.closePath();
-          c.fill();
-          c.stroke();
-
+          c.beginPath(); c.moveTo(34, 62); c.lineTo(62, 62); c.lineTo(60, 84); c.lineTo(51, 84); c.lineTo(48, 72); c.lineTo(45, 84); c.lineTo(36, 84); c.closePath(); c.fill(); c.stroke();
           drawPigHead(c, 48, 32, 0.88, 'normal');
-
         } else {
-          c.fillStyle = '#EC4899';
-          c.font = '800 11px ' + CANVAS_FONT;
-          c.fillText('おやすみ', 54, 20);
-
-          c.fillStyle = purple;
-          c.strokeStyle = ink;
-          c.lineWidth = 2.4;
-          c.beginPath();
-          c.ellipse(44, 58, 16, 18, 0, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
-
+          c.fillStyle = '#EC4899'; c.font = '800 11px ' + CANVAS_FONT; c.fillText('おやすみ', 54, 20);
+          c.fillStyle = purple; c.strokeStyle = ink; c.lineWidth = 2.4;
+          c.beginPath(); c.ellipse(44, 58, 16, 18, 0, 0, Math.PI * 2); c.fill(); c.stroke();
           c.fillStyle = '#FFFFFF';
-          c.beginPath();
-          c.arc(39, 55, 2, 0, Math.PI * 2);
-          c.arc(49, 63, 2, 0, Math.PI * 2);
-          c.fill();
-
+          c.beginPath(); c.arc(39, 55, 2, 0, Math.PI * 2); c.arc(49, 63, 2, 0, Math.PI * 2); c.fill();
           drawPigHead(c, 44, 33, 0.86, 'sleepy');
-
-          c.fillStyle = purple;
-          c.strokeStyle = ink;
-          c.lineWidth = 2.1;
-          c.beginPath();
-          c.moveTo(28, 22);
-          c.quadraticCurveTo(44, 5, 62, 18);
-          c.lineTo(58, 24);
-          c.closePath();
-          c.fill();
-          c.stroke();
-
+          c.fillStyle = purple; c.strokeStyle = ink; c.lineWidth = 2.1;
+          c.beginPath(); c.moveTo(28, 22); c.quadraticCurveTo(44, 5, 62, 18); c.lineTo(58, 24); c.closePath(); c.fill(); c.stroke();
           c.fillStyle = '#FFFDF9';
-          c.beginPath();
-          c.ellipse(68, 64, 11, 13, 0.2, 0, Math.PI * 2);
-          c.fill();
-          c.stroke();
+          c.beginPath(); c.ellipse(68, 64, 11, 13, 0.2, 0, Math.PI * 2); c.fill(); c.stroke();
         }
 
         return off;
@@ -1701,7 +1800,7 @@
       }
 
       // =========================================================================
-      // 4. 高辨識度寬幅數位時鐘向量路徑 (0-9)
+      // 5. 高辨識度寬幅數位時鐘向量路徑 (0-9)
       // =========================================================================
       var DIGIT_POLYLINES = {
         '0': [
@@ -1787,7 +1886,7 @@
       }
 
       // =========================================================================
-      // 5. 105 隻小豬角色群體生成與時鐘排隊演算法
+      // 6. 105 隻小豬角色群體生成與時鐘排隊演算法
       // =========================================================================
       function initPigs() {
         pigs = [];
@@ -1819,7 +1918,7 @@
         var topBarEl = document.getElementById('topBar');
         var bottomBarEl = document.getElementById('bottomBar');
         var topBottom = 18;
-        if (currentSettings.visible && topBarEl) {
+        if (currentSettings && currentSettings.visible && topBarEl) {
           topBottom = 68;
           var tr = topBarEl.getBoundingClientRect();
           if (tr && tr.bottom > 20) topBottom = tr.bottom;
@@ -1936,7 +2035,7 @@
       }
 
       // =========================================================================
-      // 6. 主動畫迴圈
+      // 7. 主動畫迴圈
       // =========================================================================
       var lastTime = 0;
       function animate(now) {
@@ -1964,7 +2063,7 @@
         }
 
         var box = state.clockBox;
-        var minTopY = currentSettings.visible ? 64 : 26;
+        var minTopY = (currentSettings && currentSettings.visible) ? 64 : 26;
 
         for (var i = 0; i < pigs.length; i++) {
           var p = pigs[i];
@@ -2038,9 +2137,79 @@
       }
 
       // =========================================================================
-      // 7. 頂部標題、後方小圖示與按鈕圖示同步機制
+      // 8. 動態渲染彈窗預選格子與圖示同步
       // =========================================================================
+      function populatePresetPickers() {
+        var titleGrid = document.getElementById('titleStickerGrid');
+        if (titleGrid) {
+          titleGrid.innerHTML = '';
+          for (var i = 0; i < PRESET_ICONS.length; i++) {
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'sticker-item';
+            btn.setAttribute('data-preset-idx', String(i));
+            btn.title = PRESET_NAMES[i] || ('小豬 ' + (i + 1));
+            var img = document.createElement('img');
+            img.src = PRESET_ICONS[i];
+            img.alt = btn.title;
+            btn.appendChild(img);
+            titleGrid.appendChild(btn);
+          }
+        }
+
+        var hideGroup = document.getElementById('hideIconGroup');
+        if (hideGroup) {
+          hideGroup.innerHTML = '';
+          for (var h = 0; h < HIDE_PRESET_INDICES.length; h++) {
+            var hIdx = HIDE_PRESET_INDICES[h];
+            var hBtn = document.createElement('button');
+            hBtn.type = 'button';
+            hBtn.className = 'mini-icon-btn hide-icon-opt';
+            hBtn.setAttribute('data-preset-idx', String(hIdx));
+            hBtn.title = PRESET_NAMES[hIdx] || '';
+            var hImg = document.createElement('img');
+            hImg.src = PRESET_ICONS[hIdx];
+            hImg.alt = hBtn.title;
+            hBtn.appendChild(hImg);
+            hideGroup.appendChild(hBtn);
+          }
+          var hInp = document.createElement('input');
+          hInp.id = 'inputHideBtnIcon';
+          hInp.type = 'text';
+          hInp.maxLength = 4;
+          hInp.className = 'mini-icon-input';
+          hInp.placeholder = '自訂文字';
+          hideGroup.appendChild(hInp);
+        }
+
+        var showGroup = document.getElementById('showIconGroup');
+        if (showGroup) {
+          showGroup.innerHTML = '';
+          for (var s = 0; s < SHOW_PRESET_INDICES.length; s++) {
+            var sIdx = SHOW_PRESET_INDICES[s];
+            var sBtn = document.createElement('button');
+            sBtn.type = 'button';
+            sBtn.className = 'mini-icon-btn show-icon-opt';
+            sBtn.setAttribute('data-preset-idx', String(sIdx));
+            sBtn.title = PRESET_NAMES[sIdx] || '';
+            var sImg = document.createElement('img');
+            sImg.src = PRESET_ICONS[sIdx];
+            sImg.alt = sBtn.title;
+            sBtn.appendChild(sImg);
+            showGroup.appendChild(sBtn);
+          }
+          var sInp = document.createElement('input');
+          sInp.id = 'inputShowBtnIcon';
+          sInp.type = 'text';
+          sInp.maxLength = 4;
+          sInp.className = 'mini-icon-input';
+          sInp.placeholder = '自訂文字';
+          showGroup.appendChild(sInp);
+        }
+      }
+
       function loadSettings() {
+        currentSettings = getDefaultSettings();
         var raw = safeGet(STORAGE_KEY, '');
         if (!raw) return;
         try {
@@ -2059,13 +2228,13 @@
 
       function syncButtonIconDisplay(iconEl, imgEl, iconType, iconText, imgData) {
         if (!iconEl || !imgEl) return;
-        if (iconType === 'image' && imgData) {
+        if ((iconType === 'preset' || iconType === 'image') && imgData) {
           iconEl.style.display = 'none';
           imgEl.src = imgData;
           imgEl.style.display = 'inline-block';
         } else {
           imgEl.style.display = 'none';
-          iconEl.textContent = iconText || '🙈';
+          iconEl.textContent = iconText || '🐷';
           iconEl.style.display = 'inline-flex';
         }
       }
@@ -2099,11 +2268,11 @@
           if (s.iconType === 'none') {
             iconEl.style.display = 'none';
             imgEl.style.display = 'none';
-          } else if (s.iconType === 'image' && s.iconImage) {
+          } else if ((s.iconType === 'preset' || s.iconType === 'image') && s.iconImage) {
             iconEl.style.display = 'none';
             imgEl.src = s.iconImage;
             imgEl.style.display = 'inline-block';
-            var dim = Math.round(s.fontSize * 1.18);
+            var dim = Math.round(s.fontSize * 1.22);
             imgEl.style.width = dim + 'px';
             imgEl.style.height = dim + 'px';
           } else {
@@ -2121,9 +2290,9 @@
         }
       }
 
-      function syncModalUploadBar(thumbEl, statusEl, clearBtnEl, isImage, imgData, defaultMsg) {
+      function syncModalUploadBar(thumbEl, statusEl, clearBtnEl, isUploadedImg, imgData, defaultMsg) {
         if (thumbEl) {
-          if (isImage && imgData) {
+          if (isUploadedImg && imgData) {
             thumbEl.src = imgData;
             thumbEl.style.display = 'inline-block';
           } else {
@@ -2131,10 +2300,10 @@
           }
         }
         if (statusEl) {
-          statusEl.textContent = isImage && imgData ? '已套用自訂去背圖片' : defaultMsg;
+          statusEl.textContent = isUploadedImg && imgData ? '已套用相簿上傳圖片' : defaultMsg;
         }
         if (clearBtnEl) {
-          clearBtnEl.classList.toggle('hidden', !(isImage && imgData));
+          clearBtnEl.classList.toggle('hidden', !(isUploadedImg && imgData));
         }
       }
 
@@ -2174,11 +2343,11 @@
           if (!d.visible || d.iconType === 'none') {
             prevIcon.style.display = 'none';
             prevImg.style.display = 'none';
-          } else if (d.iconType === 'image' && d.iconImage) {
+          } else if ((d.iconType === 'preset' || d.iconType === 'image') && d.iconImage) {
             prevIcon.style.display = 'none';
             prevImg.src = d.iconImage;
             prevImg.style.display = 'inline-block';
-            var dim = Math.round(d.fontSize * 1.18);
+            var dim = Math.round(d.fontSize * 1.22);
             prevImg.style.width = dim + 'px';
             prevImg.style.height = dim + 'px';
           } else {
@@ -2197,7 +2366,7 @@
           document.getElementById('btnClearTitleIconImg'),
           d.iconType === 'image',
           d.iconImage,
-          '從手機相簿選擇小圖片（自動去背）'
+          '也可從手機相簿選擇小圖片（自動去背）'
         );
 
         var sizeBtns = document.querySelectorAll('.size-btn');
@@ -2206,16 +2375,16 @@
           sizeBtns[i].classList.toggle('active', sz === d.fontSize);
         }
 
-        var emojiBtns = document.querySelectorAll('.emoji-item');
-        for (var j = 0; j < emojiBtns.length; j++) {
-          var em = emojiBtns[j].getAttribute('data-emoji');
-          emojiBtns[j].classList.toggle('active', d.iconType === 'emoji' && d.iconEmoji === em);
+        var stickerBtns = document.querySelectorAll('.sticker-item');
+        for (var j = 0; j < stickerBtns.length; j++) {
+          var idx = Number(stickerBtns[j].getAttribute('data-preset-idx'));
+          stickerBtns[j].classList.toggle('active', d.iconType === 'preset' && d.presetIndex === idx);
         }
 
         var hideOpts = document.querySelectorAll('.hide-icon-opt');
         for (var h1 = 0; h1 < hideOpts.length; h1++) {
-          var matchHide = d.hideBtnIconType !== 'image' && hideOpts[h1].getAttribute('data-icon') === d.hideBtnIcon;
-          hideOpts[h1].classList.toggle('active', matchHide);
+          var hIdx = Number(hideOpts[h1].getAttribute('data-preset-idx'));
+          hideOpts[h1].classList.toggle('active', d.hideBtnIconType === 'preset' && d.hideBtnPresetIndex === hIdx);
         }
         syncModalUploadBar(
           document.getElementById('hideBtnThumb'),
@@ -2223,7 +2392,7 @@
           document.getElementById('btnClearHideIconImg'),
           d.hideBtnIconType === 'image',
           d.hideBtnImageData,
-          '目前使用文字/Emoji'
+          '已內建 6 款不理不理小圖示'
         );
         syncButtonIconDisplay(
           document.getElementById('prevHideEmoji'),
@@ -2235,8 +2404,8 @@
 
         var showOpts = document.querySelectorAll('.show-icon-opt');
         for (var s1 = 0; s1 < showOpts.length; s1++) {
-          var matchShow = d.showBtnIconType !== 'image' && showOpts[s1].getAttribute('data-icon') === d.showBtnIcon;
-          showOpts[s1].classList.toggle('active', matchShow);
+          var sIdx = Number(showOpts[s1].getAttribute('data-preset-idx'));
+          showOpts[s1].classList.toggle('active', d.showBtnIconType === 'preset' && d.showBtnPresetIndex === sIdx);
         }
         syncModalUploadBar(
           document.getElementById('showBtnThumb'),
@@ -2244,7 +2413,7 @@
           document.getElementById('btnClearShowIconImg'),
           d.showBtnIconType === 'image',
           d.showBtnImageData,
-          '目前使用文字/Emoji'
+          '已內建 6 款不理不理小圖示'
         );
         syncButtonIconDisplay(
           document.getElementById('prevShowEmoji'),
@@ -2267,8 +2436,12 @@
         if (inputCustomIcon) {
           inputCustomIcon.value = draftSettings.iconType === 'emoji' ? draftSettings.iconEmoji : '';
         }
-        if (inputHideBtnIcon) inputHideBtnIcon.value = draftSettings.hideBtnIcon;
-        if (inputShowBtnIcon) inputShowBtnIcon.value = draftSettings.showBtnIcon;
+        if (inputHideBtnIcon) {
+          inputHideBtnIcon.value = draftSettings.hideBtnIconType === 'emoji' ? draftSettings.hideBtnIcon : '';
+        }
+        if (inputShowBtnIcon) {
+          inputShowBtnIcon.value = draftSettings.showBtnIconType === 'emoji' ? draftSettings.showBtnIcon : '';
+        }
 
         updateModalPreview();
         var modal = document.getElementById('titleModal');
@@ -2281,7 +2454,7 @@
       }
 
       // =========================================================================
-      // 8. 響應式畫布尺寸重設
+      // 9. 響應式畫布尺寸重設
       // =========================================================================
       function resize() {
         W = Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0, 320);
@@ -2303,7 +2476,7 @@
       }
 
       // =========================================================================
-      // 9. 完整 UI 事件綁定與啟動流程
+      // 10. 完整 UI 事件綁定與啟動流程
       // =========================================================================
       function bindUI() {
         canvas.addEventListener('click', function () {
@@ -2514,17 +2687,18 @@
           updateModalPreview();
         });
 
-        document.getElementById('emojiGrid').addEventListener('click', function (e) {
+        // 點選 16 款預選標題小豬頭像
+        document.getElementById('titleStickerGrid').addEventListener('click', function (e) {
           var target = e.target;
-          while (target && target !== this && !target.classList.contains('emoji-item')) {
+          while (target && target !== this && !target.classList.contains('sticker-item')) {
             target = target.parentNode;
           }
-          if (!target || !target.classList.contains('emoji-item') || !draftSettings) return;
-          var em = target.getAttribute('data-emoji') || '🐷';
-          draftSettings.iconType = 'emoji';
-          draftSettings.iconEmoji = em;
-          draftSettings.iconImage = '';
-          document.getElementById('inputCustomIcon').value = em;
+          if (!target || !target.classList.contains('sticker-item') || !draftSettings) return;
+          var idx = Number(target.getAttribute('data-preset-idx')) || 0;
+          draftSettings.iconType = 'preset';
+          draftSettings.presetIndex = idx;
+          draftSettings.iconImage = PRESET_ICONS[idx] || '';
+          document.getElementById('inputCustomIcon').value = '';
           updateModalPreview();
         });
 
@@ -2532,8 +2706,8 @@
           if (!draftSettings) return;
           var val = this.value.trim();
           if (!val) {
-            draftSettings.iconType = 'none';
-            draftSettings.iconImage = '';
+            draftSettings.iconType = 'preset';
+            draftSettings.iconImage = PRESET_ICONS[draftSettings.presetIndex] || '';
           } else {
             draftSettings.iconType = 'emoji';
             draftSettings.iconEmoji = val;
@@ -2571,31 +2745,39 @@
 
         document.getElementById('btnClearTitleIconImg').addEventListener('click', function () {
           if (!draftSettings) return;
-          draftSettings.iconType = 'emoji';
-          draftSettings.iconImage = '';
-          if (!draftSettings.iconEmoji) draftSettings.iconEmoji = '🐷';
-          document.getElementById('inputCustomIcon').value = draftSettings.iconEmoji;
+          draftSettings.iconType = 'preset';
+          draftSettings.presetIndex = 0;
+          draftSettings.iconImage = PRESET_ICONS[0] || '';
+          document.getElementById('inputCustomIcon').value = '';
           updateModalPreview();
         });
 
+        // 隱藏選項按鈕圖示選擇
         document.getElementById('hideIconGroup').addEventListener('click', function (e) {
           var target = e.target;
           while (target && target !== this && !target.classList.contains('hide-icon-opt')) {
             target = target.parentNode;
           }
           if (!target || !target.classList.contains('hide-icon-opt') || !draftSettings) return;
-          var ic = target.getAttribute('data-icon') || '🙈';
-          draftSettings.hideBtnIconType = 'emoji';
-          draftSettings.hideBtnIcon = ic;
-          document.getElementById('inputHideBtnIcon').value = ic;
+          var idx = Number(target.getAttribute('data-preset-idx')) || 6;
+          draftSettings.hideBtnIconType = 'preset';
+          draftSettings.hideBtnPresetIndex = idx;
+          draftSettings.hideBtnImageData = PRESET_ICONS[idx] || '';
+          var inp = document.getElementById('inputHideBtnIcon');
+          if (inp) inp.value = '';
           updateModalPreview();
         });
 
         document.getElementById('inputHideBtnIcon').addEventListener('input', function () {
           if (!draftSettings) return;
           var val = this.value.trim();
-          draftSettings.hideBtnIconType = 'emoji';
-          draftSettings.hideBtnIcon = val || '🙈';
+          if (!val) {
+            draftSettings.hideBtnIconType = 'preset';
+            draftSettings.hideBtnImageData = PRESET_ICONS[draftSettings.hideBtnPresetIndex] || '';
+          } else {
+            draftSettings.hideBtnIconType = 'emoji';
+            draftSettings.hideBtnIcon = val;
+          }
           updateModalPreview();
         });
 
@@ -2627,28 +2809,38 @@
 
         document.getElementById('btnClearHideIconImg').addEventListener('click', function () {
           if (!draftSettings) return;
-          draftSettings.hideBtnIconType = 'emoji';
+          draftSettings.hideBtnIconType = 'preset';
+          draftSettings.hideBtnPresetIndex = 6;
+          draftSettings.hideBtnImageData = PRESET_ICONS[6] || '';
           updateModalPreview();
         });
 
+        // 顯示選項按鈕圖示選擇
         document.getElementById('showIconGroup').addEventListener('click', function (e) {
           var target = e.target;
           while (target && target !== this && !target.classList.contains('show-icon-opt')) {
             target = target.parentNode;
           }
           if (!target || !target.classList.contains('show-icon-opt') || !draftSettings) return;
-          var ic = target.getAttribute('data-icon') || '👁️';
-          draftSettings.showBtnIconType = 'emoji';
-          draftSettings.showBtnIcon = ic;
-          document.getElementById('inputShowBtnIcon').value = ic;
+          var idx = Number(target.getAttribute('data-preset-idx')) || 4;
+          draftSettings.showBtnIconType = 'preset';
+          draftSettings.showBtnPresetIndex = idx;
+          draftSettings.showBtnImageData = PRESET_ICONS[idx] || '';
+          var inp = document.getElementById('inputShowBtnIcon');
+          if (inp) inp.value = '';
           updateModalPreview();
         });
 
         document.getElementById('inputShowBtnIcon').addEventListener('input', function () {
           if (!draftSettings) return;
           var val = this.value.trim();
-          draftSettings.showBtnIconType = 'emoji';
-          draftSettings.showBtnIcon = val || '👁️';
+          if (!val) {
+            draftSettings.showBtnIconType = 'preset';
+            draftSettings.showBtnImageData = PRESET_ICONS[draftSettings.showBtnPresetIndex] || '';
+          } else {
+            draftSettings.showBtnIconType = 'emoji';
+            draftSettings.showBtnIcon = val;
+          }
           updateModalPreview();
         });
 
@@ -2680,30 +2872,40 @@
 
         document.getElementById('btnClearShowIconImg').addEventListener('click', function () {
           if (!draftSettings) return;
-          draftSettings.showBtnIconType = 'emoji';
+          draftSettings.showBtnIconType = 'preset';
+          draftSettings.showBtnPresetIndex = 4;
+          draftSettings.showBtnImageData = PRESET_ICONS[4] || '';
           updateModalPreview();
         });
 
         document.getElementById('btnResetDefaults').addEventListener('click', function () {
-          draftSettings = cloneSettings(DEFAULT_SETTINGS);
+          draftSettings = getDefaultSettings();
           document.getElementById('inputTitle').value = draftSettings.text;
-          document.getElementById('inputCustomIcon').value = draftSettings.iconEmoji;
-          document.getElementById('inputHideBtnIcon').value = draftSettings.hideBtnIcon;
-          document.getElementById('inputShowBtnIcon').value = draftSettings.showBtnIcon;
+          document.getElementById('inputCustomIcon').value = '';
+          var hInp = document.getElementById('inputHideBtnIcon');
+          var sInp = document.getElementById('inputShowBtnIcon');
+          if (hInp) hInp.value = '';
+          if (sInp) sInp.value = '';
           updateModalPreview();
           showToast('已重設為預設值（按「確認套用」生效）');
         });
 
         document.getElementById('btnApplyModal').addEventListener('click', function () {
           if (draftSettings) {
-            if (draftSettings.iconType === 'image' && !draftSettings.iconImage) {
-              draftSettings.iconType = 'emoji';
+            if ((draftSettings.iconType === 'image' || draftSettings.iconType === 'preset') && !draftSettings.iconImage) {
+              draftSettings.iconType = 'preset';
+              draftSettings.presetIndex = 0;
+              draftSettings.iconImage = PRESET_ICONS[0] || '';
             }
-            if (draftSettings.hideBtnIconType === 'image' && !draftSettings.hideBtnImageData) {
-              draftSettings.hideBtnIconType = 'emoji';
+            if ((draftSettings.hideBtnIconType === 'image' || draftSettings.hideBtnIconType === 'preset') && !draftSettings.hideBtnImageData) {
+              draftSettings.hideBtnIconType = 'preset';
+              draftSettings.hideBtnPresetIndex = 6;
+              draftSettings.hideBtnImageData = PRESET_ICONS[6] || '';
             }
-            if (draftSettings.showBtnIconType === 'image' && !draftSettings.showBtnImageData) {
-              draftSettings.showBtnIconType = 'emoji';
+            if ((draftSettings.showBtnIconType === 'image' || draftSettings.showBtnIconType === 'preset') && !draftSettings.showBtnImageData) {
+              draftSettings.showBtnIconType = 'preset';
+              draftSettings.showBtnPresetIndex = 4;
+              draftSettings.showBtnImageData = PRESET_ICONS[4] || '';
             }
             currentSettings = cloneSettings(draftSettings);
             saveSettings();
@@ -2724,6 +2926,8 @@
       }
 
       function bootstrap() {
+        buildPresetIcons();
+        populatePresetPickers();
         loadSettings();
         applySettingsToScreen();
         buildDefaultSprites();
