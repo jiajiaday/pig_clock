@@ -7,11 +7,11 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#FDF6EC" id="metaTheme" />
   <title>不理不理左衛門時鐘</title>
-  <meta name="mobile-web-app-capable" content="yes">
-  <link rel="manifest" href="manifest.json">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@700;900&family=Yomogi&display=swap" rel="stylesheet">
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Hachi+Maru+Pop&family=Kiwi+Maru:wght@400;500&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg: #FDF6EC;
@@ -21,7 +21,8 @@
       --modal-bg: #FDF6EC;
       --card-bg: #FFFFFF;
       --accent: #F4B89C;
-      --font-hand: "Zen Maru Gothic", "Yomogi", "Comic Sans MS", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      --font-hand: "Hachi Maru Pop", "Kiwi Maru", "Zen Maru Gothic", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      --font-ui: "Zen Maru Gothic", "Kiwi Maru", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", sans-serif;
     }
 
     body.night {
@@ -49,7 +50,7 @@
       overflow: hidden;
       background-color: var(--bg);
       color: var(--ink);
-      font-family: var(--font-hand);
+      font-family: var(--font-ui);
       transition: background-color 0.25s ease, color 0.25s ease;
       touch-action: manipulation;
     }
@@ -96,7 +97,7 @@
       font-size: 24px;
       font-weight: 900;
       line-height: 1.25;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.03em;
       cursor: pointer;
       transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
     }
@@ -176,15 +177,14 @@
       align-items: center;
       justify-content: center;
       gap: 5px;
-      padding: 7px 14px;
-      border: 2px solid var(--pill-border);
-      border-radius: 22px 16px 24px 18px / 18px 24px 16px 22px;
+      padding: 7px 13px;
+      border: 1.8px solid var(--pill-border);
+      border-radius: 18px 14px 20px 15px / 15px 19px 14px 18px;
       background-color: var(--pill-bg);
       color: var(--ink);
       font-family: var(--font-hand);
       font-size: 13px;
-      font-weight: 900;
-      letter-spacing: 0.02em;
+      font-weight: 800;
       cursor: pointer;
       box-shadow: 0 2px 0 var(--pill-border);
       white-space: nowrap;
@@ -203,10 +203,9 @@
     .hint-line {
       margin-top: 7px;
       font-family: var(--font-hand);
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 700;
-      letter-spacing: 0.03em;
-      opacity: 0.75;
+      opacity: 0.72;
       text-align: center;
     }
 
@@ -297,7 +296,6 @@
       border-radius: 20px;
       padding: 16px;
       box-shadow: 0 14px 36px rgba(0, 0, 0, 0.3);
-      font-family: var(--font-hand);
     }
 
     .modal-head {
@@ -347,6 +345,7 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
+      font-family: var(--font-hand);
       font-size: 24px;
       font-weight: 900;
       line-height: 1.25;
@@ -422,7 +421,7 @@
       border-radius: 12px;
       background: var(--card-bg);
       color: var(--ink);
-      font-family: var(--font-hand);
+      font-family: inherit;
       font-size: 13px;
       font-weight: 800;
       cursor: pointer;
@@ -440,7 +439,7 @@
       border-radius: 12px;
       background: var(--card-bg);
       color: var(--ink);
-      font-family: var(--font-hand);
+      font-family: inherit;
       font-size: 14px;
       font-weight: 700;
       user-select: text;
@@ -460,7 +459,7 @@
       border-radius: 999px;
       background: var(--card-bg);
       color: var(--ink);
-      font-family: var(--font-hand);
+      font-family: inherit;
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
@@ -484,7 +483,7 @@
       border-radius: 10px;
       background: var(--card-bg);
       color: var(--ink);
-      font-family: var(--font-hand);
+      font-family: inherit;
       font-size: 11px;
       font-weight: 800;
       cursor: pointer;
@@ -566,7 +565,7 @@
       border-radius: 10px;
       background: var(--card-bg);
       color: var(--ink);
-      font-family: var(--font-hand);
+      font-family: inherit;
       font-size: 14px;
       font-weight: 800;
       text-align: center;
@@ -797,4 +796,681 @@
           <button type="button" class="mini-icon-btn hide-icon-opt" data-icon="🔽">🔽</button>
           <button type="button" class="mini-icon-btn hide-icon-opt" data-icon="🫥">🫥</button>
           <button type="button" class="mini-icon-btn hide-icon-opt" data-icon="🌙">🌙</button>
-          <button type="button"
+          <button type="button" class="mini-icon-btn hide-icon-opt" data-icon="🐷">🐷</button>
+          <button type="button" class="mini-icon-btn hide-icon-opt" data-icon="🐾">🐾</button>
+          <input id="inputHideBtnIcon" type="text" maxlength="4" class="mini-icon-input" placeholder="自訂" title="輸入自訂圖示" />
+        </div>
+        <div class="btn-icon-upload-bar">
+          <div class="btn-icon-upload-left">
+            <img id="hideBtnThumb" class="btn-icon-thumb" alt="隱藏圖示預覽" />
+            <span id="hideBtnImgStatus">目前使用文字/Emoji</span>
+          </div>
+          <div class="btn-icon-actions">
+            <button id="btnUploadHideIcon" type="button" class="chip">📁 上傳圖示</button>
+            <button id="btnClearHideIconImg" type="button" class="chip hidden">改用 Emoji</button>
+            <input id="fileHideIconInput" type="file" accept="image/*" class="hidden" />
+          </div>
+        </div>
+
+        <!-- 6. 「顯示選項」按鈕圖示 -->
+        <div class="field-label-row" style="margin-top:10px;">
+          <span>6. 「顯示選項」按鈕圖示</span>
+        </div>
+        <div class="icon-pick-row" id="showIconGroup">
+          <button type="button" class="mini-icon-btn show-icon-opt" data-icon="👁️">👁️</button>
+          <button type="button" class="mini-icon-btn show-icon-opt" data-icon="🔼">🔼</button>
+          <button type="button" class="mini-icon-btn show-icon-opt" data-icon="⚙️">⚙️</button>
+          <button type="button" class="mini-icon-btn show-icon-opt" data-icon="✨">✨</button>
+          <button type="button" class="mini-icon-btn show-icon-opt" data-icon="🎛️">🎛️</button>
+          <button type="button" class="mini-icon-btn show-icon-opt" data-icon="🐷">🐷</button>
+          <input id="inputShowBtnIcon" type="text" maxlength="4" class="mini-icon-input" placeholder="自訂" title="輸入自訂圖示" />
+        </div>
+        <div class="btn-icon-upload-bar">
+          <div class="btn-icon-upload-left">
+            <img id="showBtnThumb" class="btn-icon-thumb" alt="顯示圖示預覽" />
+            <span id="showBtnImgStatus">目前使用文字/Emoji</span>
+          </div>
+          <div class="btn-icon-actions">
+            <button id="btnUploadShowIcon" type="button" class="chip">📁 上傳圖示</button>
+            <button id="btnClearShowIconImg" type="button" class="chip hidden">改用 Emoji</button>
+            <input id="fileShowIconInput" type="file" accept="image/*" class="hidden" />
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部操作按鈕 -->
+      <div class="modal-actions">
+        <button id="btnResetDefaults" type="button" class="chip">↺ 恢復預設值</button>
+        <div class="modal-actions-right">
+          <button id="btnCancelModal" type="button" class="pill-btn">取消</button>
+          <button id="btnApplyModal" type="button" class="pill-btn primary">✓ 確認套用</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var HAND_FONT = '"Hachi Maru Pop", "Kiwi Maru", "Zen Maru Gothic", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
+
+      // =========================================================================
+      // 1. 安全儲存存取
+      // =========================================================================
+      var memStore = {};
+      function safeGet(key, fallback) {
+        try {
+          var v = window.localStorage.getItem(key);
+          if (v !== null) return v;
+        } catch (e) {}
+        return Object.prototype.hasOwnProperty.call(memStore, key) ? memStore[key] : fallback;
+      }
+
+      function safeSet(key, val) {
+        memStore[key] = val;
+        try {
+          window.localStorage.setItem(key, val);
+        } catch (e) {}
+      }
+
+      function drawRoundRect(c, x, y, w, h, r) {
+        var radius = Math.min(r, w / 2, h / 2);
+        c.beginPath();
+        c.moveTo(x + radius, y);
+        c.arcTo(x + w, y, x + w, y + h, radius);
+        c.arcTo(x + w, y + h, x, y + h, radius);
+        c.arcTo(x, y + h, x, y, radius);
+        c.arcTo(x, y, x + w, y, radius);
+        c.closePath();
+      }
+
+      // =========================================================================
+      // 2. 應用程式狀態與視窗尺寸初始化
+      // =========================================================================
+      var STORAGE_KEY = 'buriburi_pig_clock_settings_v4';
+      var TOTAL_PIGS = 105;
+      var DEFAULT_POSE_COUNT = 16;
+      var W = Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0, 320);
+      var H = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0, 480);
+      var DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+      var DEFAULT_SETTINGS = {
+        visible: true,
+        text: '不理不理左衛門時鐘',
+        fontSize: 24,
+        iconType: 'emoji',
+        iconEmoji: '🐷',
+        iconImage: '',
+        hideBtnIcon: '🙈',
+        hideBtnIconType: 'emoji',
+        hideBtnImageData: '',
+        showBtnIcon: '👁️',
+        showBtnIconType: 'emoji',
+        showBtnImageData: ''
+      };
+
+      function cloneSettings(src) {
+        return {
+          visible: typeof src.visible === 'boolean' ? src.visible : true,
+          text: typeof src.text === 'string' ? src.text : DEFAULT_SETTINGS.text,
+          fontSize: typeof src.fontSize === 'number' ? Math.min(42, Math.max(14, src.fontSize)) : 24,
+          iconType: (src.iconType === 'emoji' || src.iconType === 'image' || src.iconType === 'none') ? src.iconType : 'emoji',
+          iconEmoji: typeof src.iconEmoji === 'string' ? src.iconEmoji : (typeof src.emoji === 'string' ? src.emoji : '🐷'),
+          iconImage: typeof src.iconImage === 'string' ? src.iconImage : (typeof src.imageData === 'string' ? src.imageData : ''),
+          hideBtnIcon: typeof src.hideBtnIcon === 'string' && src.hideBtnIcon.trim() ? src.hideBtnIcon.trim() : '🙈',
+          hideBtnIconType: (src.hideBtnIconType === 'image' && src.hideBtnImageData) ? 'image' : 'emoji',
+          hideBtnImageData: typeof src.hideBtnImageData === 'string' ? src.hideBtnImageData : '',
+          showBtnIcon: typeof src.showBtnIcon === 'string' && src.showBtnIcon.trim() ? src.showBtnIcon.trim() : '👁️',
+          showBtnIconType: (src.showBtnIconType === 'image' && src.showBtnImageData) ? 'image' : 'emoji',
+          showBtnImageData: typeof src.showBtnImageData === 'string' ? src.showBtnImageData : ''
+        };
+      }
+
+      var currentSettings = cloneSettings(DEFAULT_SETTINGS);
+      var draftSettings = null;
+
+      var state = {
+        gathered: true,
+        extraLarge: true,
+        nightMode: false,
+        wakeLock: null,
+        barHidden: false,
+        lastMinute: -1,
+        clockBox: { left: 20, right: 300, top: 120, bottom: 420 }
+      };
+
+      var canvas = document.getElementById('clockCanvas');
+      var ctx = canvas.getContext('2d');
+      var defaultSprites = [];
+      var activeSprites = [];
+      var usingCustomStickers = false;
+      var pigs = [];
+      var toastTimer = null;
+
+      function showToast(msg) {
+        var el = document.getElementById('toast');
+        if (!el) return;
+        el.textContent = msg;
+        el.classList.add('show');
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () {
+          el.classList.remove('show');
+        }, 2200);
+      }
+
+      // =========================================================================
+      // 3. 預先繪製 16 款不理不理左衛門搞笑姿勢（96x96 離屏畫布）
+      // =========================================================================
+      function drawKatana(c, x, y, angle) {
+        c.save();
+        c.translate(x, y);
+        c.rotate(angle);
+        c.fillStyle = '#E11D48';
+        c.strokeStyle = '#3B2318';
+        c.lineWidth = 1.8;
+        drawRoundRect(c, -12, -2.5, 16, 5, 2);
+        c.fill();
+        c.stroke();
+        c.fillStyle = '#FACC15';
+        c.fillRect(3, -4.5, 3, 9);
+        c.strokeRect(3, -4.5, 3, 9);
+        c.fillStyle = '#FDE047';
+        drawRoundRect(c, 6, -2.5, 8, 5, 1.5);
+        c.fill();
+        c.stroke();
+        c.restore();
+      }
+
+      function drawPigHead(c, cx, cy, scale, mood) {
+        c.save();
+        c.translate(cx, cy);
+        c.scale(scale, scale);
+
+        var skin = '#F5B496';
+        var snoutCol = '#F9CBB5';
+        var ink = '#3B2318';
+
+        c.fillStyle = skin;
+        c.strokeStyle = ink;
+        c.lineWidth = 2.4;
+        c.lineJoin = 'round';
+        c.lineCap = 'round';
+
+        // 尖尖豬耳朵
+        c.beginPath();
+        c.moveTo(-17, -10);
+        c.lineTo(-22, -26);
+        c.lineTo(-7, -17);
+        c.closePath();
+        c.fill();
+        c.stroke();
+
+        c.beginPath();
+        c.moveTo(17, -10);
+        c.lineTo(22, -26);
+        c.lineTo(7, -17);
+        c.closePath();
+        c.fill();
+        c.stroke();
+
+        // 圓滾滾臉型
+        c.beginPath();
+        c.ellipse(0, 0, 21, 18, 0, 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+
+        // 招牌粗眉毛
+        c.lineWidth = 3.2;
+        if (mood === 'sad') {
+          c.beginPath();
+          c.moveTo(-15, -9);
+          c.lineTo(-6, -6);
+          c.moveTo(15, -9);
+          c.lineTo(6, -6);
+          c.stroke();
+        } else {
+          c.beginPath();
+          c.moveTo(-15, -6);
+          c.lineTo(-5, -10);
+          c.moveTo(15, -6);
+          c.lineTo(5, -10);
+          c.stroke();
+        }
+
+        // 眼睛
+        c.fillStyle = ink;
+        if (mood === 'sleepy') {
+          c.lineWidth = 2;
+          c.beginPath();
+          c.moveTo(-13, -3);
+          c.lineTo(-7, -3);
+          c.moveTo(7, -3);
+          c.lineTo(13, -3);
+          c.stroke();
+        } else {
+          c.beginPath();
+          c.arc(-10, -3, 2.1, 0, Math.PI * 2);
+          c.arc(10, -3, 2.1, 0, Math.PI * 2);
+          c.fill();
+        }
+
+        // 大豬鼻子
+        c.fillStyle = snoutCol;
+        c.strokeStyle = ink;
+        c.lineWidth = 2.2;
+        c.beginPath();
+        c.ellipse(0, 6, 13, 9, 0, 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+
+        // 兩個鼻孔
+        c.fillStyle = ink;
+        c.beginPath();
+        c.ellipse(-4.5, 6, 2.2, 3.4, 0, 0, Math.PI * 2);
+        c.ellipse(4.5, 6, 2.2, 3.4, 0, 0, Math.PI * 2);
+        c.fill();
+
+        c.restore();
+      }
+
+      function createPigSprite(pose) {
+        var off = document.createElement('canvas');
+        off.width = 96;
+        off.height = 96;
+        var c = off.getContext('2d');
+        var skin = '#F5B496';
+        var purple = '#7E3AF2';
+        var ink = '#3B2318';
+
+        c.lineCap = 'round';
+        c.lineJoin = 'round';
+
+        if (pose === 0) {
+          // 姿勢 0：站立比 OK 手勢
+          c.fillStyle = skin;
+          c.strokeStyle = ink;
+          c.lineWidth = 2.4;
+          c.beginPath();
+          c.ellipse(48, 55, 16, 15, 0, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+
+          c.beginPath();
+          c.moveTo(62, 49);
+          c.quadraticCurveTo(74, 38, 70, 28);
+          c.stroke();
+          c.beginPath();
+          c.arc(70, 26, 4.5, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+          c.beginPath();
+          c.moveTo(34, 50);
+          c.lineTo(25, 60);
+          c.stroke();
+
+          c.fillStyle = purple;
+          c.beginPath();
+          c.moveTo(33, 60);
+          c.lineTo(63, 60);
+          c.lineTo(61, 83);
+          c.lineTo(51, 83);
+          c.lineTo(48, 71);
+          c.lineTo(45, 83);
+          c.lineTo(35, 83);
+          c.closePath();
+          c.fill();
+          c.stroke();
+
+          drawKatana(c, 33, 62, -0.4);
+          drawPigHead(c, 48, 30, 0.92, 'normal');
+
+          c.fillStyle = '#DC2626';
+          c.font = '900 13px ' + HAND_FONT;
+          c.fillText('ok', 63, 17);
+
+        } else if (pose === 1) {
+          // 姿勢 1：趴地單手撐頭發懶
+          c.fillStyle = purple;
+          c.strokeStyle = ink;
+          c.lineWidth = 2.4;
+          c.beginPath();
+          c.ellipse(68, 66, 19, 8, -0.1, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+
+          c.fillStyle = skin;
+          c.beginPath();
+          c.ellipse(44, 65, 18, 10, 0, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+
+          c.beginPath();
+          c.moveTo(26, 68);
+          c.lineTo(22, 56);
+          c.lineTo(29, 52);
+          c.stroke();
+
+          drawKatana(c, 58, 61, 0.15);
+          drawPigHead(c, 32, 46, 0.9, 'sleepy');
+
+        } else if (pose === 2) {
+          // 姿勢 2：流汗下跪土下座道歉
+          c.fillStyle = purple;
+          c.strokeStyle = ink;
+          c.lineWidth = 2.4;
+          c.beginPath();
+          c.ellipse(54, 71, 17, 11, 0, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+
+          c.fillStyle = skin;
+          c.beginPath();
+          c.ellipse(42, 65, 17, 13, -0.2, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+
+          drawKatana(c, 62, 66, 0.3);
+          drawPigHead(c, 32, 56, 0.86, 'sad');
+
+          c.fillStyle = '#38BDF8';
+          c.beginPath();
+          c.arc(22, 36, 2.5, 0, Math.PI * 2);
+          c.arc(46, 34, 2.5, 0, Math.PI * 2);
+          c.arc(64, 44, 2.5, 0, Math.PI * 2);
+          c.fill();
+
+          c.fillStyle = '#2563EB';
+          c.font = '800 11px ' + HAND_FONT;
+          c.fillText('すみません', 16, 22);
+
+        } else if (pose === 3) {
+          // 姿勢 3：紫褲武術高側踢
+          c.fillStyle = skin;
+          c.strokeStyle = ink;
+          c.lineWidth = 2.4;
+          c.beginPath();
+          c.ellipse(42, 53, 14, 14, -0.2, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+
+          c.beginPath();
+          c.moveTo(30, 48);
+          c.lineTo(20, 39);
+          c.moveTo(54, 49);
+          c.lineTo(64, 41);
+          c.stroke();
+
+          c.fillStyle = purple;
+          c.beginPath();
+          c.moveTo(30, 60);
+          c.lineTo(54, 57);
+          c.lineTo(82, 43);
+          c.lineTo(85, 52);
+          c.lineTo(52, 69);
+          c.lineTo(44, 86);
+          c.lineTo(34, 86);
+          c.closePath();
+          c.fill();
+          c.stroke();
+
+          drawKatana(c, 31, 61, -0.5);
+          drawPigHead(c, 40, 29, 0.9, 'normal');
+
+        } else if (pose === 4) {
+          // 姿勢 4：深情捧著鮮紅玫瑰
+          c.fillStyle = skin;
+          c.strokeStyle = ink;
+          c.lineWidth = 2.4;
+          c.beginPath();
+          c.ellipse(48, 55, 16, 15, 0, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+
+          c.fillStyle = purple;
+          c.beginPath();
+          c.moveTo(33, 60);
+          c.lineTo(63, 60);
+          c.lineTo(61, 83);
+          c.lineTo(51, 83);
+          c.lineTo(48, 71);
+          c.lineTo(45, 83);
+          c.lineTo(35, 83);
+          c.closePath();
+          c.fill();
+          c.stroke();
+
+          drawKatana(c, 33, 62, -0.4);
+          drawPigHead(c, 48, 30, 0.92, 'normal');
+
+          c.strokeStyle = '#16A34A';
+          c.lineWidth = 3;
+          c.beginPath();
+          c.moveTo(46, 64);
+          c.lineTo(60, 46);
+          c.stroke();
+
+          c.fillStyle = '#22C55E';
+          c.beginPath();
+          c.ellipse(57, 56, 5, 2.5, 0.4, 0, Math.PI * 2);
+          c.fill();
+
+          c.fillStyle = '#E11D48';
+          c.strokeStyle = ink;
+          c.lineWidth = 1.8;
+          c.beginPath();
+          c.arc(61, 44, 7, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+
+        } else if (pose === 5) {
+          // 姿勢 5：紫色圓點睡衣睡帽抱枕頭
+          c.fillStyle = purple;
+          c.strokeStyle = ink;
+          c.lineWidth = 2.4;
+          c.beginPath();
+          c.ellipse(48, 58, 17, 18, 0, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+
+          c.fillStyle = '#FFFFFF';
+          c.beginPath();
+          c.arc(42, 54, 2.2, 0, Math.PI * 2);
+          c.arc(54, 62, 2.2, 0, Math.PI * 2);
+          c.arc(44, 68, 2.2, 0, Math.PI * 2);
+          c.fill();
+
+          drawPigHead(c, 48, 33, 0.88, 'sleepy');
+
+          c.fillStyle = purple;
+          c.strokeStyle = ink;
+          c.lineWidth = 2.2;
+          c.beginPath();
+          c.moveTo(31, 22);
+          c.quadraticCurveTo(48, 4, 68, 18);
+          c.lineTo(63, 24);
+          c.closePath();
+          c.fill();
+          c.stroke();
+          c.fillStyle = '#FFFFFF';
+          c.beginPath();
+          c.arc(70, 19, 4, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+
+          c.fillStyle = '#FFFDF9';
+          c.beginPath();
+          c.ellipse(72, 62, 11, 14, 0.25, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+
+        } else if (pose === 6) {
+          // 姿勢 6：風衣禮帽墨鏡偵探
+          c.fillStyle = '#E5E7EB';
+          c.strokeStyle = ink;
+          c.lineWidth = 2.3;
+          c.beginPath();
+          c.moveTo(33, 42);
+          c.lineTo(27, 79);
+          c.lineTo(69, 79);
+          c.lineTo(63, 42);
+          c.closePath();
+          c.fill();
+          c.stroke();
+
+          c.fillStyle = purple;
+          c.fillRect(36, 79, 8, 6);
+          c.fillRect(52, 79, 8, 6);
+
+          drawPigHead(c, 48, 31, 0.88, 'normal');
+
+          c.fillStyle = '#111827';
+          c.fillRect(34, 26, 12, 6);
+          c.fillRect(50, 26, 12, 6);
+          c.strokeStyle = '#111827';
+          c.lineWidth = 2;
+          c.beginPath();
+          c.moveTo(46, 28);
+          c.lineTo(50, 28);
+          c.stroke();
+
+          c.fillStyle = '#6B7280';
+          c.strokeStyle = ink;
+          c.lineWidth = 2.2;
+          c.beginPath();
+          c.ellipse(48, 20, 25, 5, 0, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+          c.beginPath();
+          c.arc(48, 18, 14, Math.PI, 0);
+          c.fill();
+          c.stroke();
+
+        } else if (pose === 7) {
+          // 姿勢 7：開心跳躍撒粉紅愛心
+          c.fillStyle = skin;
+          c.strokeStyle = ink;
+          c.lineWidth = 2.4;
+          c.beginPath();
+          c.ellipse(46, 53, 15, 14, -0.1, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+
+          c.beginPath();
+          c.moveTo(32, 47);
+          c.lineTo(22, 37);
+          c.moveTo(60, 48);
+          c.lineTo(70, 39);
+          c.stroke();
+
+          c.fillStyle = purple;
+          c.beginPath();
+          c.moveTo(32, 58);
+          c.lineTo(60, 58);
+          c.lineTo(65, 81);
+          c.lineTo(54, 82);
+          c.lineTo(46, 70);
+          c.lineTo(36, 82);
+          c.lineTo(27, 78);
+          c.closePath();
+          c.fill();
+          c.stroke();
+
+          drawKatana(c, 32, 59, -0.45);
+          drawPigHead(c, 45, 29, 0.9, 'normal');
+
+          c.fillStyle = '#EC4899';
+          c.beginPath();
+          c.arc(73, 21, 3.5, 0, Math.PI * 2);
+          c.arc(78, 21, 3.5, 0, Math.PI * 2);
+          c.moveTo(70, 23);
+          c.lineTo(75.5, 30);
+          c.lineTo(81, 23);
+          c.fill();
+
+          c.beginPath();
+          c.arc(20, 22, 2.5, 0, Math.PI * 2);
+          c.arc(24, 22, 2.5, 0, Math.PI * 2);
+          c.moveTo(18, 23.5);
+          c.lineTo(22, 28.5);
+          c.lineTo(26, 23.5);
+          c.fill();
+
+        } else if (pose === 8) {
+          // 姿勢 8：側躺挖鼻孔「へー」
+          c.fillStyle = purple;
+          c.strokeStyle = ink;
+          c.lineWidth = 2.4;
+          c.beginPath();
+          c.ellipse(66, 68, 20, 9, -0.12, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+
+          c.fillStyle = skin;
+          c.beginPath();
+          c.ellipse(45, 65, 17, 11, 0, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+
+          drawKatana(c, 60, 62, 0.12);
+          drawPigHead(c, 34, 49, 0.9, 'normal');
+
+          // 手指靠近鼻孔
+          c.strokeStyle = ink;
+          c.lineWidth = 2.2;
+          c.beginPath();
+          c.moveTo(22, 66);
+          c.lineTo(31, 56);
+          c.stroke();
+
+          c.fillStyle = '#A855F7';
+          c.font = '800 12px ' + HAND_FONT;
+          c.fillText('へー', 24, 21);
+
+        } else if (pose === 9) {
+          // 姿勢 9：背影側頭看武士刀「ふっふっふっ」
+          c.fillStyle = skin;
+          c.strokeStyle = ink;
+          c.lineWidth = 2.4;
+          c.beginPath();
+          c.ellipse(48, 56, 16, 15, 0, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+
+          c.fillStyle = purple;
+          c.beginPath();
+          c.moveTo(33, 60);
+          c.lineTo(63, 60);
+          c.lineTo(62, 83);
+          c.lineTo(52, 83);
+          c.lineTo(48, 72);
+          c.lineTo(44, 83);
+          c.lineTo(34, 83);
+          c.closePath();
+          c.fill();
+          c.stroke();
+
+          // 背後斜插武士刀
+          drawKatana(c, 35, 62, -0.65);
+
+          // 後腦勺與回眸側臉
+          c.fillStyle = skin;
+          c.beginPath();
+          c.arc(48, 30, 17, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+          drawPigHead(c, 42, 31, 0.82, 'normal');
+
+          c.fillStyle = '#0284C7';
+          c.font = '800 11px ' + HAND_FONT;
+          c.fillText('ふっふっふっ', 22, 16);
+
+        } else if (pose === 10) {
+          // 姿勢 10：坐著拿手機「読んだ?」
+          c.fillStyle = skin;
+          c.strokeStyle = ink;
+          c.lineWidth = 2.4;
+          c.beginPath();
+          c.ellipse(44, 57, 15, 14, 0, 0, Math.PI * 2);
+          c.fill();
+          c.
