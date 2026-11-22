@@ -774,7 +774,7 @@
         </div>
       </div>
 
-      <!-- 5. 「隱藏選項」按鈕圖示 -->
+      <!-- 5. 「隱藏選項」與 6. 「顯示選項」按鈕圖示 -->
       <div class="field-group">
         <div class="field-label-row">
           <span>5. 「隱藏選項」按鈕圖示</span>
@@ -792,7 +792,6 @@
           </div>
         </div>
 
-        <!-- 6. 「顯示選項」按鈕圖示 -->
         <div class="field-label-row" style="margin-top:10px;">
           <span>6. 「顯示選項」按鈕圖示</span>
         </div>
@@ -858,7 +857,7 @@
       }
 
       // =========================================================================
-      // 2. 16 張原圖路徑清單（icons/PIG (1).jpg ~ icons/PIG (16).jpg）與智慧去背
+      // 2. 16 張原圖路徑清單（僅供標題後方小圖示與「隱藏／顯示選項」按鈕使用）
       // =========================================================================
       var PIG_FILE_PATHS = [
         'icons/PIG (1).jpg',
@@ -879,12 +878,9 @@
         'icons/PIG (16).jpg'
       ];
 
-      // 隱藏選項預選：PIG (7)睡帽打盹, PIG (4)閉眼大喊, PIG (9)吐舌頭, PIG (12)墨鏡白帽, PIG (15)小豬太陽, PIG (16)蝴蝶結褲
       var HIDE_PRESET_INDICES = [6, 3, 8, 11, 14, 15];
-      // 顯示選項預選：PIG (5)水汪汪, PIG (11)頭頂閃亮, PIG (10)推眼鏡, PIG (1)呆萌臉, PIG (6)抱大愛心, PIG (13)毛巾豬
       var SHOW_PRESET_INDICES = [4, 10, 9, 0, 5, 12];
 
-      // 依照四個角落取樣背景色並做去背與裁切留白，完整保留原圖內部細節
       function removeBackgroundAndTrim(img, outSize, callback) {
         try {
           var rawW = Math.max(img.naturalWidth || img.width || 1, 1);
@@ -898,7 +894,6 @@
           var imgData = tc.getImageData(0, 0, rawW, rawH);
           var d = imgData.data;
 
-          // 取四個角落像素平均作為背景參考色
           var corners = [
             [0, 0],
             [rawW - 1, 0],
@@ -969,7 +964,6 @@
 
           callback(off);
         } catch (err) {
-          // 若遇到跨來源 Canvas 限制，退回直接繪製縮放原圖
           try {
             var fallbackOff = document.createElement('canvas');
             fallbackOff.width = outSize;
@@ -986,7 +980,6 @@
         }
       }
 
-      var originalCutoutCanvases = new Array(16);
       var originalCutoutDataURLs = new Array(16);
       var pickerImgEls = {
         title: [],
@@ -1037,19 +1030,9 @@
           }
           updateModalPreview();
         }
-
-        if (!usingCustomStickers) {
-          var readyList = [];
-          for (var r = 0; r < originalCutoutCanvases.length; r++) {
-            if (originalCutoutCanvases[r]) readyList.push(originalCutoutCanvases[r]);
-          }
-          if (readyList.length > 0) {
-            activeSprites = readyList;
-          }
-        }
       }
 
-      function loadOriginalPigIcons(onDone) {
+      function loadOriginalPigIcons() {
         var remaining = PIG_FILE_PATHS.length;
         for (var i = 0; i < PIG_FILE_PATHS.length; i++) {
           (function (idx) {
@@ -1057,7 +1040,6 @@
             img.onload = function () {
               removeBackgroundAndTrim(img, 96, function (cutCanvas) {
                 if (cutCanvas) {
-                  originalCutoutCanvases[idx] = cutCanvas;
                   try {
                     originalCutoutDataURLs[idx] = cutCanvas.toDataURL('image/png');
                   } catch (e) {
@@ -1069,7 +1051,6 @@
                 remaining--;
                 if (remaining <= 0) {
                   refreshAllPresetImagesInDOM();
-                  if (typeof onDone === 'function') onDone();
                 }
               });
             };
@@ -1078,7 +1059,6 @@
               remaining--;
               if (remaining <= 0) {
                 refreshAllPresetImagesInDOM();
-                if (typeof onDone === 'function') onDone();
               }
             };
             img.src = encodeURI(PIG_FILE_PATHS[idx]);
@@ -1091,7 +1071,7 @@
       // =========================================================================
       var STORAGE_KEY = 'buriburi_pig_clock_settings_v6';
       var TOTAL_PIGS = 105;
-      var DEFAULT_POSE_COUNT = 16;
+      var DEFAULT_POSE_COUNT = 12;
       var W = Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0, 320);
       var H = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0, 480);
       var DPR = Math.min(window.devicePixelRatio || 1, 2);
@@ -1193,33 +1173,143 @@
       }
 
       // =========================================================================
-      // 4. 備援離屏小豬畫布（原圖載入前或離線測試時使用）
+      // 4. 還原：排時鐘專用 12 款手繪小豬精靈圖
       // =========================================================================
-      function createFallbackPigSprite(idx) {
+      function createHandDrawnPigSprite(poseIdx) {
         var off = document.createElement('canvas');
         off.width = 96;
         off.height = 96;
         var c = off.getContext('2d');
-        var hues = ['#F6C198', '#F4B89C', '#FAD1B8', '#F2A98B'];
-        c.fillStyle = hues[idx % hues.length];
-        c.strokeStyle = '#3B2318';
-        c.lineWidth = 3;
+
+        var skin = '#F6C198';
+        var darkInk = '#3B2318';
+        var snoutPink = '#F17A7E';
+        var cheekPink = '#F78A8C';
+
+        c.save();
+        c.lineCap = 'round';
+        c.lineJoin = 'round';
+        c.strokeStyle = darkInk;
+        c.lineWidth = 3.2;
+
+        // 尾巴（在身體後方）
         c.beginPath();
-        c.ellipse(48, 52, 26, 22, 0, 0, Math.PI * 2);
+        c.moveTo(22, 58);
+        c.bezierCurveTo(10, 52, 12, 40, 22, 45);
+        c.stroke();
+
+        // 短腿
+        c.fillStyle = skin;
+        drawRoundRect(c, 31, 64, 11, 13, 5);
         c.fill();
         c.stroke();
-        c.fillStyle = '#F17A7E';
-        c.beginPath();
-        c.ellipse(48, 56, 11, 8, 0, 0, Math.PI * 2);
+
+        drawRoundRect(c, 54, 64, 11, 13, 5);
         c.fill();
         c.stroke();
+
+        // 圓滾滾身體
+        c.fillStyle = skin;
+        c.beginPath();
+        c.ellipse(48, 53, 27, 21, 0, 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+
+        // 垂耳
+        c.fillStyle = skin;
+        c.beginPath();
+        c.ellipse(28, 35, 7, 11, 0.45, 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+
+        c.beginPath();
+        c.ellipse(68, 35, 7, 11, -0.45, 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+
+        // 表情與配件變化（12 種姿態）
+        var mode = poseIdx % 12;
+
+        if (mode === 3 || mode === 7) {
+          // 笑瞇瞇彎眼
+          c.beginPath();
+          c.arc(38, 46, 4.5, Math.PI * 1.1, Math.PI * 1.9);
+          c.stroke();
+          c.beginPath();
+          c.arc(58, 46, 4.5, Math.PI * 1.1, Math.PI * 1.9);
+          c.stroke();
+        } else if (mode === 5 || mode === 10) {
+          // 眨眼
+          c.beginPath();
+          c.arc(38, 46, 4.5, 0, Math.PI * 2);
+          c.fillStyle = darkInk;
+          c.fill();
+          c.beginPath();
+          c.moveTo(54, 46);
+          c.lineTo(62, 46);
+          c.stroke();
+        } else {
+          // 圓眼
+          c.fillStyle = darkInk;
+          c.beginPath();
+          c.arc(38, 46, 4.2, 0, Math.PI * 2);
+          c.arc(58, 46, 4.2, 0, Math.PI * 2);
+          c.fill();
+        }
+
+        // 紅暈腮紅
+        c.fillStyle = cheekPink;
+        c.beginPath();
+        c.ellipse(29, 53, 5.2, 3.2, 0, 0, Math.PI * 2);
+        c.ellipse(67, 53, 5.2, 3.2, 0, 0, Math.PI * 2);
+        c.fill();
+
+        // 豬鼻子與鼻孔
+        c.fillStyle = snoutPink;
+        c.beginPath();
+        c.ellipse(48, 53, 10.5, 7.5, 0, 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+
+        c.fillStyle = darkInk;
+        c.beginPath();
+        c.arc(44.5, 53, 2, 0, Math.PI * 2);
+        c.arc(51.5, 53, 2, 0, Math.PI * 2);
+        c.fill();
+
+        // 嘴巴變化
+        if (mode === 1 || mode === 6 || mode === 11) {
+          c.fillStyle = '#D95360';
+          c.beginPath();
+          c.arc(48, 62, 4.5, 0, Math.PI);
+          c.fill();
+          c.stroke();
+        } else {
+          c.beginPath();
+          c.moveTo(43, 62);
+          c.quadraticCurveTo(48, 66, 53, 62);
+          c.stroke();
+        }
+
+        // 偶爾冒出小愛心或小星星點綴
+        if (mode === 2 || mode === 8) {
+          c.fillStyle = '#E85D75';
+          c.beginPath();
+          c.arc(74, 24, 4, 0, Math.PI * 2);
+          c.arc(80, 24, 4, 0, Math.PI * 2);
+          c.lineTo(77, 32);
+          c.closePath();
+          c.fill();
+        }
+
+        c.restore();
         return off;
       }
 
       function buildDefaultSprites() {
         defaultSprites = [];
         for (var i = 0; i < DEFAULT_POSE_COUNT; i++) {
-          defaultSprites.push(originalCutoutCanvases[i] || createFallbackPigSprite(i));
+          defaultSprites.push(createHandDrawnPigSprite(i));
         }
         if (!usingCustomStickers) {
           activeSprites = defaultSprites.slice();
@@ -2004,7 +2094,7 @@
                       activeSprites = loadedSprites;
                       usingCustomStickers = true;
                       btnResetSticker.classList.remove('hidden');
-                      showToast('已套用 ' + loadedSprites.length + ' 張自訂貼圖！');
+                      showToast('已套用 ' + loadedSprites.length + ' 張自訂排時鐘貼圖！');
                     }
                   });
                 };
@@ -2021,7 +2111,7 @@
           usingCustomStickers = false;
           buildDefaultSprites();
           btnResetSticker.classList.add('hidden');
-          showToast('已恢復預設 16 張 PIG 原圖小豬！');
+          showToast('已恢復預設排時鐘小豬！');
         });
 
         document.getElementById('btnOpenSettings').addEventListener('click', function (e) {
@@ -2367,9 +2457,7 @@
         resize();
         setGathered(true);
         requestAnimationFrame(animate);
-        loadOriginalPigIcons(function () {
-          buildDefaultSprites();
-        });
+        loadOriginalPigIcons();
       }
 
       if (document.readyState === 'loading') {
