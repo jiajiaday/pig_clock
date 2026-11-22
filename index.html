@@ -48,7 +48,7 @@
       color: var(--ink);
       font-family: var(--font-round);
       transition: background-color 0.25s ease, color 0.25s ease;
-      touch-action: manipulation;
+      touch-action: none;
     }
 
     #clockCanvas {
@@ -62,7 +62,6 @@
       cursor: pointer;
     }
 
-    /* 頂部可自訂標題列 */
     #topBar {
       position: fixed;
       top: 0;
@@ -139,7 +138,6 @@
       margin-left: 2px;
     }
 
-    /* 底部控制工具列 */
     #bottomBar {
       position: fixed;
       bottom: 10px;
@@ -205,7 +203,6 @@
       display: none !important;
     }
 
-    /* 隱藏選項後的右下角恢復按鈕 */
     #btnShowBar {
       position: fixed;
       right: 12px;
@@ -234,7 +231,6 @@
       transform: scale(0.96);
     }
 
-    /* 輕量操作提示氣泡 */
     #toast {
       position: fixed;
       top: 64px;
@@ -259,7 +255,6 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* 標題與圖示設定彈窗 */
     #titleModal {
       position: fixed;
       inset: 0;
@@ -495,7 +490,6 @@
       accent-color: #D97757;
     }
 
-    /* 16 款原圖預選網格 */
     .sticker-grid {
       display: grid;
       grid-template-columns: repeat(8, 1fr);
@@ -634,10 +628,8 @@
   </style>
 </head>
 <body>
-  <!-- 主互動小豬時鐘畫布 -->
   <canvas id="clockCanvas"></canvas>
 
-  <!-- 頂部可自訂標題列 -->
   <header id="topBar">
     <button id="titleTrigger" type="button" title="點擊修改標題、顯示狀態與後方小圖示">
       <span id="titleText">不理不理左衛門時鐘</span>
@@ -647,13 +639,11 @@
     </button>
   </header>
 
-  <!-- 輕量操作提示氣泡 -->
   <div id="toast"></div>
 
-  <!-- 底部控制工具列（完整還原原本所有選項 + 整點彩蛋按鈕） -->
   <footer id="bottomBar">
     <div class="toolbar-row">
-      <button id="btnToggleGather" type="button" class="pill-btn">散開 / 集合</button>
+      <button id="btnToggleGather" type="button" class="pill-btn">散開 / 集合 (已集合)</button>
       <button id="btnToggleSize" type="button" class="pill-btn">時間：特大</button>
       <button id="btnToggleNight" type="button" class="pill-btn">夜間模式</button>
       <button id="btnWakeLock" type="button" class="pill-btn">螢幕常亮</button>
@@ -667,18 +657,16 @@
         <span>隱藏選項</span>
       </button>
     </div>
-    <div class="hint-line">點擊小豬可觸發互動彩蛋，點擊空白處可讓小豬散開或集合報時！</div>
+    <div class="hint-line">點角色觸發互動彩蛋（再點可換動作／拖曳移動）；雙擊空白處可切換散開或集合！</div>
     <input id="fileStickerInput" type="file" accept="image/*" multiple class="hidden" />
   </footer>
 
-  <!-- 隱藏選項後的右下角恢復按鈕 -->
   <button id="btnShowBar" type="button" class="hidden" title="顯示底部控制列">
     <span id="showBtnIcon" class="ctrl-btn-icon"></span>
     <img id="showBtnImg" class="ctrl-btn-img" alt="顯示選項圖示" />
     <span>顯示選項</span>
   </button>
 
-  <!-- 標題與圖示自訂設定彈窗 -->
   <div id="titleModal" role="dialog" aria-modal="true">
     <div class="modal-box">
       <div class="modal-head">
@@ -686,7 +674,6 @@
         <button id="btnCloseModal" type="button" class="close-btn">✕</button>
       </div>
 
-      <!-- 即時預覽區 -->
       <div class="preview-panel">
         <span class="preview-tag">頂部標題與按鈕即時預覽</span>
         <div id="modalPreview">
@@ -708,7 +695,6 @@
         </div>
       </div>
 
-      <!-- 1. 頂部標題顯示狀態 -->
       <div class="field-group">
         <div class="field-label-row">
           <span>1. 頂部標題顯示狀態</span>
@@ -719,7 +705,6 @@
         </div>
       </div>
 
-      <!-- 2. 標題文字內容 -->
       <div class="field-group">
         <div class="field-label-row">
           <label for="inputTitle">2. 標題文字內容</label>
@@ -734,7 +719,6 @@
         </div>
       </div>
 
-      <!-- 3. 標題字型大小 -->
       <div class="field-group">
         <div class="field-label-row">
           <label for="inputFontSize">3. 標題字型大小</label>
@@ -754,7 +738,6 @@
         </div>
       </div>
 
-      <!-- 4. 標題後方小圖示（icons/PIG (1).jpg ~ PIG (16).jpg 原圖自動去背） -->
       <div class="field-group">
         <div class="field-label-row">
           <span>4. 標題後方小圖示（點選原圖預選）</span>
@@ -775,7 +758,6 @@
         </div>
       </div>
 
-      <!-- 5. 「隱藏選項」與 6. 「顯示選項」按鈕圖示 -->
       <div class="field-group">
         <div class="field-label-row">
           <span>5. 「隱藏選項」按鈕圖示</span>
@@ -810,7 +792,6 @@
         </div>
       </div>
 
-      <!-- 底部操作按鈕 -->
       <div class="modal-actions">
         <button id="btnResetDefaults" type="button" class="chip">↺ 恢復預設值</button>
         <div class="modal-actions-right">
@@ -825,9 +806,6 @@
     (function () {
       'use strict';
 
-      // =========================================================================
-      // 1. 安全儲存存取與輔助繪圖
-      // =========================================================================
       var memStore = {};
       function safeGet(key, fallback) {
         try {
@@ -855,9 +833,6 @@
         c.closePath();
       }
 
-      // =========================================================================
-      // 2. 標題／按鈕圖示（icons/）與排時鐘／彩蛋圖庫（clock-pigs/、easter-eggs/）
-      // =========================================================================
       var PIG_FILE_PATHS = [
         'icons/PIG (1).jpg', 'icons/PIG (2).jpg', 'icons/PIG (3).jpg', 'icons/PIG (4).jpg',
         'icons/PIG (5).jpg', 'icons/PIG (6).jpg', 'icons/PIG (7).jpg', 'icons/PIG (8).jpg',
@@ -1074,11 +1049,8 @@
         }
       }
 
-      // =========================================================================
-      // 3. 應用程式狀態與預設值
-      // =========================================================================
       var STORAGE_KEY = 'buriburi_pig_clock_settings_v6';
-      var TOTAL_PIGS = 105;
+      var TOTAL_PIGS = 108;
       var DEFAULT_POSE_COUNT = 12;
       var W = Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0, 320);
       var H = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0, 480);
@@ -1175,6 +1147,11 @@
       var paradeVisitors = [];
       var toastTimer = null;
 
+      // 拖曳與互動狀態
+      var draggingPig = null;
+      var pointerDownPos = { x: 0, y: 0 };
+      var pointerMoved = false;
+
       function showToast(msg) {
         var el = document.getElementById('toast');
         if (!el) return;
@@ -1183,7 +1160,7 @@
         if (toastTimer) clearTimeout(toastTimer);
         toastTimer = setTimeout(function () {
           el.classList.remove('show');
-        }, 2300);
+        }, 2500);
       }
 
       function getCurrentClockPool() {
@@ -1192,9 +1169,6 @@
         return fallbackSprites;
       }
 
-      // =========================================================================
-      // 4. 內建備援小豬與外部資料夾（clock-pigs/、easter-eggs/）載入
-      // =========================================================================
       function createHandDrawnPigSprite(poseIdx) {
         var off = document.createElement('canvas');
         off.width = 96;
@@ -1358,6 +1332,7 @@
 
         loadFolderSprites(EASTER_EGGS_DIR, WEIRDO_EGG_FILES, 96, function (loaded) {
           weirdoSprites = loaded;
+          if (!state.gathered) applyWeirdoMix(true);
         });
 
         loadFolderSprites(EASTER_EGGS_DIR, HOUR_EGG_FILES, 112, function (loaded) {
@@ -1369,9 +1344,6 @@
         });
       }
 
-      // =========================================================================
-      // 5. 數位時鐘向量路徑與 105 隻小豬排隊／動態／彩蛋
-      // =========================================================================
       var DIGIT_POLYLINES = {
         '0': [
           [0.32, 0.05], [0.68, 0.05], [0.86, 0.22], [0.88, 0.50],
@@ -1459,6 +1431,7 @@
         pigs = [];
         for (var i = 0; i < TOTAL_PIGS; i++) {
           pigs.push({
+            id: i,
             x: Math.random() * (W - 60) + 30,
             y: Math.random() * (H - 140) + 80,
             vx: (Math.random() - 0.5) * 70,
@@ -1474,8 +1447,9 @@
             scale: 0.42,
             isWeirdo: false,
             overrideSprite: null,
-            clickBoost: 0,
-            clickPause: 0,
+            eggTimer: 0,        // 彩蛋焦點停留時間（秒）
+            eggAction: 0,       // 0: 彈跳, 1: 翻面定格, 2: 搞笑圖示, 3: 高速扭動
+            eggLabel: '',
             clickFlip: 1
           });
         }
@@ -1485,24 +1459,27 @@
         var pool = hourSprites.length > 0 ? hourSprites : (weirdoSprites.length > 0 ? weirdoSprites : getCurrentClockPool());
         if (!pool || pool.length === 0) return;
 
-        var count = Math.min(6, Math.max(3, pool.length));
+        var count = Math.min(5, Math.max(3, pool.length));
         for (var i = 0; i < count; i++) {
           var fromLeft = i % 2 === 0;
           var spr = pool[i % pool.length];
-          var sz = Math.max(46, Math.min(76, Math.min(W, H) * 0.11));
-          var yBase = H * (0.22 + (i / count) * 0.54);
+          var sz = Math.max(54, Math.min(84, Math.min(W, H) * 0.12));
+          var yBase = H * (0.24 + (i / count) * 0.50);
           paradeVisitors.push({
             sprite: spr,
-            x: fromLeft ? -sz - i * 75 : W + sz + i * 75,
+            x: fromLeft ? -sz - i * 85 : W + sz + i * 85,
             y: yBase,
             baseY: yBase,
             size: sz,
-            vx: fromLeft ? (145 + Math.random() * 65) : -(145 + Math.random() * 65),
+            vx: fromLeft ? 135 : -135,
+            baseSpeed: 135,
             phase: Math.random() * Math.PI * 2,
-            facing: fromLeft ? 1 : -1
+            facing: fromLeft ? 1 : -1,
+            pauseTimer: 0,
+            hasPausedAtMid: false
           });
         }
-        showToast(msg || '✨ 特殊時刻彩蛋：角色逛過去囉！');
+        showToast(msg || '✨ 整點／特殊時刻彩蛋：角色進場逛街囉！');
       }
 
       function computeClockTargets() {
@@ -1622,13 +1599,13 @@
         var wPool = weirdoSprites;
         for (var i = 0; i < pigs.length; i++) {
           pigs[i].isWeirdo = false;
-          if (pigs[i].clickBoost <= 0) pigs[i].overrideSprite = null;
+          if (pigs[i].eggTimer <= 0) pigs[i].overrideSprite = null;
           if (enable && wPool.length > 0 && i % 6 === 0) {
             pigs[i].isWeirdo = true;
             pigs[i].overrideSprite = wPool[(i / 6) % wPool.length];
-            pigs[i].scale = 0.52;
+            pigs[i].scale = 0.56;
             var ang = Math.random() * Math.PI * 2;
-            var spd = 65 + Math.random() * 55;
+            var spd = 55 + Math.random() * 45;
             pigs[i].vx = Math.cos(ang) * spd;
             pigs[i].vy = Math.sin(ang) * spd;
           }
@@ -1644,6 +1621,7 @@
         if (state.gathered) {
           applyWeirdoMix(false);
           computeClockTargets();
+          showToast('已集合排時鐘（108 隻）');
         } else {
           applyWeirdoMix(true);
           for (var i = 0; i < pigs.length; i++) {
@@ -1654,62 +1632,101 @@
             pigs[i].vx = Math.cos(angle) * spd;
             pigs[i].vy = Math.sin(angle) * spd;
           }
+          showToast('已散開自由走動，怪咖角色混入中！');
         }
       }
 
-      function handleCanvasTap(clientX, clientY) {
+      function triggerPigEgg(pig, cycleNext) {
+        var nextAction = cycleNext ? ((pig.eggAction + 1) % 4) : Math.floor(Math.random() * 4);
+        pig.eggAction = nextAction;
+        pig.eggTimer = 3.6;
+        pig.clickFlip *= -1;
+
+        if (nextAction === 0) {
+          pig.eggLabel = '跳一下！';
+          pig.vy = -150;
+          showToast('🦘 彩蛋 #' + (pig.id + 1) + '：原地彈跳中（再點可換動作或拖曳）');
+        } else if (nextAction === 1) {
+          pig.eggLabel = '翻面定格';
+          showToast('🔄 彩蛋 #' + (pig.id + 1) + '：翻面定格展示中！');
+        } else if (nextAction === 2) {
+          var pool = clickSprites.length > 0 ? clickSprites : weirdoSprites;
+          if (pool.length > 0) {
+            pig.overrideSprite = pool[Math.floor(Math.random() * pool.length)];
+          }
+          pig.eggLabel = '誇張反應';
+          showToast('⚡ 彩蛋 #' + (pig.id + 1) + '：切換誇張反應圖示！');
+        } else {
+          pig.eggLabel = '高速扭動';
+          pig.wiggleFreq = 16;
+          showToast('🌀 彩蛋 #' + (pig.id + 1) + '：高速扭動中！');
+        }
+      }
+
+      function findPigAt(px, py) {
+        for (var i = pigs.length - 1; i >= 0; i--) {
+          var p = pigs[i];
+          var hitRadius = Math.max(26, 96 * p.scale * 0.65);
+          if (Math.hypot(px - p.x, py - p.y) <= hitRadius) {
+            return p;
+          }
+        }
+        return null;
+      }
+
+      function handlePointerDown(clientX, clientY) {
         var rect = canvas.getBoundingClientRect();
         var px = clientX - rect.left;
         var py = clientY - rect.top;
+        pointerDownPos = { x: px, y: py };
+        pointerMoved = false;
 
         for (var vIdx = paradeVisitors.length - 1; vIdx >= 0; vIdx--) {
           var vis = paradeVisitors[vIdx];
-          if (Math.hypot(px - vis.x, py - vis.y) <= vis.size * 0.65) {
-            vis.vx = -vis.vx * 1.25;
+          if (Math.hypot(px - vis.x, py - vis.y) <= vis.size * 0.7) {
+            vis.vx = -vis.vx;
             vis.facing *= -1;
-            showToast('🎭 抓到逛街彩蛋，調頭囉！');
+            vis.pauseTimer = 1.2;
+            showToast('🎭 抓到逛街彩蛋，停留一下再調頭！');
             return;
           }
         }
 
-        var bestPig = null;
-        var bestDist = Infinity;
-        for (var i = 0; i < pigs.length; i++) {
-          var d = Math.hypot(px - pigs[i].x, py - pigs[i].y);
-          if (d < bestDist) {
-            bestDist = d;
-            bestPig = pigs[i];
-          }
+        var hit = findPigAt(px, py);
+        if (hit) {
+          draggingPig = hit;
+          hit.eggTimer = Math.max(hit.eggTimer, 3.6);
         }
-
-        if (bestPig && bestDist <= 38) {
-          var mode = Math.floor(Math.random() * 4);
-          bestPig.clickBoost = 1.2;
-          bestPig.clickFlip *= -1;
-          if (mode === 0) {
-            bestPig.y -= 18;
-            bestPig.vy = -120;
-            showToast('🦘 點擊彩蛋：跳一下＋翻面！');
-          } else if (mode === 1) {
-            bestPig.clickPause = 0.55;
-            showToast('⏸️ 點擊彩蛋：短暫停頓定格！');
-          } else if (mode === 2 && clickSprites.length > 0) {
-            bestPig.overrideSprite = clickSprites[Math.floor(Math.random() * clickSprites.length)];
-            bestPig.clickBoost = 1.7;
-            showToast('⚡ 點擊彩蛋：誇張反應姿勢！');
-          } else {
-            bestPig.wiggleFreq = 14;
-            showToast('🌀 點擊彩蛋：高速扭動！');
-          }
-          return;
-        }
-
-        setGathered(!state.gathered);
       }
 
-      // =========================================================================
-      // 6. 主動畫迴圈
-      // =========================================================================
+      function handlePointerMove(clientX, clientY) {
+        if (!draggingPig) return;
+        var rect = canvas.getBoundingClientRect();
+        var px = clientX - rect.left;
+        var py = clientY - rect.top;
+        if (Math.hypot(px - pointerDownPos.x, py - pointerDownPos.y) > 6) {
+          pointerMoved = true;
+        }
+        if (pointerMoved) {
+          draggingPig.x = Math.min(Math.max(px, 24), W - 24);
+          draggingPig.y = Math.min(Math.max(py, 56), H - 36);
+          draggingPig.vx = 0;
+          draggingPig.vy = 0;
+        }
+      }
+
+      function handlePointerUp(clientX, clientY) {
+        if (!draggingPig) return;
+        var targetPig = draggingPig;
+        draggingPig = null;
+
+        if (!pointerMoved) {
+          triggerPigEgg(targetPig, targetPig.eggTimer > 0.2);
+        } else {
+          showToast('✋ 放開了彩蛋 #' + (targetPig.id + 1) + '，點擊可切換動作');
+        }
+      }
+
       var lastTime = 0;
       function animate(now) {
         requestAnimationFrame(animate);
@@ -1743,18 +1760,23 @@
           var p = pigs[i];
           p.wigglePhase += dt * p.wiggleFreq;
 
-          if (p.clickBoost > 0) {
-            p.clickBoost -= dt;
-            if (p.clickBoost <= 0) {
-              p.clickBoost = 0;
+          var isFocusedEgg = p.eggTimer > 0;
+          if (isFocusedEgg) {
+            p.eggTimer -= dt;
+            if (p.eggTimer <= 0) {
+              p.eggTimer = 0;
+              p.eggLabel = '';
               p.wiggleFreq = 3.6 + (i % 5) * 0.45;
               if (!p.isWeirdo) p.overrideSprite = null;
             }
           }
 
-          if (p.clickPause > 0) {
-            p.clickPause -= dt;
-          } else if (state.gathered && (p.role === 'digit' || p.role === 'colon')) {
+          if (p === draggingPig) {
+            // 正在拖曳中，保持在手指位置
+          } else if (isFocusedEgg && p.eggAction === 1) {
+            // 翻面定格：稍微上下輕晃，不跑掉
+            p.y += Math.sin(sec * 8 + p.id) * 0.4;
+          } else if (state.gathered && !isFocusedEgg && (p.role === 'digit' || p.role === 'colon')) {
             var dx = p.tx - p.x;
             var dy = p.ty - p.y;
             p.x += dx * Math.min(1, dt * 7.5);
@@ -1765,12 +1787,12 @@
           } else {
             p.poseTimer -= dt;
             if (p.poseTimer <= 0) {
-              if (!p.isWeirdo && p.clickBoost <= 0) {
+              if (!p.isWeirdo && !isFocusedEgg) {
                 p.pose = Math.floor(Math.random() * pool.length);
               }
               p.poseTimer = 2 + Math.random() * 4;
               var ang = Math.random() * Math.PI * 2;
-              var speed = p.isWeirdo ? (60 + Math.random() * 55) : (35 + Math.random() * 55);
+              var speed = p.isWeirdo ? (55 + Math.random() * 45) : (35 + Math.random() * 55);
               p.vx = Math.cos(ang) * speed;
               p.vy = Math.sin(ang) * speed;
             }
@@ -1785,7 +1807,7 @@
             if (p.y < minTopY) { p.y = minTopY; p.vy = Math.abs(p.vy); }
             if (p.y > H - 36) { p.y = H - 36; p.vy = -Math.abs(p.vy); }
 
-            if (state.gathered && p.x > box.left && p.x < box.right && p.y > box.top && p.y < box.bottom) {
+            if (state.gathered && !isFocusedEgg && p.x > box.left && p.x < box.right && p.y > box.top && p.y < box.bottom) {
               var dLeft = p.x - box.left;
               var dRight = box.right - p.x;
               var dTop = p.y - box.top;
@@ -1801,15 +1823,32 @@
           var sprite = p.overrideSprite || pool[p.pose % pool.length] || fallbackSprites[0];
           if (!sprite) continue;
 
-          var drawScale = p.scale * (p.clickBoost > 0 ? 1.24 : 1);
-          if (state.gathered && p.role === 'colon') {
+          var drawScale = p.scale * (isFocusedEgg ? 1.45 : 1);
+          if (state.gathered && p.role === 'colon' && !isFocusedEgg) {
             drawScale *= (1 + 0.16 * Math.sin(sec * Math.PI * 2));
           }
-          var bobY = Math.sin(p.wigglePhase * 0.7) * (p.clickBoost > 0 ? 4.5 : 1.8);
-          var wiggleAngle = Math.sin(p.wigglePhase) * (p.clickBoost > 0 ? 0.28 : 0.08);
+
+          var jumpOffset = 0;
+          if (isFocusedEgg && p.eggAction === 0) {
+            jumpOffset = -Math.abs(Math.sin(sec * 9 + p.id)) * 18;
+          }
+
+          var bobY = Math.sin(p.wigglePhase * 0.7) * (isFocusedEgg ? 4 : 1.8) + jumpOffset;
+          var wiggleAngle = Math.sin(p.wigglePhase) * (isFocusedEgg ? 0.25 : 0.08);
 
           ctx.save();
           ctx.translate(p.x, p.y + bobY);
+
+          if (isFocusedEgg) {
+            ctx.save();
+            ctx.strokeStyle = '#FF7675';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.arc(0, 0, 44 * drawScale, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+          }
+
           ctx.rotate(wiggleAngle);
           ctx.scale(p.flipX * p.clickFlip * drawScale, drawScale);
 
@@ -1827,11 +1866,35 @@
           ctx.drawImage(sprite, -48, -48, 96, 96);
           ctx.shadowBlur = 0;
           ctx.restore();
+
+          if (isFocusedEgg && p.eggLabel) {
+            ctx.save();
+            ctx.font = '900 12px "Noto Sans TC", sans-serif';
+            ctx.textAlign = 'center';
+            var labelW = ctx.measureText(p.eggLabel).width + 12;
+            var ly = p.y + bobY - 46 * drawScale;
+            ctx.fillStyle = 'rgba(59, 35, 24, 0.88)';
+            drawRoundRect(ctx, p.x - labelW / 2, ly - 15, labelW, 20, 8);
+            ctx.fill();
+            ctx.fillStyle = '#FFFDF9';
+            ctx.fillText(p.eggLabel, p.x, ly - 1);
+            ctx.restore();
+          }
         }
 
         for (var v = paradeVisitors.length - 1; v >= 0; v--) {
           var vis = paradeVisitors[v];
-          vis.x += vis.vx * dt;
+          if (vis.pauseTimer > 0) {
+            vis.pauseTimer -= dt;
+          } else {
+            vis.x += vis.vx * dt;
+            var midX = W * 0.5;
+            if (!vis.hasPausedAtMid && ((vis.vx > 0 && vis.x >= midX - 20 && vis.x <= midX + 20) || (vis.vx < 0 && vis.x <= midX + 20 && vis.x >= midX - 20))) {
+              vis.hasPausedAtMid = true;
+              vis.pauseTimer = 1.1;
+            }
+          }
+
           vis.y = vis.baseY + Math.sin(sec * 4.2 + vis.phase) * 14;
           var vAng = Math.sin(sec * 6.5 + vis.phase) * 0.16;
           var vScale = vis.size / 96;
@@ -1854,9 +1917,6 @@
         }
       }
 
-      // =========================================================================
-      // 7. 動態渲染原圖預選格與圖示同步
-      // =========================================================================
       function populatePresetPickers() {
         pickerImgEls.title = [];
         pickerImgEls.hide = [];
@@ -2177,9 +2237,6 @@
         if (modal) modal.classList.remove('open');
       }
 
-      // =========================================================================
-      // 8. 響應式畫布尺寸重設
-      // =========================================================================
       function resize() {
         W = Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0, 320);
         H = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0, 480);
@@ -2199,12 +2256,21 @@
         }
       }
 
-      // =========================================================================
-      // 9. 完整 UI 事件綁定與啟動流程
-      // =========================================================================
       function bindUI() {
-        canvas.addEventListener('click', function (e) {
-          handleCanvasTap(e.clientX, e.clientY);
+        canvas.addEventListener('pointerdown', function (e) {
+          handlePointerDown(e.clientX, e.clientY);
+        });
+        window.addEventListener('pointermove', function (e) {
+          handlePointerMove(e.clientX, e.clientY);
+        });
+        window.addEventListener('pointerup', function (e) {
+          handlePointerUp(e.clientX, e.clientY);
+        });
+        canvas.addEventListener('dblclick', function (e) {
+          var rect = canvas.getBoundingClientRect();
+          if (!findPigAt(e.clientX - rect.left, e.clientY - rect.top)) {
+            setGathered(!state.gathered);
+          }
         });
 
         document.getElementById('titleTrigger').addEventListener('click', function (e) {
@@ -2267,7 +2333,7 @@
 
         document.getElementById('btnHourEaster').addEventListener('click', function (e) {
           e.stopPropagation();
-          triggerHourParade('🎉 特殊時刻彩蛋：角色冒出來逛街囉！');
+          triggerHourParade('🎉 整點／特殊時刻彩蛋：角色進場逛街囉！');
         });
 
         var fileStickerInput = document.getElementById('fileStickerInput');
