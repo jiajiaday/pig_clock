@@ -3,23 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>105 隻小豬排時鐘｜動態與彩蛋版</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#FDF6EC" id="metaTheme" />
+  <title>不理不理左衛門時鐘</title>
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="manifest.json" />
   <style>
     :root {
-      --bg-top: #fff9ef;
-      --bg-bottom: #ffe8cc;
-      --panel-bg: rgba(255, 255, 255, 0.86);
-      --text-main: #3b2618;
-      --text-sub: #7a5841;
-      --accent: #ff6b6b;
-      --accent-2: #ff9f43;
-      --border: rgba(59, 38, 24, 0.14);
-      --shadow: 0 8px 24px rgba(88, 52, 24, 0.12);
+      --bg: #FDF6EC;
+      --ink: #3B2318;
+      --pill-bg: #FFFAF3;
+      --pill-border: #3B2318;
+      --modal-bg: #FDF6EC;
+      --card-bg: #FFFFFF;
+      --accent: #F4B89C;
+      --font-round: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "Hiragino Maru Gothic ProN", sans-serif;
     }
 
-    * {
+    body.night {
+      --bg: #050505;
+      --ink: #F5EDE4;
+      --pill-bg: rgba(28, 28, 32, 0.92);
+      --pill-border: rgba(245, 237, 228, 0.72);
+      --modal-bg: #18181B;
+      --card-bg: #242429;
+      --accent: #D98A6C;
+    }
+
+    *, *::before, *::after {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     html, body {
@@ -28,957 +44,2632 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", sans-serif;
-      background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
-      color: var(--text-main);
-      user-select: none;
-    }
-
-    #stage {
-      position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
-      display: block;
+      background-color: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-round);
+      transition: background-color 0.25s ease, color 0.25s ease;
       touch-action: manipulation;
     }
 
-    /* 頂部資訊列 */
-    .top-bar {
+    #clockCanvas {
       position: fixed;
-      top: 12px;
-      left: 12px;
-      right: 12px;
-      z-index: 10;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 1;
+      cursor: pointer;
+    }
+
+    /* 頂部可自訂標題列 */
+    #topBar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
       display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 12px;
+      pointer-events: none;
+    }
+
+    #titleTrigger {
+      pointer-events: auto;
+      display: inline-flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: space-between;
-      gap: 8px;
+      justify-content: center;
+      gap: 6px;
+      max-width: 95vw;
+      padding: 6px 14px;
+      border: 1.8px solid var(--pill-border);
+      border-radius: 16px;
+      background: var(--pill-bg);
+      color: var(--ink);
+      font-family: var(--font-round);
+      font-size: 26px;
+      font-weight: 900;
+      line-height: 1.2;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      box-shadow: 0 2px 0 var(--pill-border);
+      transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+    }
+
+    #titleTrigger:active {
+      transform: scale(0.96);
+    }
+
+    #titleIcon {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    #titleIconImg {
+      display: inline-block;
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      vertical-align: middle;
+    }
+
+    .ctrl-btn-icon {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .ctrl-btn-img {
+      display: inline-block;
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      vertical-align: middle;
+    }
+
+    .edit-badge {
+      font-size: 0.6em;
+      opacity: 0.6;
+      margin-left: 2px;
+    }
+
+    /* 底部控制工具列 */
+    #bottomBar {
+      position: fixed;
+      bottom: 10px;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 8px;
       pointer-events: none;
     }
 
-    .badge {
+    .toolbar-row {
       pointer-events: auto;
-      background: var(--panel-bg);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 6px 12px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-main);
-      box-shadow: var(--shadow);
-      display: inline-flex;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       align-items: center;
       gap: 6px;
+      max-width: 98vw;
     }
 
-    .badge small {
-      color: var(--text-sub);
-      font-weight: 500;
+    .pill-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 6px 10px;
+      border: 1.8px solid var(--pill-border);
+      border-radius: 12px;
+      background-color: var(--pill-bg);
+      color: var(--ink);
+      font-family: var(--font-round);
+      font-size: 14.5px;
+      line-height: 1.2;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 2px 0 var(--pill-border);
+      white-space: nowrap;
+      transition: transform 0.1s ease, background-color 0.2s ease;
     }
 
-    /* 彩蛋橫幅提示 */
-    .easter-banner {
-      position: fixed;
-      top: 58px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-10px);
-      z-index: 15;
-      background: rgba(59, 38, 24, 0.9);
-      color: #fff;
-      padding: 7px 16px;
-      border-radius: 999px;
+    .pill-btn:active {
+      transform: translateY(1px) scale(0.96);
+    }
+
+    .pill-btn.primary {
+      background-color: var(--accent);
+      color: #2B1810;
+    }
+
+    .hint-line {
+      margin-top: 6px;
+      font-family: var(--font-round);
       font-size: 13px;
-      font-weight: 600;
+      font-weight: 800;
+      opacity: 0.78;
+      text-align: center;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* 隱藏選項後的右下角恢復按鈕 */
+    #btnShowBar {
+      position: fixed;
+      right: 12px;
+      bottom: 12px;
+      z-index: 25;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 10px;
+      border: 1.8px solid var(--pill-border);
+      border-radius: 12px;
+      background-color: var(--pill-bg);
+      color: var(--ink);
+      font-family: var(--font-round);
+      font-size: 14px;
+      line-height: 1.2;
+      font-weight: 900;
+      opacity: 0.9;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      transition: opacity 0.2s ease, transform 0.1s ease;
+    }
+
+    #btnShowBar:active {
+      opacity: 1;
+      transform: scale(0.96);
+    }
+
+    /* 輕量操作提示氣泡 */
+    #toast {
+      position: fixed;
+      top: 64px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      z-index: 40;
+      padding: 6px 14px;
+      border-radius: 12px;
+      background: rgba(35, 24, 18, 0.92);
+      color: #FFFDF9;
+      font-family: var(--font-round);
+      font-size: 13px;
+      font-weight: 800;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.25s ease, transform 0.25s ease;
+      transition: opacity 0.2s ease, transform 0.2s ease;
       white-space: nowrap;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.2);
     }
 
-    .easter-banner.show {
+    #toast.show {
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
 
-    /* 底部工具列 */
-    .bottom-bar {
+    /* 標題與圖示設定彈窗 */
+    #titleModal {
       position: fixed;
-      bottom: 14px;
-      left: 12px;
-      right: 12px;
-      z-index: 10;
+      inset: 0;
+      z-index: 50;
+      background: rgba(0, 0, 0, 0.54);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+    }
+
+    #titleModal.open {
+      display: flex;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 440px;
+      max-height: 88vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      background-color: var(--modal-bg);
+      color: var(--ink);
+      border: 2px solid var(--pill-border);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .modal-head h2 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 900;
+    }
+
+    .close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      border: 1.5px solid var(--pill-border);
+      background: var(--card-bg);
+      color: var(--ink);
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .preview-panel {
+      background: var(--card-bg);
+      border: 1.5px dashed rgba(128, 128, 128, 0.42);
+      border-radius: 14px;
+      padding: 10px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .preview-tag {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      opacity: 0.62;
+      margin-bottom: 4px;
+    }
+
+    #modalPreview {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-family: var(--font-round);
+      font-size: 24px;
+      font-weight: 900;
+      line-height: 1.25;
+      min-height: 36px;
+    }
+
+    #previewImg {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      object-fit: contain;
+    }
+
+    .preview-btns-bar {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(128, 128, 128, 0.28);
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .preview-mini-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 9px;
+      border-radius: 10px;
+      border: 1px solid rgba(128, 128, 128, 0.35);
+    }
+
+    .preview-mini-img {
+      display: inline-block;
+      width: 19px;
+      height: 19px;
+      object-fit: contain;
+    }
+
+    .field-group {
+      margin-bottom: 13px;
+      padding-bottom: 11px;
+      border-bottom: 1px solid rgba(128, 128, 128, 0.18);
+    }
+
+    .field-group:last-of-type {
+      border-bottom: none;
+      margin-bottom: 6px;
+    }
+
+    .field-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .segmented-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .seg-btn {
+      padding: 8px 10px;
+      border: 1.6px solid var(--pill-border);
+      border-radius: 12px;
+      background: var(--card-bg);
+      color: var(--ink);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .seg-btn.active {
+      background: var(--accent);
+      color: #2B1810;
+    }
+
+    .text-box {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1.6px solid var(--pill-border);
+      border-radius: 12px;
+      background: var(--card-bg);
+      color: var(--ink);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .chip-wrap {
       display: flex;
       flex-wrap: wrap;
-      justify-content: center;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .chip {
+      padding: 5px 10px;
+      border: 1.4px solid var(--pill-border);
+      border-radius: 10px;
+      background: var(--card-bg);
+      color: var(--ink);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .chip.active {
+      background: var(--accent);
+      color: #2B1810;
+    }
+
+    .size-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px;
+      margin-bottom: 8px;
+    }
+
+    .size-btn {
+      padding: 6px 2px;
+      border: 1.4px solid var(--pill-border);
+      border-radius: 10px;
+      background: var(--card-bg);
+      color: var(--ink);
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .size-btn.active {
+      background: var(--accent);
+      color: #2B1810;
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
       gap: 8px;
+    }
+
+    .slider-row input[type="range"] {
+      flex: 1;
+      accent-color: #D97757;
+    }
+
+    /* 16 款原圖預選網格 */
+    .sticker-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 5px;
+      margin-bottom: 8px;
+    }
+
+    .sticker-item {
+      aspect-ratio: 1;
+      border: 1.5px solid rgba(128, 128, 128, 0.35);
+      border-radius: 10px;
+      background: #FFFDF9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 2px;
+      touch-action: manipulation;
+    }
+
+    .sticker-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
       pointer-events: none;
     }
 
-    .btn {
-      pointer-events: auto;
-      appearance: none;
-      border: 1px solid var(--border);
-      background: var(--panel-bg);
-      backdrop-filter: blur(8px);
-      color: var(--text-main);
-      border-radius: 14px;
-      padding: 9px 13px;
-      font-size: 13px;
-      font-weight: 600;
+    .sticker-item.active {
+      border-color: var(--pill-border);
+      background: var(--accent);
+      box-shadow: 0 1px 0 var(--pill-border);
+    }
+
+    .icon-pick-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .mini-icon-btn {
+      width: 38px;
+      height: 38px;
+      border: 1.5px solid rgba(128, 128, 128, 0.35);
+      border-radius: 10px;
+      background: #FFFDF9;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
-      box-shadow: var(--shadow);
-      transition: transform 0.12s ease, background 0.15s ease;
+      padding: 2px;
+    }
+
+    .mini-icon-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    .mini-icon-btn.active {
+      border-color: var(--pill-border);
+      background: var(--accent);
+      box-shadow: 0 1px 0 var(--pill-border);
+    }
+
+    .mini-icon-input {
+      width: 68px;
+      padding: 6px 8px;
+      border: 1.5px solid var(--pill-border);
+      border-radius: 10px;
+      background: var(--card-bg);
+      color: var(--ink);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      text-align: center;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .btn-icon-upload-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 7px;
+      padding: 6px 9px;
+      border-radius: 10px;
+      background: var(--card-bg);
+      border: 1.2px dashed rgba(128, 128, 128, 0.35);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .btn-icon-upload-left {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .btn-icon-thumb {
+      display: none;
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+      border-radius: 5px;
+      border: 1px solid rgba(128, 128, 128, 0.3);
+      background: #FFFFFF;
+    }
+
+    .btn-icon-actions {
       display: inline-flex;
       align-items: center;
       gap: 5px;
+      flex-shrink: 0;
     }
 
-    .btn:active {
-      transform: scale(0.95);
+    .modal-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
     }
 
-    .btn.primary {
-      background: linear-gradient(135deg, #ff7675, #ff9f43);
-      color: #fff;
-      border-color: transparent;
-    }
-
-    .btn.active {
-      background: #3b2618;
-      color: #fff;
-      border-color: #3b2618;
-    }
-
-    #customStickerInput {
-      display: none;
-    }
-
-    @media (max-width: 520px) {
-      .badge {
-        font-size: 12px;
-        padding: 5px 10px;
-      }
-      .btn {
-        font-size: 12px;
-        padding: 8px 11px;
-        border-radius: 12px;
-      }
+    .modal-actions-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
     }
   </style>
 </head>
 <body>
-  <canvas id="stage"></canvas>
+  <!-- 主互動小豬時鐘畫布 -->
+  <canvas id="clockCanvas"></canvas>
 
-  <div class="top-bar">
-    <div class="badge" id="statusBadge">
-      <span>🐷 105 隻排時鐘</span>
-      <small id="sourceInfo">載入 clock-pigs/ 中...</small>
+  <!-- 頂部可自訂標題列 -->
+  <header id="topBar">
+    <button id="titleTrigger" type="button" title="點擊修改標題、顯示狀態與後方小圖示">
+      <span id="titleText">不理不理左衛門時鐘</span>
+      <span id="titleIcon"></span>
+      <img id="titleIconImg" alt="標題小圖示" />
+      <span class="edit-badge">✎</span>
+    </button>
+  </header>
+
+  <!-- 輕量操作提示氣泡 -->
+  <div id="toast"></div>
+
+  <!-- 底部控制工具列（完整還原原本所有選項 + 整點彩蛋按鈕） -->
+  <footer id="bottomBar">
+    <div class="toolbar-row">
+      <button id="btnToggleGather" type="button" class="pill-btn">散開 / 集合</button>
+      <button id="btnToggleSize" type="button" class="pill-btn">時間：特大</button>
+      <button id="btnToggleNight" type="button" class="pill-btn">夜間模式</button>
+      <button id="btnWakeLock" type="button" class="pill-btn">螢幕常亮</button>
+      <button id="btnHourEaster" type="button" class="pill-btn">整點彩蛋</button>
+      <button id="btnCustomSticker" type="button" class="pill-btn">自訂小豬貼圖</button>
+      <button id="btnResetSticker" type="button" class="pill-btn hidden">恢復預設小豬</button>
+      <button id="btnOpenSettings" type="button" class="pill-btn">✎ 標題與圖示</button>
+      <button id="btnHideBar" type="button" class="pill-btn">
+        <span id="hideBtnIcon" class="ctrl-btn-icon"></span>
+        <img id="hideBtnImg" class="ctrl-btn-img" alt="隱藏選項圖示" />
+        <span>隱藏選項</span>
+      </button>
     </div>
-    <div class="badge" id="digitalReadout">--:--:--</div>
+    <div class="hint-line">點擊小豬可觸發互動彩蛋，點擊空白處可讓小豬散開或集合報時！</div>
+    <input id="fileStickerInput" type="file" accept="image/*" multiple class="hidden" />
+  </footer>
+
+  <!-- 隱藏選項後的右下角恢復按鈕 -->
+  <button id="btnShowBar" type="button" class="hidden" title="顯示底部控制列">
+    <span id="showBtnIcon" class="ctrl-btn-icon"></span>
+    <img id="showBtnImg" class="ctrl-btn-img" alt="顯示選項圖示" />
+    <span>顯示選項</span>
+  </button>
+
+  <!-- 標題與圖示自訂設定彈窗 -->
+  <div id="titleModal" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h2>✎ 標題與按鈕圖示設定</h2>
+        <button id="btnCloseModal" type="button" class="close-btn">✕</button>
+      </div>
+
+      <!-- 即時預覽區 -->
+      <div class="preview-panel">
+        <span class="preview-tag">頂部標題與按鈕即時預覽</span>
+        <div id="modalPreview">
+          <span id="previewText">不理不理左衛門時鐘</span>
+          <span id="previewIcon"></span>
+          <img id="previewImg" alt="預覽圖示" />
+        </div>
+        <div class="preview-btns-bar">
+          <span class="preview-mini-pill">
+            <span id="prevHideEmoji"></span>
+            <img id="prevHideImg" class="preview-mini-img" alt="" />
+            <span>隱藏選項</span>
+          </span>
+          <span class="preview-mini-pill">
+            <span id="prevShowEmoji"></span>
+            <img id="prevShowImg" class="preview-mini-img" alt="" />
+            <span>顯示選項</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- 1. 頂部標題顯示狀態 -->
+      <div class="field-group">
+        <div class="field-label-row">
+          <span>1. 頂部標題顯示狀態</span>
+        </div>
+        <div class="segmented-row">
+          <button type="button" id="btnTitleVisibleOn" class="seg-btn active">顯示標題</button>
+          <button type="button" id="btnTitleVisibleOff" class="seg-btn">隱藏標題</button>
+        </div>
+      </div>
+
+      <!-- 2. 標題文字內容 -->
+      <div class="field-group">
+        <div class="field-label-row">
+          <label for="inputTitle">2. 標題文字內容</label>
+          <button id="btnClearTitle" type="button" class="chip">清空文字</button>
+        </div>
+        <input id="inputTitle" type="text" maxlength="24" class="text-box" placeholder="輸入標題文字（可留空只顯示圖示）" />
+        <div class="chip-wrap">
+          <button type="button" class="chip preset-title" data-val="不理不理左衛門時鐘">不理不理左衛門時鐘</button>
+          <button type="button" class="chip preset-title" data-val="豬豬時鐘">豬豬時鐘</button>
+          <button type="button" class="chip preset-title" data-val="午休時間">午休時間</button>
+          <button type="button" class="chip preset-title" data-val="起床囉！">起床囉！</button>
+        </div>
+      </div>
+
+      <!-- 3. 標題字型大小 -->
+      <div class="field-group">
+        <div class="field-label-row">
+          <label for="inputFontSize">3. 標題字型大小</label>
+          <span id="fontSizeBadge" class="chip">26px</span>
+        </div>
+        <div class="size-row">
+          <button type="button" class="size-btn" data-size="18">小 18px</button>
+          <button type="button" class="size-btn" data-size="22">適中 22px</button>
+          <button type="button" class="size-btn" data-size="26">標準 26px</button>
+          <button type="button" class="size-btn" data-size="32">大 32px</button>
+          <button type="button" class="size-btn" data-size="40">特大 40px</button>
+        </div>
+        <div class="slider-row">
+          <span style="font-size:12px;font-weight:900;opacity:0.65;">A</span>
+          <input id="inputFontSize" type="range" min="16" max="44" step="1" value="26" />
+          <span style="font-size:18px;font-weight:900;">A</span>
+        </div>
+      </div>
+
+      <!-- 4. 標題後方小圖示（icons/PIG (1).jpg ~ PIG (16).jpg 原圖自動去背） -->
+      <div class="field-group">
+        <div class="field-label-row">
+          <span>4. 標題後方小圖示（點選原圖預選）</span>
+          <button id="btnNoIcon" type="button" class="chip">無圖示 (隱藏)</button>
+        </div>
+        <div class="sticker-grid" id="titleStickerGrid"></div>
+        <input id="inputCustomIcon" type="text" maxlength="8" class="text-box" placeholder="或直接輸入任何文字 / Emoji 符號..." />
+        <div class="btn-icon-upload-bar">
+          <div class="btn-icon-upload-left">
+            <img id="titleIconThumb" class="btn-icon-thumb" alt="標題小圖示縮圖" />
+            <span id="titleIconImgStatus">也可從手機相簿選擇小圖片（自動去背）</span>
+          </div>
+          <div class="btn-icon-actions">
+            <button id="btnTriggerIconUpload" type="button" class="chip">📁 上傳圖片</button>
+            <button id="btnClearTitleIconImg" type="button" class="chip hidden">改回原圖</button>
+            <input id="fileIconInput" type="file" accept="image/*" class="hidden" />
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. 「隱藏選項」與 6. 「顯示選項」按鈕圖示 -->
+      <div class="field-group">
+        <div class="field-label-row">
+          <span>5. 「隱藏選項」按鈕圖示</span>
+        </div>
+        <div class="icon-pick-row" id="hideIconGroup"></div>
+        <div class="btn-icon-upload-bar">
+          <div class="btn-icon-upload-left">
+            <img id="hideBtnThumb" class="btn-icon-thumb" alt="隱藏圖示預覽" />
+            <span id="hideBtnImgStatus">已連結 icons/PIG 原圖自動去背</span>
+          </div>
+          <div class="btn-icon-actions">
+            <button id="btnUploadHideIcon" type="button" class="chip">📁 上傳圖片</button>
+            <button id="btnClearHideIconImg" type="button" class="chip hidden">改回原圖</button>
+            <input id="fileHideIconInput" type="file" accept="image/*" class="hidden" />
+          </div>
+        </div>
+
+        <div class="field-label-row" style="margin-top:10px;">
+          <span>6. 「顯示選項」按鈕圖示</span>
+        </div>
+        <div class="icon-pick-row" id="showIconGroup"></div>
+        <div class="btn-icon-upload-bar">
+          <div class="btn-icon-upload-left">
+            <img id="showBtnThumb" class="btn-icon-thumb" alt="顯示圖示預覽" />
+            <span id="showBtnImgStatus">已連結 icons/PIG 原圖自動去背</span>
+          </div>
+          <div class="btn-icon-actions">
+            <button id="btnUploadShowIcon" type="button" class="chip">📁 上傳圖片</button>
+            <button id="btnClearShowIconImg" type="button" class="chip hidden">改回原圖</button>
+            <input id="fileShowIconInput" type="file" accept="image/*" class="hidden" />
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部操作按鈕 -->
+      <div class="modal-actions">
+        <button id="btnResetDefaults" type="button" class="chip">↺ 恢復預設值</button>
+        <div class="modal-actions-right">
+          <button id="btnCancelModal" type="button" class="pill-btn">取消</button>
+          <button id="btnApplyModal" type="button" class="pill-btn primary">✓ 確認套用</button>
+        </div>
+      </div>
+    </div>
   </div>
-
-  <div class="easter-banner" id="easterBanner">🎉 彩蛋觸發！</div>
-
-  <div class="bottom-bar">
-    <button class="btn" id="toggleScatterBtn" type="button">🌀 散開自由走動</button>
-    <button class="btn" id="triggerHourBtn" type="button">⏰ 整點冒出彩蛋</button>
-    <button class="btn primary" id="customStickerBtn" type="button">🖼️ 自訂小豬貼圖</button>
-    <button class="btn" id="resetDefaultBtn" type="button">↩️ 預設 clock-pigs</button>
-  </div>
-
-  <input type="file" id="customStickerInput" accept="image/*" multiple />
 
   <script>
-    (() => {
-      // =========================================================
-      // 1. 資料夾與檔案設定
-      // =========================================================
-      const CLOCK_PIGS_DIR = "clock-pigs/";
-      const EASTER_EGGS_DIR = "easter-eggs/";
+    (function () {
+      'use strict';
 
-      // 預設排時鐘主圖（輪廓集中、干擾少，利於 105 隻排成數字筆畫）
-      const DEFAULT_CLOCK_FILES = [
-        "12209766.png",
-        "12209767.png",
-        "12209781.png",
-        "5727675.png",
-        "5727691.png",
-        "5727689.png",
-        "3856937.png",
-        "2040294.png"
-      ];
-
-      // 怪咖／搞笑動作（散開自由走動時混入晃動）
-      const WEIRDO_EGG_FILES = [
-        "12209765.png",
-        "12209774.png",
-        "12209771.png",
-        "12209761.png",
-        "12209770.png",
-        "12209772.png",
-        "12209775.png",
-        "12209777.png",
-        "2040285.png"
-      ];
-
-      // 整點／特殊時刻冒出逛過去的角色
-      const HOUR_EGG_FILES = [
-        "12209767.png",
-        "12209781.png",
-        "2040285.png",
-        "3856930.png",
-        "3856933.png",
-        "3856929.jpg"
-      ];
-
-      // 點擊互動彩蛋可用的反應圖
-      const CLICK_EGG_FILES = [
-        "12209762.png",
-        "12209763.png",
-        "12209779.png",
-        "12209764.png",
-        "2040307.png"
-      ];
-
-      // 3x5 點陣字型（每個數字 15 格；6 位數 HH:MM:SS 共 6 * 15 = 90 格 + 冒號 15 格 = 105 隻）
-      const DIGITS_3X5 = {
-        "0": [
-          1,1,1,
-          1,0,1,
-          1,0,1,
-          1,0,1,
-          1,1,1
-        ],
-        "1": [
-          0,1,0,
-          1,1,0,
-          0,1,0,
-          0,1,0,
-          1,1,1
-        ],
-        "2": [
-          1,1,1,
-          0,0,1,
-          1,1,1,
-          1,0,0,
-          1,1,1
-        ],
-        "3": [
-          1,1,1,
-          0,0,1,
-          1,1,1,
-          0,0,1,
-          1,1,1
-        ],
-        "4": [
-          1,0,1,
-          1,0,1,
-          1,1,1,
-          0,0,1,
-          0,0,1
-        ],
-        "5": [
-          1,1,1,
-          1,0,0,
-          1,1,1,
-          0,0,1,
-          1,1,1
-        ],
-        "6": [
-          1,1,1,
-          1,0,0,
-          1,1,1,
-          1,0,1,
-          1,1,1
-        ],
-        "7": [
-          1,1,1,
-          0,0,1,
-          0,1,0,
-          0,1,0,
-          0,1,0
-        ],
-        "8": [
-          1,1,1,
-          1,0,1,
-          1,1,1,
-          1,0,1,
-          1,1,1
-        ],
-        "9": [
-          1,1,1,
-          1,0,1,
-          1,1,1,
-          0,0,1,
-          1,1,1
-        ]
-      };
-
-      // 冒號佔 1 欄寬、5 列高，共 5 格；兩個冒號共 10 格，再加上 5 顆裝飾/間隔豬 = 15 格（總計 105 隻）
-      const COLON_1X5 = [0, 1, 0, 1, 0];
-
-      // =========================================================
-      // 2. 畫布與狀態變數
-      // =========================================================
-      const canvas = document.getElementById("stage");
-      const ctx = canvas.getContext("2d");
-
-      const statusBadge = document.getElementById("statusBadge");
-      const sourceInfo = document.getElementById("sourceInfo");
-      const digitalReadout = document.getElementById("digitalReadout");
-      const easterBanner = document.getElementById("easterBanner");
-
-      const toggleScatterBtn = document.getElementById("toggleScatterBtn");
-      const triggerHourBtn = document.getElementById("triggerHourBtn");
-      const customStickerBtn = document.getElementById("customStickerBtn");
-      const resetDefaultBtn = document.getElementById("resetDefaultBtn");
-      const customStickerInput = document.getElementById("customStickerInput");
-
-      let width = 0;
-      let height = 0;
-      let dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-      let isScattered = false;          // 是否處於「散開自由走動」
-      let useCustomStickers = false;    // 是否使用手機相簿自訂貼圖
-      let lastSecondStr = "";
-      let lastHourTriggered = -1;
-
-      // 儲存已處理去背後的貼圖物件：{ img, isDarkBg }
-      let clockSprites = [];
-      let weirdoSprites = [];
-      let clickSprites = [];
-      let hourSprites = [];
-      let customSprites = [];
-
-      // 105 隻主體角色陣列
-      const pigs = [];
-
-      // 整點／特殊時刻冒出逛過去的角色陣列
-      const paradeVisitors = [];
-
-      // 內建備援小豬 SVG DataURL（當外部圖檔尚未上傳或路徑失敗時使用）
-      const fallbackPigDataUrl = "data:image/svg+xml;utf8," + encodeURIComponent(`
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
-          <circle cx="60" cy="64" r="42" fill="#ffc2c7" stroke="#4a2c2a" stroke-width="5"/>
-          <polygon points="28,34 22,12 44,24" fill="#ff9aa2" stroke="#4a2c2a" stroke-width="5" stroke-linejoin="round"/>
-          <polygon points="92,34 98,12 76,24" fill="#ff9aa2" stroke="#4a2c2a" stroke-width="5" stroke-linejoin="round"/>
-          <circle cx="45" cy="56" r="5.5" fill="#4a2c2a"/>
-          <circle cx="75" cy="56" r="5.5" fill="#4a2c2a"/>
-          <ellipse cx="60" cy="70" rx="16" ry="12" fill="#ff758f" stroke="#4a2c2a" stroke-width="4"/>
-          <circle cx="54" cy="70" r="3" fill="#4a2c2a"/>
-          <circle cx="66" cy="70" r="3" fill="#4a2c2a"/>
-        </svg>
-      `);
-      let fallbackSprite = null;
-
-      // =========================================================
-      // 3. 提示橫幅與尺寸調整
-      // =========================================================
-      let bannerTimer = null;
-      function showBanner(text) {
-        easterBanner.textContent = text;
-        easterBanner.classList.add("show");
-        clearTimeout(bannerTimer);
-        bannerTimer = setTimeout(() => {
-          easterBanner.classList.remove("show");
-        }, 2600);
-      }
-
-      function resizeCanvas() {
-        width = window.innerWidth;
-        height = window.innerHeight;
-        dpr = Math.min(window.devicePixelRatio || 1, 2);
-        canvas.width = Math.floor(width * dpr);
-        canvas.height = Math.floor(height * dpr);
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        recomputeClockTargets();
-      }
-
-      // =========================================================
-      // 4. 圖片載入與自動去背（支援白底、黑底、透明底）
-      // =========================================================
-      function processImageBackground(img) {
-        const off = document.createElement("canvas");
-        const w = img.naturalWidth || img.width || 128;
-        const h = img.naturalHeight || img.height || 128;
-        off.width = w;
-        off.height = h;
-        const octx = off.getContext("2d");
-        octx.drawImage(img, 0, 0, w, h);
-
-        let isDarkBg = false;
+      // =========================================================================
+      // 1. 安全儲存存取與輔助繪圖
+      // =========================================================================
+      var memStore = {};
+      function safeGet(key, fallback) {
         try {
-          const imgData = octx.getImageData(0, 0, w, h);
-          const data = imgData.data;
+          var v = window.localStorage.getItem(key);
+          if (v !== null) return v;
+        } catch (e) {}
+        return Object.prototype.hasOwnProperty.call(memStore, key) ? memStore[key] : fallback;
+      }
 
-          // 採樣四個角落判斷背景是偏白還是偏黑
-          const corners = [
-            0,
-            (w - 1) * 4,
-            (h - 1) * w * 4,
-            ((h - 1) * w + (w - 1)) * 4
-          ];
-          let brightCorners = 0;
-          let darkCorners = 0;
-          for (const idx of corners) {
-            const r = data[idx], g = data[idx + 1], b = data[idx + 2], a = data[idx + 3];
-            if (a > 20) {
-              const lum = 0.299 * r + 0.587 * g + 0.114 * b;
-              if (lum > 235) brightCorners++;
-              if (lum < 25) darkCorners++;
-            }
-          }
+      function safeSet(key, val) {
+        memStore[key] = val;
+        try {
+          window.localStorage.setItem(key, val);
+        } catch (e) {}
+      }
 
-          if (brightCorners >= 2) {
-            // 去除接近純白的外部背景像素
-            for (let i = 0; i < data.length; i += 4) {
-              const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
-              if (a > 0 && r >= 242 && g >= 242 && b >= 242) {
-                data[i + 3] = 0;
+      function drawRoundRect(c, x, y, w, h, r) {
+        var radius = Math.min(r, w / 2, h / 2);
+        c.beginPath();
+        c.moveTo(x + radius, y);
+        c.arcTo(x + w, y, x + w, y + h, radius);
+        c.arcTo(x + w, y + h, x, y + h, radius);
+        c.arcTo(x, y + h, x, y, radius);
+        c.arcTo(x, y, x + w, y, radius);
+        c.closePath();
+      }
+
+      // =========================================================================
+      // 2. 標題／按鈕圖示（icons/）與排時鐘／彩蛋圖庫（clock-pigs/、easter-eggs/）
+      // =========================================================================
+      var PIG_FILE_PATHS = [
+        'icons/PIG (1).jpg', 'icons/PIG (2).jpg', 'icons/PIG (3).jpg', 'icons/PIG (4).jpg',
+        'icons/PIG (5).jpg', 'icons/PIG (6).jpg', 'icons/PIG (7).jpg', 'icons/PIG (8).jpg',
+        'icons/PIG (9).jpg', 'icons/PIG (10).jpg', 'icons/PIG (11).jpg', 'icons/PIG (12).jpg',
+        'icons/PIG (13).jpg', 'icons/PIG (14).jpg', 'icons/PIG (15).jpg', 'icons/PIG (16).jpg'
+      ];
+
+      var HIDE_PRESET_INDICES = [6, 3, 8, 11, 14, 15];
+      var SHOW_PRESET_INDICES = [4, 10, 9, 0, 5, 12];
+
+      var CLOCK_PIGS_DIR = 'clock-pigs/';
+      var EASTER_EGGS_DIR = 'easter-eggs/';
+
+      var CLOCK_PIG_FILES = [
+        '12209766.png',
+        '12209767.png',
+        '12209781.png',
+        '5727675.png',
+        '5727691.png',
+        '5727689.png',
+        '3856937.png',
+        '2040294.png'
+      ];
+
+      var WEIRDO_EGG_FILES = [
+        '12209765.png',
+        '12209774.png',
+        '12209771.png',
+        '12209761.png',
+        '12209770.png',
+        '12209772.png',
+        '12209775.png',
+        '12209777.png',
+        '2040285.png'
+      ];
+
+      var HOUR_EGG_FILES = [
+        '12209767.png',
+        '12209781.png',
+        '2040285.png',
+        '3856930.png',
+        '3856933.png',
+        '3856929.jpg'
+      ];
+
+      var CLICK_EGG_FILES = [
+        '12209762.png',
+        '12209763.png',
+        '12209779.png',
+        '12209764.png',
+        '2040307.png'
+      ];
+
+      function removeBackgroundAndTrim(img, outSize, callback) {
+        try {
+          var rawW = Math.max(img.naturalWidth || img.width || 1, 1);
+          var rawH = Math.max(img.naturalHeight || img.height || 1, 1);
+          var tmp = document.createElement('canvas');
+          tmp.width = rawW;
+          tmp.height = rawH;
+          var tc = tmp.getContext('2d');
+          tc.drawImage(img, 0, 0, rawW, rawH);
+
+          var isDarkBg = false;
+          try {
+            var imgData = tc.getImageData(0, 0, rawW, rawH);
+            var d = imgData.data;
+
+            var corners = [
+              [0, 0],
+              [rawW - 1, 0],
+              [0, rawH - 1],
+              [rawW - 1, rawH - 1]
+            ];
+            var bgR = 0, bgG = 0, bgB = 0, validCorners = 0;
+            var darkCount = 0;
+            for (var cIdx = 0; cIdx < corners.length; cIdx++) {
+              var cx = corners[cIdx][0], cy = corners[cIdx][1];
+              var ci = (cy * rawW + cx) * 4;
+              var cr = d[ci], cg = d[ci + 1], cb = d[ci + 2], ca = d[ci + 3];
+              if (ca > 20) {
+                if (cr + cg + cb < 90) darkCount++;
+                bgR += cr;
+                bgG += cg;
+                bgB += cb;
+                validCorners++;
               }
             }
-            octx.putImageData(imgData, 0, 0);
-          } else if (darkCorners >= 2) {
-            isDarkBg = true;
-          }
-        } catch (err) {
-          // 若遇到跨來源限制無法讀取像素，保留原圖不中斷
-        }
 
-        return { canvas: off, w, h, isDarkBg };
+            if (darkCount >= 2) {
+              isDarkBg = true;
+            } else {
+              bgR = validCorners ? bgR / validCorners : 240;
+              bgG = validCorners ? bgG / validCorners : 242;
+              bgB = validCorners ? bgB / validCorners : 246;
+
+              for (var y = 0; y < rawH; y++) {
+                for (var x = 0; x < rawW; x++) {
+                  var idx = (y * rawW + x) * 4;
+                  var r = d[idx], g = d[idx + 1], b = d[idx + 2], a = d[idx + 3];
+                  if (a === 0) continue;
+
+                  var distBg = Math.sqrt(
+                    (r - bgR) * (r - bgR) +
+                    (g - bgG) * (g - bgG) +
+                    (b - bgB) * (b - bgB)
+                  );
+                  var isNearWhite = (r > 234 && g > 234 && b > 234);
+
+                  if (distBg < 26 || isNearWhite) {
+                    d[idx + 3] = 0;
+                  } else if (distBg < 44) {
+                    var ratio = (distBg - 26) / 18;
+                    d[idx + 3] = Math.round(a * Math.max(0.1, Math.min(0.85, ratio)));
+                  }
+                }
+              }
+              tc.putImageData(imgData, 0, 0);
+            }
+          } catch (pixErr) {}
+
+          var off = document.createElement('canvas');
+          off.width = outSize;
+          off.height = outSize;
+          var c = off.getContext('2d');
+          var pad = Math.max(3, Math.round(outSize * 0.05));
+          var scale = Math.min((outSize - pad * 2) / rawW, (outSize - pad * 2) / rawH);
+          var dw = rawW * scale;
+          var dh = rawH * scale;
+          c.drawImage(tmp, (outSize - dw) / 2, (outSize - dh) / 2, dw, dh);
+          off._isDarkBg = isDarkBg;
+
+          callback(off);
+        } catch (err) {
+          callback(null);
+        }
       }
 
-      function loadSingleSprite(url) {
-        return new Promise((resolve) => {
-          const img = new Image();
-          img.crossOrigin = "anonymous";
-          img.onload = () => {
-            resolve({ ok: true, url, sprite: processImageBackground(img) });
-          };
-          img.onerror = () => {
-            resolve({ ok: false, url, sprite: null });
-          };
-          img.src = url;
+      var originalCutoutDataURLs = new Array(16);
+      var pickerImgEls = { title: [], hide: [], show: [] };
+
+      function refreshAllPresetImagesInDOM() {
+        for (var i = 0; i < 16; i++) {
+          var url = originalCutoutDataURLs[i] || encodeURI(PIG_FILE_PATHS[i]);
+          if (pickerImgEls.title[i]) pickerImgEls.title[i].src = url;
+        }
+        for (var h = 0; h < HIDE_PRESET_INDICES.length; h++) {
+          var hIdx = HIDE_PRESET_INDICES[h];
+          if (pickerImgEls.hide[h]) {
+            pickerImgEls.hide[h].src = originalCutoutDataURLs[hIdx] || encodeURI(PIG_FILE_PATHS[hIdx]);
+          }
+        }
+        for (var s = 0; s < SHOW_PRESET_INDICES.length; s++) {
+          var sIdx = SHOW_PRESET_INDICES[s];
+          if (pickerImgEls.show[s]) {
+            pickerImgEls.show[s].src = originalCutoutDataURLs[sIdx] || encodeURI(PIG_FILE_PATHS[sIdx]);
+          }
+        }
+
+        if (currentSettings) {
+          if (currentSettings.iconType === 'preset') {
+            currentSettings.iconImage = originalCutoutDataURLs[currentSettings.presetIndex] || encodeURI(PIG_FILE_PATHS[currentSettings.presetIndex]);
+          }
+          if (currentSettings.hideBtnIconType === 'preset') {
+            currentSettings.hideBtnImageData = originalCutoutDataURLs[currentSettings.hideBtnPresetIndex] || encodeURI(PIG_FILE_PATHS[currentSettings.hideBtnPresetIndex]);
+          }
+          if (currentSettings.showBtnIconType === 'preset') {
+            currentSettings.showBtnImageData = originalCutoutDataURLs[currentSettings.showBtnPresetIndex] || encodeURI(PIG_FILE_PATHS[currentSettings.showBtnPresetIndex]);
+          }
+          applySettingsToScreen();
+        }
+
+        if (draftSettings) {
+          if (draftSettings.iconType === 'preset') {
+            draftSettings.iconImage = originalCutoutDataURLs[draftSettings.presetIndex] || encodeURI(PIG_FILE_PATHS[draftSettings.presetIndex]);
+          }
+          if (draftSettings.hideBtnIconType === 'preset') {
+            draftSettings.hideBtnImageData = originalCutoutDataURLs[draftSettings.hideBtnPresetIndex] || encodeURI(PIG_FILE_PATHS[draftSettings.hideBtnPresetIndex]);
+          }
+          if (draftSettings.showBtnIconType === 'preset') {
+            draftSettings.showBtnImageData = originalCutoutDataURLs[draftSettings.showBtnPresetIndex] || encodeURI(PIG_FILE_PATHS[draftSettings.showBtnPresetIndex]);
+          }
+          updateModalPreview();
+        }
+      }
+
+      function loadOriginalPigIcons() {
+        var remaining = PIG_FILE_PATHS.length;
+        for (var i = 0; i < PIG_FILE_PATHS.length; i++) {
+          (function (idx) {
+            var img = new Image();
+            img.onload = function () {
+              removeBackgroundAndTrim(img, 96, function (cutCanvas) {
+                if (cutCanvas) {
+                  try {
+                    originalCutoutDataURLs[idx] = cutCanvas.toDataURL('image/png');
+                  } catch (e) {
+                    originalCutoutDataURLs[idx] = encodeURI(PIG_FILE_PATHS[idx]);
+                  }
+                } else {
+                  originalCutoutDataURLs[idx] = encodeURI(PIG_FILE_PATHS[idx]);
+                }
+                remaining--;
+                if (remaining <= 0) refreshAllPresetImagesInDOM();
+              });
+            };
+            img.onerror = function () {
+              originalCutoutDataURLs[idx] = encodeURI(PIG_FILE_PATHS[idx]);
+              remaining--;
+              if (remaining <= 0) refreshAllPresetImagesInDOM();
+            };
+            img.src = encodeURI(PIG_FILE_PATHS[idx]);
+          })(i);
+        }
+      }
+
+      // =========================================================================
+      // 3. 應用程式狀態與預設值
+      // =========================================================================
+      var STORAGE_KEY = 'buriburi_pig_clock_settings_v6';
+      var TOTAL_PIGS = 105;
+      var DEFAULT_POSE_COUNT = 12;
+      var W = Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0, 320);
+      var H = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0, 480);
+      var DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+      function getDefaultSettings() {
+        return {
+          visible: true,
+          text: '不理不理左衛門時鐘',
+          fontSize: 26,
+          iconType: 'preset',
+          presetIndex: 0,
+          iconEmoji: '',
+          iconImage: originalCutoutDataURLs[0] || encodeURI(PIG_FILE_PATHS[0]),
+          hideBtnIconType: 'preset',
+          hideBtnPresetIndex: 6,
+          hideBtnIcon: '',
+          hideBtnImageData: originalCutoutDataURLs[6] || encodeURI(PIG_FILE_PATHS[6]),
+          showBtnIconType: 'preset',
+          showBtnPresetIndex: 4,
+          showBtnIcon: '',
+          showBtnImageData: originalCutoutDataURLs[4] || encodeURI(PIG_FILE_PATHS[4])
+        };
+      }
+
+      function cloneSettings(src) {
+        var def = getDefaultSettings();
+        var titleType = src.iconType;
+        if (titleType !== 'preset' && titleType !== 'image' && titleType !== 'emoji' && titleType !== 'none') {
+          titleType = 'preset';
+        }
+        var titleIdx = typeof src.presetIndex === 'number' ? Math.max(0, Math.min(15, src.presetIndex)) : 0;
+        var titleImg = titleType === 'preset'
+          ? (originalCutoutDataURLs[titleIdx] || encodeURI(PIG_FILE_PATHS[titleIdx]))
+          : (src.iconImage || '');
+
+        var hideType = src.hideBtnIconType;
+        if (hideType !== 'preset' && hideType !== 'image' && hideType !== 'emoji') hideType = 'preset';
+        var hideIdx = typeof src.hideBtnPresetIndex === 'number' ? Math.max(0, Math.min(15, src.hideBtnPresetIndex)) : 6;
+        var hideImg = hideType === 'preset'
+          ? (originalCutoutDataURLs[hideIdx] || encodeURI(PIG_FILE_PATHS[hideIdx]))
+          : (src.hideBtnImageData || '');
+
+        var showType = src.showBtnIconType;
+        if (showType !== 'preset' && showType !== 'image' && showType !== 'emoji') showType = 'preset';
+        var showIdx = typeof src.showBtnPresetIndex === 'number' ? Math.max(0, Math.min(15, src.showBtnPresetIndex)) : 4;
+        var showImg = showType === 'preset'
+          ? (originalCutoutDataURLs[showIdx] || encodeURI(PIG_FILE_PATHS[showIdx]))
+          : (src.showBtnImageData || '');
+
+        return {
+          visible: typeof src.visible === 'boolean' ? src.visible : true,
+          text: typeof src.text === 'string' ? src.text : def.text,
+          fontSize: typeof src.fontSize === 'number' ? Math.min(44, Math.max(16, src.fontSize)) : 26,
+          iconType: titleType,
+          presetIndex: titleIdx,
+          iconEmoji: typeof src.iconEmoji === 'string' ? src.iconEmoji : '',
+          iconImage: titleImg,
+          hideBtnIconType: hideType,
+          hideBtnPresetIndex: hideIdx,
+          hideBtnIcon: typeof src.hideBtnIcon === 'string' ? src.hideBtnIcon : '',
+          hideBtnImageData: hideImg,
+          showBtnIconType: showType,
+          showBtnPresetIndex: showIdx,
+          showBtnIcon: typeof src.showBtnIcon === 'string' ? src.showBtnIcon : '',
+          showBtnImageData: showImg
+        };
+      }
+
+      var currentSettings = null;
+      var draftSettings = null;
+
+      var state = {
+        gathered: true,
+        extraLarge: true,
+        nightMode: false,
+        wakeLock: null,
+        barHidden: false,
+        lastMinute: -1,
+        lastHourTriggered: -1,
+        clockBox: { left: 20, right: 300, top: 120, bottom: 420 }
+      };
+
+      var canvas = document.getElementById('clockCanvas');
+      var ctx = canvas.getContext('2d');
+      var fallbackSprites = [];
+      var repoClockSprites = [];
+      var customClockSprites = [];
+      var weirdoSprites = [];
+      var hourSprites = [];
+      var clickSprites = [];
+      var usingCustomStickers = false;
+      var pigs = [];
+      var paradeVisitors = [];
+      var toastTimer = null;
+
+      function showToast(msg) {
+        var el = document.getElementById('toast');
+        if (!el) return;
+        el.textContent = msg;
+        el.classList.add('show');
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () {
+          el.classList.remove('show');
+        }, 2300);
+      }
+
+      function getCurrentClockPool() {
+        if (usingCustomStickers && customClockSprites.length > 0) return customClockSprites;
+        if (repoClockSprites.length > 0) return repoClockSprites;
+        return fallbackSprites;
+      }
+
+      // =========================================================================
+      // 4. 內建備援小豬與外部資料夾（clock-pigs/、easter-eggs/）載入
+      // =========================================================================
+      function createHandDrawnPigSprite(poseIdx) {
+        var off = document.createElement('canvas');
+        off.width = 96;
+        off.height = 96;
+        var c = off.getContext('2d');
+
+        var skin = '#F6C198';
+        var darkInk = '#3B2318';
+        var snoutPink = '#F17A7E';
+        var cheekPink = '#F78A8C';
+
+        c.save();
+        c.lineCap = 'round';
+        c.lineJoin = 'round';
+        c.strokeStyle = darkInk;
+        c.lineWidth = 3.2;
+
+        c.beginPath();
+        c.moveTo(22, 58);
+        c.bezierCurveTo(10, 52, 12, 40, 22, 45);
+        c.stroke();
+
+        c.fillStyle = skin;
+        drawRoundRect(c, 31, 64, 11, 13, 5);
+        c.fill();
+        c.stroke();
+
+        drawRoundRect(c, 54, 64, 11, 13, 5);
+        c.fill();
+        c.stroke();
+
+        c.fillStyle = skin;
+        c.beginPath();
+        c.ellipse(48, 53, 27, 21, 0, 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+
+        c.fillStyle = skin;
+        c.beginPath();
+        c.ellipse(28, 35, 7, 11, 0.45, 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+
+        c.beginPath();
+        c.ellipse(68, 35, 7, 11, -0.45, 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+
+        var mode = poseIdx % 12;
+        if (mode === 3 || mode === 7) {
+          c.beginPath();
+          c.arc(38, 46, 4.5, Math.PI * 1.1, Math.PI * 1.9);
+          c.stroke();
+          c.beginPath();
+          c.arc(58, 46, 4.5, Math.PI * 1.1, Math.PI * 1.9);
+          c.stroke();
+        } else if (mode === 5 || mode === 10) {
+          c.beginPath();
+          c.arc(38, 46, 4.5, 0, Math.PI * 2);
+          c.fillStyle = darkInk;
+          c.fill();
+          c.beginPath();
+          c.moveTo(54, 46);
+          c.lineTo(62, 46);
+          c.stroke();
+        } else {
+          c.fillStyle = darkInk;
+          c.beginPath();
+          c.arc(38, 46, 4.2, 0, Math.PI * 2);
+          c.arc(58, 46, 4.2, 0, Math.PI * 2);
+          c.fill();
+        }
+
+        c.fillStyle = cheekPink;
+        c.beginPath();
+        c.ellipse(29, 53, 5.2, 3.2, 0, 0, Math.PI * 2);
+        c.ellipse(67, 53, 5.2, 3.2, 0, 0, Math.PI * 2);
+        c.fill();
+
+        c.fillStyle = snoutPink;
+        c.beginPath();
+        c.ellipse(48, 53, 10.5, 7.5, 0, 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+
+        c.fillStyle = darkInk;
+        c.beginPath();
+        c.arc(44.5, 53, 2, 0, Math.PI * 2);
+        c.arc(51.5, 53, 2, 0, Math.PI * 2);
+        c.fill();
+
+        if (mode === 1 || mode === 6 || mode === 11) {
+          c.fillStyle = '#D95360';
+          c.beginPath();
+          c.arc(48, 62, 4.5, 0, Math.PI);
+          c.fill();
+          c.stroke();
+        } else {
+          c.beginPath();
+          c.moveTo(43, 62);
+          c.quadraticCurveTo(48, 66, 53, 62);
+          c.stroke();
+        }
+
+        if (mode === 2 || mode === 8) {
+          c.fillStyle = '#E85D75';
+          c.beginPath();
+          c.arc(74, 24, 4, 0, Math.PI * 2);
+          c.arc(80, 24, 4, 0, Math.PI * 2);
+          c.lineTo(77, 32);
+          c.closePath();
+          c.fill();
+        }
+
+        c.restore();
+        return off;
+      }
+
+      function buildFallbackSprites() {
+        fallbackSprites = [];
+        for (var i = 0; i < DEFAULT_POSE_COUNT; i++) {
+          fallbackSprites.push(createHandDrawnPigSprite(i));
+        }
+      }
+
+      function loadFolderSprites(folder, filenames, outSize, onDone) {
+        var results = [];
+        var remaining = filenames.length;
+        if (remaining === 0) {
+          onDone([]);
+          return;
+        }
+        for (var i = 0; i < filenames.length; i++) {
+          (function (name) {
+            var img = new Image();
+            img.onload = function () {
+              removeBackgroundAndTrim(img, outSize, function (spr) {
+                if (spr) results.push(spr);
+                remaining--;
+                if (remaining <= 0) onDone(results);
+              });
+            };
+            img.onerror = function () {
+              remaining--;
+              if (remaining <= 0) onDone(results);
+            };
+            img.src = encodeURI(folder + name);
+          })(filenames[i]);
+        }
+      }
+
+      function loadClockAndEasterAssets() {
+        loadFolderSprites(CLOCK_PIGS_DIR, CLOCK_PIG_FILES, 96, function (loaded) {
+          if (loaded.length > 0) {
+            repoClockSprites = loaded;
+            for (var i = 0; i < pigs.length; i++) {
+              pigs[i].pose = i % repoClockSprites.length;
+            }
+          }
+        });
+
+        loadFolderSprites(EASTER_EGGS_DIR, WEIRDO_EGG_FILES, 96, function (loaded) {
+          weirdoSprites = loaded;
+        });
+
+        loadFolderSprites(EASTER_EGGS_DIR, HOUR_EGG_FILES, 112, function (loaded) {
+          hourSprites = loaded;
+        });
+
+        loadFolderSprites(EASTER_EGGS_DIR, CLICK_EGG_FILES, 96, function (loaded) {
+          clickSprites = loaded;
         });
       }
 
-      async function loadSpriteGroup(folder, filenames) {
-        const results = await Promise.all(
-          filenames.map((name) => loadSingleSprite(`${folder}${name}`))
-        );
-        const loaded = results.filter((r) => r.ok).map((r) => r.sprite);
-        const failedCount = results.filter((r) => !r.ok).length;
-        return { loaded, failedCount };
+      // =========================================================================
+      // 5. 數位時鐘向量路徑與 105 隻小豬排隊／動態／彩蛋
+      // =========================================================================
+      var DIGIT_POLYLINES = {
+        '0': [
+          [0.32, 0.05], [0.68, 0.05], [0.86, 0.22], [0.88, 0.50],
+          [0.86, 0.78], [0.68, 0.95], [0.32, 0.95], [0.14, 0.78],
+          [0.12, 0.50], [0.14, 0.22], [0.32, 0.05]
+        ],
+        '1': [
+          [0.30, 0.20], [0.54, 0.05], [0.54, 0.95], [0.28, 0.95], [0.80, 0.95]
+        ],
+        '2': [
+          [0.16, 0.22], [0.32, 0.06], [0.70, 0.06], [0.86, 0.22],
+          [0.84, 0.42], [0.14, 0.94], [0.88, 0.94]
+        ],
+        '3': [
+          [0.18, 0.10], [0.72, 0.06], [0.86, 0.24], [0.72, 0.46],
+          [0.44, 0.48], [0.74, 0.52], [0.86, 0.74], [0.72, 0.94], [0.18, 0.90]
+        ],
+        '4': [
+          [0.72, 0.95], [0.72, 0.05], [0.12, 0.66], [0.90, 0.66]
+        ],
+        '5': [
+          [0.84, 0.06], [0.20, 0.06], [0.18, 0.44], [0.70, 0.44],
+          [0.86, 0.64], [0.72, 0.94], [0.16, 0.90]
+        ],
+        '6': [
+          [0.76, 0.08], [0.34, 0.08], [0.14, 0.44], [0.14, 0.76],
+          [0.36, 0.94], [0.72, 0.94], [0.86, 0.72], [0.70, 0.50], [0.18, 0.50]
+        ],
+        '7': [
+          [0.14, 0.06], [0.88, 0.06], [0.40, 0.95]
+        ],
+        '8': [
+          [0.48, 0.48], [0.22, 0.40], [0.18, 0.20], [0.36, 0.05],
+          [0.64, 0.05], [0.82, 0.20], [0.78, 0.40], [0.52, 0.48],
+          [0.82, 0.58], [0.86, 0.78], [0.66, 0.95], [0.34, 0.95],
+          [0.14, 0.78], [0.18, 0.58], [0.48, 0.48]
+        ],
+        '9': [
+          [0.82, 0.48], [0.28, 0.48], [0.14, 0.28], [0.28, 0.06],
+          [0.66, 0.06], [0.86, 0.28], [0.84, 0.68], [0.62, 0.94], [0.22, 0.94]
+        ]
+      };
+
+      function samplePolyline(pts, count) {
+        var segLengths = [];
+        var totalLen = 0;
+        for (var i = 0; i < pts.length - 1; i++) {
+          var dx = pts[i + 1][0] - pts[i][0];
+          var dy = pts[i + 1][1] - pts[i][1];
+          var len = Math.sqrt(dx * dx + dy * dy);
+          segLengths.push(len);
+          totalLen += len;
+        }
+        var out = [];
+        if (totalLen <= 0 || count <= 1) {
+          out.push({ x: pts[0][0], y: pts[0][1] });
+          return out;
+        }
+        for (var k = 0; k < count; k++) {
+          var targetDist = (k / (count - 1)) * totalLen;
+          var acc = 0;
+          var placed = false;
+          for (var s = 0; s < segLengths.length; s++) {
+            var sl = segLengths[s];
+            if (acc + sl >= targetDist || s === segLengths.length - 1) {
+              var t = sl > 0 ? Math.min(1, Math.max(0, (targetDist - acc) / sl)) : 0;
+              out.push({
+                x: pts[s][0] + (pts[s + 1][0] - pts[s][0]) * t,
+                y: pts[s][1] + (pts[s + 1][1] - pts[s][1]) * t
+              });
+              placed = true;
+              break;
+            }
+            acc += sl;
+          }
+          if (!placed) {
+            var last = pts[pts.length - 1];
+            out.push({ x: last[0], y: last[1] });
+          }
+        }
+        return out;
       }
 
-      async function initAllAssets() {
-        const fbRes = await loadSingleSprite(fallbackPigDataUrl);
-        if (fbRes.ok) fallbackSprite = fbRes.sprite;
-
-        const [clockRes, weirdoRes, clickRes, hourRes] = await Promise.all([
-          loadSpriteGroup(CLOCK_PIGS_DIR, DEFAULT_CLOCK_FILES),
-          loadSpriteGroup(EASTER_EGGS_DIR, WEIRDO_EGG_FILES),
-          loadSpriteGroup(EASTER_EGGS_DIR, CLICK_EGG_FILES),
-          loadSpriteGroup(EASTER_EGGS_DIR, HOUR_EGG_FILES)
-        ]);
-
-        clockSprites = clockRes.loaded;
-        weirdoSprites = weirdoRes.loaded;
-        clickSprites = clickRes.loaded;
-        hourSprites = hourRes.loaded;
-
-        updateSourceStatus(clockRes.loaded.length, clockRes.failedCount);
-        create105Pigs();
-        recomputeClockTargets();
-      }
-
-      function updateSourceStatus(loadedCount, failedCount) {
-        if (useCustomStickers) {
-          sourceInfo.textContent = `自訂相簿（${customSprites.length} 張）`;
-          return;
-        }
-        if (loadedCount > 0 && failedCount === 0) {
-          sourceInfo.textContent = `clock-pigs/（${loadedCount} 張已載入）`;
-        } else if (loadedCount > 0) {
-          sourceInfo.textContent = `clock-pigs/（${loadedCount} 張成功，${failedCount} 張備援）`;
-        } else {
-          sourceInfo.textContent = `使用內建備援小豬（請確認 clock-pigs/ 檔名）`;
-        }
-      }
-
-      function getActiveClockSprite(pig) {
-        if (useCustomStickers && customSprites.length > 0) {
-          return customSprites[pig.spriteIndex % customSprites.length];
-        }
-        if (clockSprites.length > 0) {
-          return clockSprites[pig.spriteIndex % clockSprites.length];
-        }
-        return fallbackSprite;
-      }
-
-      // =========================================================
-      // 5. 105 隻小豬角色初始化與時鐘點陣座標計算
-      // =========================================================
-      function create105Pigs() {
-        pigs.length = 0;
-        const total = 105;
-        for (let i = 0; i < total; i++) {
-          const baseSpriteIdx = clockSprites.length > 0 ? i % clockSprites.length : 0;
+      function initPigs() {
+        pigs = [];
+        for (var i = 0; i < TOTAL_PIGS; i++) {
           pigs.push({
-            id: i,
-            x: Math.random() * (width || 800),
-            y: Math.random() * (height || 600),
-            tx: (width || 800) / 2,
-            ty: (height || 600) / 2,
-            vx: (Math.random() - 0.5) * 2.2,
-            vy: (Math.random() - 0.5) * 2.2,
-            size: 32,
-            targetSize: 32,
-            phase: Math.random() * Math.PI * 2,
-            wiggleSpeed: 2.2 + Math.random() * 2.2,
-            bobSpeed: 2.0 + Math.random() * 2.0,
-            facing: Math.random() < 0.5 ? 1 : -1,
-            spriteIndex: baseSpriteIdx,
-            // 彩蛋狀態
+            x: Math.random() * (W - 60) + 30,
+            y: Math.random() * (H - 140) + 80,
+            vx: (Math.random() - 0.5) * 70,
+            vy: (Math.random() - 0.5) * 70,
+            pose: i % DEFAULT_POSE_COUNT,
+            poseTimer: 1.5 + Math.random() * 3.5,
+            wigglePhase: Math.random() * Math.PI * 2,
+            wiggleFreq: 3.6 + Math.random() * 2.4,
+            flipX: Math.random() > 0.5 ? 1 : -1,
+            role: 'roamer',
+            tx: 0,
+            ty: 0,
+            scale: 0.42,
             isWeirdo: false,
-            clickBoost: 0,        // 點擊觸發的誇張動態剩餘時間（秒）
-            clickFlip: 1,         // 點擊翻面
-            clickPause: 0,        // 點擊短暫停頓剩餘時間（秒）
-            overrideSprite: null  // 點擊時暫時切換的彩蛋圖示
+            overrideSprite: null,
+            clickBoost: 0,
+            clickPause: 0,
+            clickFlip: 1
           });
         }
       }
 
-      // 產生 105 個 HH:MM:SS 點陣座標
-      function buildClockGridPoints(timeStr) {
-        // timeStr 格式為 "HHMMSS"（6 位數字）
-        // 每個數字 3 欄 x 5 列 = 15 點；6 位數共 90 點
-        // 兩個冒號各 1 欄 x 5 列 = 10 點
-        // 其餘 5 點放在時間列下方中央當作小豬列隊裝飾（總計 90 + 10 + 5 = 105 點）
-        const dChars = timeStr.split("");
-        const cells = [];
+      function triggerHourParade(msg) {
+        var pool = hourSprites.length > 0 ? hourSprites : (weirdoSprites.length > 0 ? weirdoSprites : getCurrentClockPool());
+        if (!pool || pool.length === 0) return;
 
-        // 排法： [D0][D1] : [D2][D3] : [D4][D5]
-        // 總欄數：3+1+3 + 1 + 3+1+3 + 1 + 3+1+3 = 21 欄，5 列
-        const colGap = 1.0;
-
-        function addDigitAt(digitChar, startCol) {
-          const pat = DIGITS_3X5[digitChar] || DIGITS_3X5["0"];
-          for (let r = 0; r < 5; r++) {
-            for (let c = 0; c < 3; c++) {
-              if (pat[r * 3 + c] === 1) {
-                cells.push({ col: startCol + c, row: r, kind: "digit" });
-              }
-            }
-          }
-        }
-
-        function addColonAt(colPos) {
-          for (let r = 0; r < 5; r++) {
-            if (COLON_1X5[r] === 1) {
-              cells.push({ col: colPos, row: r, kind: "colon" });
-            }
-          }
-        }
-
-        addDigitAt(dChars[0], 0);
-        addDigitAt(dChars[1], 4);
-        addColonAt(7.5);
-        addDigitAt(dChars[2], 9);
-        addDigitAt(dChars[3], 13);
-        addColonAt(16.5);
-        addDigitAt(dChars[4], 18);
-        addDigitAt(dChars[5], 22);
-
-        // 補足到 105 格（在底部排成一行小豬列隊）
-        let extraIndex = 0;
-        while (cells.length < 105) {
-          cells.push({
-            col: 8.5 + extraIndex * 1.8,
-            row: 5.85,
-            kind: "footer"
-          });
-          extraIndex++;
-        }
-
-        const totalCols = 25;
-        const totalRows = 6.4;
-        const usableW = Math.max(240, width * 0.88);
-        const usableH = Math.max(160, height * 0.56);
-
-        const cellW = usableW / totalCols;
-        const cellH = usableH / totalRows;
-        const unit = Math.min(cellW, cellH);
-
-        const gridW = totalCols * unit;
-        const gridH = totalRows * unit;
-        const offsetX = (width - gridW) / 2 + unit * 0.5;
-        const offsetY = (height - gridH) / 2 + unit * 0.35;
-
-        const pigSize = Math.max(18, Math.min(46, unit * 0.88));
-
-        return cells.slice(0, 105).map((pt) => ({
-          x: offsetX + pt.col * unit,
-          y: offsetY + pt.row * unit,
-          size: pigSize,
-          kind: pt.kind
-        }));
-      }
-
-      function recomputeClockTargets(force = false) {
-        const now = new Date();
-        const hh = String(now.getHours()).padStart(2, "0");
-        const mm = String(now.getMinutes()).padStart(2, "0");
-        const ss = String(now.getSeconds()).padStart(2, "0");
-        const readout = `${hh}:${mm}:${ss}`;
-        digitalReadout.textContent = readout;
-
-        const compact = `${hh}${mm}${ss}`;
-        if (!force && compact === lastSecondStr) return;
-        lastSecondStr = compact;
-
-        // 自動偵測整點（每小時 00 分 00 秒觸發一次）
-        if (now.getMinutes() === 0 && now.getSeconds() === 0 && now.getHours() !== lastHourTriggered) {
-          lastHourTriggered = now.getHours();
-          triggerHourParade(`${hh}:00 整點到！彩蛋角色巡邏中`);
-        }
-
-        const targets = buildClockGridPoints(compact);
-        for (let i = 0; i < pigs.length; i++) {
-          const t = targets[i] || { x: width / 2, y: height / 2, size: 28, kind: "digit" };
-          pigs[i].tx = t.x;
-          pigs[i].ty = t.y;
-          pigs[i].targetSize = t.size;
-          pigs[i].kind = t.kind;
-
-          // 每秒微微輪換姿態索引，讓排時鐘有逐秒跳動感
-          if (!isScattered && pigs[i].clickPause <= 0 && Math.random() < 0.14) {
-            pigs[i].spriteIndex = (pigs[i].spriteIndex + 1) % 64;
-          }
-        }
-      }
-
-      // =========================================================
-      // 6. 三種彩蛋邏輯
-      // =========================================================
-      // 彩蛋一：「怪咖混入／搞笑動作」——切換散開自由走動時混入搞笑角色
-      function applyWeirdoMix(enable) {
-        const poolCount = weirdoSprites.length;
-        for (let i = 0; i < pigs.length; i++) {
-          pigs[i].isWeirdo = false;
-          pigs[i].overrideSprite = null;
-          if (enable && poolCount > 0 && i % 6 === 0) {
-            pigs[i].isWeirdo = true;
-            pigs[i].overrideSprite = weirdoSprites[(i / 6) % poolCount];
-            pigs[i].vx = (Math.random() - 0.5) * 4.5;
-            pigs[i].vy = (Math.random() - 0.5) * 4.5;
-          }
-        }
-        if (enable && poolCount > 0) {
-          showBanner("🤪 散開自由走動：怪咖／搞笑姿勢混入晃動中！");
-        } else if (enable) {
-          showBanner("🌀 散開自由走動中！");
-        }
-      }
-
-      // 彩蛋二：「整點／特殊時刻冒出」——角色從畫面側邊逛過去
-      function triggerHourParade(labelText = "✨ 特殊時刻彩蛋：角色逛過去囉！") {
-        const pool = hourSprites.length > 0
-          ? hourSprites
-          : (weirdoSprites.length > 0 ? weirdoSprites : [fallbackSprite].filter(Boolean));
-
-        if (pool.length === 0) return;
-
-        const count = Math.min(6, Math.max(3, pool.length));
-        for (let i = 0; i < count; i++) {
-          const fromLeft = i % 2 === 0;
-          const sprite = pool[i % pool.length];
-          const size = Math.max(44, Math.min(78, Math.min(width, height) * 0.11));
-          const yBase = height * (0.2 + (i / count) * 0.6);
+        var count = Math.min(6, Math.max(3, pool.length));
+        for (var i = 0; i < count; i++) {
+          var fromLeft = i % 2 === 0;
+          var spr = pool[i % pool.length];
+          var sz = Math.max(46, Math.min(76, Math.min(W, H) * 0.11));
+          var yBase = H * (0.22 + (i / count) * 0.54);
           paradeVisitors.push({
-            sprite,
-            x: fromLeft ? -size - i * 70 : width + size + i * 70,
+            sprite: spr,
+            x: fromLeft ? -sz - i * 75 : W + sz + i * 75,
             y: yBase,
             baseY: yBase,
-            size,
-            vx: fromLeft ? (2.4 + Math.random() * 1.4) : -(2.4 + Math.random() * 1.4),
+            size: sz,
+            vx: fromLeft ? (145 + Math.random() * 65) : -(145 + Math.random() * 65),
             phase: Math.random() * Math.PI * 2,
             facing: fromLeft ? 1 : -1
           });
         }
-        showBanner(labelText);
+        showToast(msg || '✨ 特殊時刻彩蛋：角色逛過去囉！');
       }
 
-      // 彩蛋三：「點擊互動彩蛋」——點到某隻角色做誇張動作、翻面、短暫停頓或跳一下
-      function handleCanvasClick(clientX, clientY) {
-        const rect = canvas.getBoundingClientRect();
-        const px = clientX - rect.left;
-        const py = clientY - rect.top;
+      function computeClockTargets() {
+        var now = new Date();
+        var curMin = now.getMinutes();
+        var curHour = now.getHours();
+        if (curMin === 0 && now.getSeconds() === 0 && curHour !== state.lastHourTriggered) {
+          state.lastHourTriggered = curHour;
+          triggerHourParade(String(curHour).padStart(2, '0') + ':00 整點彩蛋登場！');
+        }
+        state.lastMinute = curMin;
 
-        // 先檢查是否點到正在逛街的整點彩蛋角色
-        for (let i = paradeVisitors.length - 1; i >= 0; i--) {
-          const v = paradeVisitors[i];
-          const dist = Math.hypot(px - v.x, py - v.y);
-          if (dist <= v.size * 0.65) {
-            v.vx *= -1.35;
-            v.facing *= -1;
-            v.phase += 1.5;
-            showBanner("🎭 抓到逛街彩蛋！立刻調頭！");
+        var hh = String(curHour).padStart(2, '0');
+        var mm = String(curMin).padStart(2, '0');
+        var digits = [hh[0], hh[1], mm[0], mm[1]];
+
+        var topBarEl = document.getElementById('topBar');
+        var bottomBarEl = document.getElementById('bottomBar');
+        var topBottom = 18;
+        if (currentSettings && currentSettings.visible && topBarEl) {
+          topBottom = 68;
+          var tr = topBarEl.getBoundingClientRect();
+          if (tr && tr.bottom > 20) topBottom = tr.bottom;
+        }
+        var bottomTop = H - 18;
+        if (!state.barHidden && bottomBarEl) {
+          var br = bottomBarEl.getBoundingClientRect();
+          if (br && br.top > 120) bottomTop = br.top;
+        }
+
+        var safeTop = topBottom + 14;
+        var safeBottom = Math.max(safeTop + 140, bottomTop - 14);
+        var safeH = safeBottom - safeTop;
+
+        var clockW = W * (state.extraLarge ? 0.91 : 0.79);
+        var colonW = clockW * 0.095;
+        var digitGap = clockW * 0.045;
+        var digitW = (clockW - colonW - digitGap * 2) / 4;
+        var digitH = Math.min(safeH * (state.extraLarge ? 0.85 : 0.68), digitW * 1.92);
+
+        var startX = (W - clockW) / 2;
+        var centerY = (safeTop + safeBottom) / 2;
+        var topY = centerY - digitH / 2;
+
+        state.clockBox = {
+          left: startX - 18,
+          right: startX + clockW + 18,
+          top: topY - 18,
+          bottom: topY + digitH + 18
+        };
+
+        var xOffsets = [
+          startX,
+          startX + digitW + digitGap,
+          startX + digitW * 2 + digitGap + colonW,
+          startX + digitW * 3 + digitGap * 2 + colonW
+        ];
+
+        var targets = [];
+        var ptsPerDigit = 20;
+
+        for (var d = 0; d < 4; d++) {
+          var poly = DIGIT_POLYLINES[digits[d]] || DIGIT_POLYLINES['0'];
+          var samples = samplePolyline(poly, ptsPerDigit);
+          for (var s = 0; s < samples.length; s++) {
+            targets.push({
+              x: xOffsets[d] + samples[s].x * digitW,
+              y: topY + samples[s].y * digitH,
+              role: 'digit'
+            });
+          }
+        }
+
+        var colonX = startX + digitW * 2 + digitGap + colonW * 0.5;
+        targets.push({ x: colonX, y: topY + digitH * 0.34, role: 'colon' });
+        targets.push({ x: colonX, y: topY + digitH * 0.68, role: 'colon' });
+
+        for (var i = 0; i < pigs.length; i++) {
+          pigs[i].role = 'roamer';
+        }
+
+        var used = new Array(pigs.length);
+        var pigScale = Math.max(0.30, Math.min(0.46, (digitW / 96) * 0.62));
+
+        for (var t = 0; t < targets.length; t++) {
+          var bestIdx = -1;
+          var bestDist = Infinity;
+          for (var p = 0; p < pigs.length; p++) {
+            if (used[p]) continue;
+            var dx = pigs[p].x - targets[t].x;
+            var dy = pigs[p].y - targets[t].y;
+            var dist = dx * dx + dy * dy;
+            if (dist < bestDist) {
+              bestDist = dist;
+              bestIdx = p;
+            }
+          }
+          if (bestIdx !== -1) {
+            used[bestIdx] = true;
+            pigs[bestIdx].role = targets[t].role;
+            pigs[bestIdx].tx = targets[t].x;
+            pigs[bestIdx].ty = targets[t].y;
+            pigs[bestIdx].scale = targets[t].role === 'colon' ? pigScale * 1.12 : pigScale;
+          }
+        }
+
+        for (var r = 0; r < pigs.length; r++) {
+          if (pigs[r].role === 'roamer') {
+            pigs[r].scale = 0.42;
+            pigs[r].vx = (Math.random() - 0.5) * 75;
+            pigs[r].vy = (Math.random() - 0.5) * 75;
+          }
+        }
+      }
+
+      function applyWeirdoMix(enable) {
+        var wPool = weirdoSprites;
+        for (var i = 0; i < pigs.length; i++) {
+          pigs[i].isWeirdo = false;
+          if (pigs[i].clickBoost <= 0) pigs[i].overrideSprite = null;
+          if (enable && wPool.length > 0 && i % 6 === 0) {
+            pigs[i].isWeirdo = true;
+            pigs[i].overrideSprite = wPool[(i / 6) % wPool.length];
+            pigs[i].scale = 0.52;
+            var ang = Math.random() * Math.PI * 2;
+            var spd = 65 + Math.random() * 55;
+            pigs[i].vx = Math.cos(ang) * spd;
+            pigs[i].vy = Math.sin(ang) * spd;
+          }
+        }
+      }
+
+      function setGathered(val) {
+        state.gathered = !!val;
+        var btn = document.getElementById('btnToggleGather');
+        if (btn) {
+          btn.textContent = state.gathered ? '散開 / 集合 (已集合)' : '散開 / 集合 (自由中)';
+        }
+        if (state.gathered) {
+          applyWeirdoMix(false);
+          computeClockTargets();
+        } else {
+          applyWeirdoMix(true);
+          for (var i = 0; i < pigs.length; i++) {
+            pigs[i].role = 'roamer';
+            if (!pigs[i].isWeirdo) pigs[i].scale = 0.44;
+            var angle = Math.random() * Math.PI * 2;
+            var spd = 45 + Math.random() * 55;
+            pigs[i].vx = Math.cos(angle) * spd;
+            pigs[i].vy = Math.sin(angle) * spd;
+          }
+        }
+      }
+
+      function handleCanvasTap(clientX, clientY) {
+        var rect = canvas.getBoundingClientRect();
+        var px = clientX - rect.left;
+        var py = clientY - rect.top;
+
+        for (var vIdx = paradeVisitors.length - 1; vIdx >= 0; vIdx--) {
+          var vis = paradeVisitors[vIdx];
+          if (Math.hypot(px - vis.x, py - vis.y) <= vis.size * 0.65) {
+            vis.vx = -vis.vx * 1.25;
+            vis.facing *= -1;
+            showToast('🎭 抓到逛街彩蛋，調頭囉！');
             return;
           }
         }
 
-        // 找距離點擊點最近的一隻小豬
-        let bestPig = null;
-        let bestDist = Infinity;
-        for (const p of pigs) {
-          const d = Math.hypot(px - p.x, py - p.y);
+        var bestPig = null;
+        var bestDist = Infinity;
+        for (var i = 0; i < pigs.length; i++) {
+          var d = Math.hypot(px - pigs[i].x, py - pigs[i].y);
           if (d < bestDist) {
             bestDist = d;
-            bestPig = p;
+            bestPig = pigs[i];
           }
         }
 
-        if (!bestPig || bestDist > Math.max(48, bestPig.size * 1.45)) return;
-
-        const actionType = Math.floor(Math.random() * 4);
-        bestPig.clickBoost = 1.25; // 1.25 秒誇張動態
-        bestPig.clickFlip *= -1;
-
-        if (actionType === 0) {
-          // 誇張跳躍 + 翻面
-          bestPig.vy = -6.5;
-          bestPig.vx = (Math.random() - 0.5) * 5;
-          showBanner("🦘 互動彩蛋：跳一下＋翻面！");
-        } else if (actionType === 1) {
-          // 短暫停頓定格再彈開
-          bestPig.clickPause = 0.55;
-          showBanner("⏸️ 互動彩蛋：短暫停頓定格中！");
-        } else if (actionType === 2 && clickSprites.length > 0) {
-          // 切換成點擊專屬反應圖示做誇張晃動
-          bestPig.overrideSprite = clickSprites[Math.floor(Math.random() * clickSprites.length)];
-          bestPig.clickBoost = 1.8;
-          showBanner("⚡ 互動彩蛋：觸發誇張反應姿勢！");
-        } else {
-          // 高速左右扭動翻面
-          bestPig.wiggleSpeed = 14;
-          bestPig.vx = bestPig.clickFlip * 4.2;
-          showBanner("🌀 互動彩蛋：高速扭動翻面！");
+        if (bestPig && bestDist <= 38) {
+          var mode = Math.floor(Math.random() * 4);
+          bestPig.clickBoost = 1.2;
+          bestPig.clickFlip *= -1;
+          if (mode === 0) {
+            bestPig.y -= 18;
+            bestPig.vy = -120;
+            showToast('🦘 點擊彩蛋：跳一下＋翻面！');
+          } else if (mode === 1) {
+            bestPig.clickPause = 0.55;
+            showToast('⏸️ 點擊彩蛋：短暫停頓定格！');
+          } else if (mode === 2 && clickSprites.length > 0) {
+            bestPig.overrideSprite = clickSprites[Math.floor(Math.random() * clickSprites.length)];
+            bestPig.clickBoost = 1.7;
+            showToast('⚡ 點擊彩蛋：誇張反應姿勢！');
+          } else {
+            bestPig.wiggleFreq = 14;
+            showToast('🌀 點擊彩蛋：高速扭動！');
+          }
+          return;
         }
+
+        setGathered(!state.gathered);
       }
 
-      // =========================================================
-      // 7. 主動畫迴圈
-      // =========================================================
-      let lastTime = performance.now();
-
-      function updateAndDraw(now) {
-        const dt = Math.min(0.05, (now - lastTime) / 1000);
+      // =========================================================================
+      // 6. 主動畫迴圈
+      // =========================================================================
+      var lastTime = 0;
+      function animate(now) {
+        requestAnimationFrame(animate);
+        if (!lastTime) lastTime = now;
+        var dt = Math.min((now - lastTime) / 1000, 0.05);
         lastTime = now;
-        const tSec = now / 1000;
+        var sec = now / 1000;
 
-        recomputeClockTargets(false);
-        ctx.clearRect(0, 0, width, height);
+        var curMin = new Date().getMinutes();
+        if (state.gathered && curMin !== state.lastMinute) {
+          computeClockTargets();
+        }
 
-        // 繪製背景輕柔裝飾圓圈
-        ctx.save();
-        ctx.fillStyle = "rgba(255, 255, 255, 0.35)";
-        ctx.beginPath();
-        ctx.arc(width * 0.15, height * 0.2, Math.min(width, height) * 0.14, 0, Math.PI * 2);
-        ctx.arc(width * 0.85, height * 0.78, Math.min(width, height) * 0.18, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
+        ctx.fillStyle = state.nightMode ? '#050505' : '#FDF6EC';
+        ctx.fillRect(0, 0, W, H);
 
-        // 更新並繪製 105 隻小豬
-        for (let i = 0; i < pigs.length; i++) {
-          const p = pigs[i];
+        if (!state.nightMode) {
+          ctx.fillStyle = 'rgba(59, 35, 24, 0.05)';
+          for (var gx = 16; gx < W; gx += 28) {
+            for (var gy = 16; gy < H; gy += 28) {
+              ctx.fillRect(gx, gy, 1.5, 1.5);
+            }
+          }
+        }
+
+        var box = state.clockBox;
+        var minTopY = (currentSettings && currentSettings.visible) ? 64 : 26;
+        var pool = getCurrentClockPool();
+
+        for (var i = 0; i < pigs.length; i++) {
+          var p = pigs[i];
+          p.wigglePhase += dt * p.wiggleFreq;
 
           if (p.clickBoost > 0) {
             p.clickBoost -= dt;
             if (p.clickBoost <= 0) {
               p.clickBoost = 0;
-              p.overrideSprite = p.isWeirdo ? p.overrideSprite : null;
-              p.wiggleSpeed = 2.2 + (i % 5) * 0.45;
+              p.wiggleFreq = 3.6 + (i % 5) * 0.45;
+              if (!p.isWeirdo) p.overrideSprite = null;
             }
           }
 
           if (p.clickPause > 0) {
             p.clickPause -= dt;
-          } else if (isScattered) {
-            // 散開自由走動模式
-            const speedFactor = p.isWeirdo ? 1.25 : 0.85;
-            p.x += p.vx * speedFactor;
-            p.y += p.vy * speedFactor;
-
-            // 偶爾微調方向
-            if (Math.random() < 0.025) {
-              p.vx += (Math.random() - 0.5) * 1.4;
-              p.vy += (Math.random() - 0.5) * 1.4;
-              const maxSpd = p.isWeirdo ? 3.8 : 2.6;
-              p.vx = Math.max(-maxSpd, Math.min(maxSpd, p.vx));
-              p.vy = Math.max(-maxSpd, Math.min(maxSpd, p.vy));
+          } else if (state.gathered && (p.role === 'digit' || p.role === 'colon')) {
+            var dx = p.tx - p.x;
+            var dy = p.ty - p.y;
+            p.x += dx * Math.min(1, dt * 7.5);
+            p.y += dy * Math.min(1, dt * 7.5);
+            if (Math.abs(dx) > 1.5) {
+              p.flipX = dx >= 0 ? 1 : -1;
+            }
+          } else {
+            p.poseTimer -= dt;
+            if (p.poseTimer <= 0) {
+              if (!p.isWeirdo && p.clickBoost <= 0) {
+                p.pose = Math.floor(Math.random() * pool.length);
+              }
+              p.poseTimer = 2 + Math.random() * 4;
+              var ang = Math.random() * Math.PI * 2;
+              var speed = p.isWeirdo ? (60 + Math.random() * 55) : (35 + Math.random() * 55);
+              p.vx = Math.cos(ang) * speed;
+              p.vy = Math.sin(ang) * speed;
             }
 
-            if (p.vx > 0.15) p.facing = 1;
-            else if (p.vx < -0.15) p.facing = -1;
+            p.x += p.vx * dt;
+            p.y += p.vy * dt;
+            if (Math.abs(p.vx) > 2) p.flipX = p.vx >= 0 ? 1 : -1;
 
-            const margin = 36;
-            if (p.x < margin) { p.x = margin; p.vx = Math.abs(p.vx); p.facing = 1; }
-            if (p.x > width - margin) { p.x = width - margin; p.vx = -Math.abs(p.vx); p.facing = -1; }
-            if (p.y < margin + 36) { p.y = margin + 36; p.vy = Math.abs(p.vy); }
-            if (p.y > height - margin - 44) { p.y = height - margin - 44; p.vy = -Math.abs(p.vy); }
+            var margin = 24;
+            if (p.x < margin) { p.x = margin; p.vx = Math.abs(p.vx); }
+            if (p.x > W - margin) { p.x = W - margin; p.vx = -Math.abs(p.vx); }
+            if (p.y < minTopY) { p.y = minTopY; p.vy = Math.abs(p.vy); }
+            if (p.y > H - 36) { p.y = H - 36; p.vy = -Math.abs(p.vy); }
 
-            const scatterSize = Math.max(30, Math.min(56, Math.min(width, height) * 0.075)) * (p.isWeirdo ? 1.18 : 1);
-            p.size += (scatterSize - p.size) * 0.12;
-          } else {
-            // 排時鐘模式：平滑飛向目標點陣座標，並保有微幅動態律動
-            const dx = p.tx - p.x;
-            const dy = p.ty - p.y;
-            p.x += dx * 0.14;
-            p.y += dy * 0.14;
-            p.size += (p.targetSize - p.size) * 0.16;
+            if (state.gathered && p.x > box.left && p.x < box.right && p.y > box.top && p.y < box.bottom) {
+              var dLeft = p.x - box.left;
+              var dRight = box.right - p.x;
+              var dTop = p.y - box.top;
+              var dBot = box.bottom - p.y;
+              var minD = Math.min(dLeft, dRight, dTop, dBot);
+              if (minD === dLeft) { p.x = box.left; p.vx = -Math.abs(p.vx); }
+              else if (minD === dRight) { p.x = box.right; p.vx = Math.abs(p.vx); }
+              else if (minD === dTop) { p.y = box.top; p.vy = -Math.abs(p.vy); }
+              else { p.y = box.bottom; p.vy = Math.abs(p.vy); }
+            }
           }
 
-          // 動態扭動、呼吸跳動與翻面
-          const bobOffset = Math.sin(tSec * p.bobSpeed + p.phase) * (isScattered ? 4.5 : 2.2);
-          const wiggleAngle = Math.sin(tSec * p.wiggleSpeed + p.phase) * (p.clickBoost > 0 ? 0.34 : 0.11);
-          const breathScale = 1 + Math.sin(tSec * (p.bobSpeed * 1.2) + p.phase) * (p.clickBoost > 0 ? 0.18 : 0.05);
+          var sprite = p.overrideSprite || pool[p.pose % pool.length] || fallbackSprites[0];
+          if (!sprite) continue;
 
-          const spriteToDraw = p.overrideSprite || getActiveClockSprite(p);
-          drawSpriteItem(
-            spriteToDraw,
-            p.x,
-            p.y + bobOffset,
-            p.size * breathScale,
-            wiggleAngle,
-            p.facing * p.clickFlip
-          );
+          var drawScale = p.scale * (p.clickBoost > 0 ? 1.24 : 1);
+          if (state.gathered && p.role === 'colon') {
+            drawScale *= (1 + 0.16 * Math.sin(sec * Math.PI * 2));
+          }
+          var bobY = Math.sin(p.wigglePhase * 0.7) * (p.clickBoost > 0 ? 4.5 : 1.8);
+          var wiggleAngle = Math.sin(p.wigglePhase) * (p.clickBoost > 0 ? 0.28 : 0.08);
+
+          ctx.save();
+          ctx.translate(p.x, p.y + bobY);
+          ctx.rotate(wiggleAngle);
+          ctx.scale(p.flipX * p.clickFlip * drawScale, drawScale);
+
+          if (sprite._isDarkBg) {
+            ctx.fillStyle = 'rgba(20, 18, 22, 0.85)';
+            drawRoundRect(ctx, -50, -50, 100, 100, 14);
+            ctx.fill();
+          }
+
+          if (state.nightMode) {
+            ctx.shadowColor = 'rgba(255, 245, 225, 0.62)';
+            ctx.shadowBlur = 9;
+          }
+
+          ctx.drawImage(sprite, -48, -48, 96, 96);
+          ctx.shadowBlur = 0;
+          ctx.restore();
         }
 
-        // 更新並繪製整點／特殊時刻冒出逛過去的角色
-        for (let i = paradeVisitors.length - 1; i >= 0; i--) {
-          const v = paradeVisitors[i];
-          v.x += v.vx;
-          v.y = v.baseY + Math.sin(tSec * 4.2 + v.phase) * 14;
-          const angle = Math.sin(tSec * 6.5 + v.phase) * 0.16;
+        for (var v = paradeVisitors.length - 1; v >= 0; v--) {
+          var vis = paradeVisitors[v];
+          vis.x += vis.vx * dt;
+          vis.y = vis.baseY + Math.sin(sec * 4.2 + vis.phase) * 14;
+          var vAng = Math.sin(sec * 6.5 + vis.phase) * 0.16;
+          var vScale = vis.size / 96;
 
-          drawSpriteItem(v.sprite, v.x, v.y, v.size, angle, v.facing);
+          ctx.save();
+          ctx.translate(vis.x, vis.y);
+          ctx.rotate(vAng);
+          ctx.scale(vis.facing * vScale, vScale);
+          if (vis.sprite._isDarkBg) {
+            ctx.fillStyle = 'rgba(20, 18, 22, 0.85)';
+            drawRoundRect(ctx, -50, -50, 100, 100, 14);
+            ctx.fill();
+          }
+          ctx.drawImage(vis.sprite, -48, -48, 96, 96);
+          ctx.restore();
 
-          if (v.x < -v.size * 2.5 || v.x > width + v.size * 2.5) {
-            paradeVisitors.splice(i, 1);
+          if (vis.x < -vis.size * 2.5 || vis.x > W + vis.size * 2.5) {
+            paradeVisitors.splice(v, 1);
           }
         }
-
-        requestAnimationFrame(updateAndDraw);
       }
 
-      function drawSpriteItem(spriteObj, cx, cy, boxSize, angle, scaleX) {
-        if (!spriteObj || !spriteObj.canvas) return;
-        const aspect = spriteObj.w / (spriteObj.h || 1);
-        let drawW = boxSize;
-        let drawH = boxSize;
+      // =========================================================================
+      // 7. 動態渲染原圖預選格與圖示同步
+      // =========================================================================
+      function populatePresetPickers() {
+        pickerImgEls.title = [];
+        pickerImgEls.hide = [];
+        pickerImgEls.show = [];
 
-        if (aspect >= 1) {
-          drawH = boxSize / Math.min(aspect, 1.5);
-          drawW = drawH * aspect;
+        var titleGrid = document.getElementById('titleStickerGrid');
+        if (titleGrid) {
+          titleGrid.innerHTML = '';
+          for (var i = 0; i < PIG_FILE_PATHS.length; i++) {
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'sticker-item';
+            btn.setAttribute('data-preset-idx', String(i));
+            btn.title = 'PIG (' + (i + 1) + ').jpg';
+            var img = document.createElement('img');
+            img.src = originalCutoutDataURLs[i] || encodeURI(PIG_FILE_PATHS[i]);
+            img.alt = btn.title;
+            btn.appendChild(img);
+            titleGrid.appendChild(btn);
+            pickerImgEls.title[i] = img;
+          }
+        }
+
+        var hideGroup = document.getElementById('hideIconGroup');
+        if (hideGroup) {
+          hideGroup.innerHTML = '';
+          for (var h = 0; h < HIDE_PRESET_INDICES.length; h++) {
+            var hIdx = HIDE_PRESET_INDICES[h];
+            var hBtn = document.createElement('button');
+            hBtn.type = 'button';
+            hBtn.className = 'mini-icon-btn hide-icon-opt';
+            hBtn.setAttribute('data-preset-idx', String(hIdx));
+            hBtn.title = 'PIG (' + (hIdx + 1) + ').jpg';
+            var hImg = document.createElement('img');
+            hImg.src = originalCutoutDataURLs[hIdx] || encodeURI(PIG_FILE_PATHS[hIdx]);
+            hImg.alt = hBtn.title;
+            hBtn.appendChild(hImg);
+            hideGroup.appendChild(hBtn);
+            pickerImgEls.hide[h] = hImg;
+          }
+          var hInp = document.createElement('input');
+          hInp.id = 'inputHideBtnIcon';
+          hInp.type = 'text';
+          hInp.maxLength = 4;
+          hInp.className = 'mini-icon-input';
+          hInp.placeholder = '自訂文字';
+          hideGroup.appendChild(hInp);
+        }
+
+        var showGroup = document.getElementById('showIconGroup');
+        if (showGroup) {
+          showGroup.innerHTML = '';
+          for (var s = 0; s < SHOW_PRESET_INDICES.length; s++) {
+            var sIdx = SHOW_PRESET_INDICES[s];
+            var sBtn = document.createElement('button');
+            sBtn.type = 'button';
+            sBtn.className = 'mini-icon-btn show-icon-opt';
+            sBtn.setAttribute('data-preset-idx', String(sIdx));
+            sBtn.title = 'PIG (' + (sIdx + 1) + ').jpg';
+            var sImg = document.createElement('img');
+            sImg.src = originalCutoutDataURLs[sIdx] || encodeURI(PIG_FILE_PATHS[sIdx]);
+            sImg.alt = sBtn.title;
+            sBtn.appendChild(sImg);
+            showGroup.appendChild(sBtn);
+            pickerImgEls.show[s] = sImg;
+          }
+          var sInp = document.createElement('input');
+          sInp.id = 'inputShowBtnIcon';
+          sInp.type = 'text';
+          sInp.maxLength = 4;
+          sInp.className = 'mini-icon-input';
+          sInp.placeholder = '自訂文字';
+          showGroup.appendChild(sInp);
+        }
+      }
+
+      function loadSettings() {
+        currentSettings = getDefaultSettings();
+        var raw = safeGet(STORAGE_KEY, '');
+        if (!raw) return;
+        try {
+          var parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') {
+            currentSettings = cloneSettings(parsed);
+          }
+        } catch (e) {}
+      }
+
+      function saveSettings() {
+        try {
+          safeSet(STORAGE_KEY, JSON.stringify(currentSettings));
+        } catch (e) {}
+      }
+
+      function syncButtonIconDisplay(iconEl, imgEl, iconType, iconText, imgData) {
+        if (!iconEl || !imgEl) return;
+        if ((iconType === 'preset' || iconType === 'image') && imgData) {
+          iconEl.style.display = 'none';
+          imgEl.src = imgData;
+          imgEl.style.display = 'inline-block';
         } else {
-          drawW = boxSize * Math.max(aspect, 0.68);
-          drawH = drawW / aspect;
+          imgEl.style.display = 'none';
+          iconEl.textContent = iconText || '🐷';
+          iconEl.style.display = 'inline-flex';
         }
-
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.rotate(angle);
-        ctx.scale(scaleX >= 0 ? 1 : -1, 1);
-
-        // 若為黑底圖（如 3856929.jpg），加上柔和圓角底框避免黑邊生硬
-        if (spriteObj.isDarkBg) {
-          const pad = 4;
-          ctx.fillStyle = "rgba(25, 22, 28, 0.86)";
-          ctx.beginPath();
-          ctx.roundRect(-drawW / 2 - pad, -drawH / 2 - pad, drawW + pad * 2, drawH + pad * 2, 10);
-          ctx.fill();
-        }
-
-        ctx.drawImage(spriteObj.canvas, -drawW / 2, -drawH / 2, drawW, drawH);
-        ctx.restore();
       }
 
-      // =========================================================
-      // 8. 按鈕與手機相簿自訂貼圖事件
-      // =========================================================
-      toggleScatterBtn.addEventListener("click", () => {
-        isScattered = !isScattered;
-        toggleScatterBtn.classList.toggle("active", isScattered);
-        toggleScatterBtn.textContent = isScattered ? "🔢 集合排時鐘" : "🌀 散開自由走動";
-        statusBadge.firstElementChild.textContent = isScattered ? "🌀 自由走動中" : "🐷 105 隻排時鐘";
-        applyWeirdoMix(isScattered);
-        if (!isScattered) {
-          recomputeClockTargets(true);
+      function applySettingsToScreen() {
+        var s = currentSettings;
+        var topBarEl = document.getElementById('topBar');
+        var trigger = document.getElementById('titleTrigger');
+        var textEl = document.getElementById('titleText');
+        var iconEl = document.getElementById('titleIcon');
+        var imgEl = document.getElementById('titleIconImg');
+        var hideIconEl = document.getElementById('hideBtnIcon');
+        var hideImgEl = document.getElementById('hideBtnImg');
+        var showIconEl = document.getElementById('showBtnIcon');
+        var showImgEl = document.getElementById('showBtnImg');
+
+        if (topBarEl) {
+          topBarEl.classList.toggle('hidden', !s.visible);
         }
-      });
 
-      triggerHourBtn.addEventListener("click", () => {
-        triggerHourParade("🎉 特殊時刻彩蛋：角色冒出來逛街囉！");
-      });
+        if (trigger) {
+          trigger.style.fontSize = s.fontSize + 'px';
+        }
 
-      customStickerBtn.addEventListener("click", () => {
-        customStickerInput.value = "";
-        customStickerInput.click();
-      });
+        if (textEl) {
+          textEl.textContent = s.text;
+          textEl.style.display = s.text ? 'inline' : 'none';
+        }
 
-      customStickerInput.addEventListener("change", async (e) => {
-        const files = Array.from(e.target.files || []);
-        if (files.length === 0) return;
-
-        const loadedList = [];
-        for (const file of files) {
-          const objectUrl = URL.createObjectURL(file);
-          const res = await loadSingleSprite(objectUrl);
-          URL.revokeObjectURL(objectUrl);
-          if (res.ok && res.sprite) {
-            loadedList.push(res.sprite);
+        if (iconEl && imgEl) {
+          if (s.iconType === 'none') {
+            iconEl.style.display = 'none';
+            imgEl.style.display = 'none';
+          } else if ((s.iconType === 'preset' || s.iconType === 'image') && s.iconImage) {
+            iconEl.style.display = 'none';
+            imgEl.src = s.iconImage;
+            imgEl.style.display = 'inline-block';
+            var dim = Math.round(s.fontSize * 1.24);
+            imgEl.style.width = dim + 'px';
+            imgEl.style.height = dim + 'px';
+          } else {
+            imgEl.style.display = 'none';
+            iconEl.textContent = s.iconEmoji || '🐷';
+            iconEl.style.display = 'inline-flex';
           }
         }
 
-        if (loadedList.length > 0) {
-          customSprites = loadedList;
-          useCustomStickers = true;
-          for (let i = 0; i < pigs.length; i++) {
-            pigs[i].spriteIndex = i % customSprites.length;
-            if (!pigs[i].isWeirdo) pigs[i].overrideSprite = null;
+        syncButtonIconDisplay(hideIconEl, hideImgEl, s.hideBtnIconType, s.hideBtnIcon, s.hideBtnImageData);
+        syncButtonIconDisplay(showIconEl, showImgEl, s.showBtnIconType, s.showBtnIcon, s.showBtnImageData);
+
+        if (state.gathered) {
+          setTimeout(computeClockTargets, 30);
+        }
+      }
+
+      function syncModalUploadBar(thumbEl, statusEl, clearBtnEl, isUploadedImg, imgData, defaultMsg) {
+        if (thumbEl) {
+          if (isUploadedImg && imgData) {
+            thumbEl.src = imgData;
+            thumbEl.style.display = 'inline-block';
+          } else {
+            thumbEl.style.display = 'none';
           }
-          updateSourceStatus(customSprites.length, 0);
-          showBanner(`🖼️ 已套用 ${customSprites.length} 張自訂貼圖排時鐘！`);
         }
-      });
-
-      resetDefaultBtn.addEventListener("click", () => {
-        useCustomStickers = false;
-        customSprites = [];
-        for (let i = 0; i < pigs.length; i++) {
-          pigs[i].spriteIndex = clockSprites.length > 0 ? i % clockSprites.length : 0;
-          if (!pigs[i].isWeirdo) pigs[i].overrideSprite = null;
+        if (statusEl) {
+          statusEl.textContent = isUploadedImg && imgData ? '已套用相簿上傳圖片' : defaultMsg;
         }
-        updateSourceStatus(clockSprites.length, Math.max(0, DEFAULT_CLOCK_FILES.length - clockSprites.length));
-        showBanner("↩️ 已切回預設 clock-pigs/ 貼圖");
-      });
+        if (clearBtnEl) {
+          clearBtnEl.classList.toggle('hidden', !(isUploadedImg && imgData));
+        }
+      }
 
-      canvas.addEventListener("click", (ev) => {
-        handleCanvasClick(ev.clientX, ev.clientY);
-      });
+      function updateModalPreview() {
+        var d = draftSettings;
+        if (!d) return;
 
-      window.addEventListener("resize", resizeCanvas);
+        var prevBox = document.getElementById('modalPreview');
+        var prevText = document.getElementById('previewText');
+        var prevIcon = document.getElementById('previewIcon');
+        var prevImg = document.getElementById('previewImg');
+        var badge = document.getElementById('fontSizeBadge');
+        var slider = document.getElementById('inputFontSize');
+        var btnVisOn = document.getElementById('btnTitleVisibleOn');
+        var btnVisOff = document.getElementById('btnTitleVisibleOff');
 
-      // 啟動
-      resizeCanvas();
-      initAllAssets().then(() => {
-        requestAnimationFrame(updateAndDraw);
-      });
+        if (btnVisOn) btnVisOn.classList.toggle('active', d.visible);
+        if (btnVisOff) btnVisOff.classList.toggle('active', !d.visible);
+
+        if (prevBox) {
+          prevBox.style.fontSize = d.fontSize + 'px';
+          prevBox.style.opacity = d.visible ? '1' : '0.45';
+        }
+        if (badge) badge.textContent = d.fontSize + 'px';
+        if (slider) slider.value = String(d.fontSize);
+
+        if (prevText) {
+          if (!d.visible) {
+            prevText.textContent = '（目前設為隱藏標題）';
+          } else {
+            prevText.textContent = d.text || (d.iconType === 'none' ? '（空白標題）' : '');
+          }
+          prevText.style.opacity = (d.text && d.visible) ? '1' : '0.55';
+        }
+
+        if (prevIcon && prevImg) {
+          if (!d.visible || d.iconType === 'none') {
+            prevIcon.style.display = 'none';
+            prevImg.style.display = 'none';
+          } else if ((d.iconType === 'preset' || d.iconType === 'image') && d.iconImage) {
+            prevIcon.style.display = 'none';
+            prevImg.src = d.iconImage;
+            prevImg.style.display = 'inline-block';
+            var dim = Math.round(d.fontSize * 1.24);
+            prevImg.style.width = dim + 'px';
+            prevImg.style.height = dim + 'px';
+          } else {
+            prevImg.style.display = 'none';
+            prevIcon.textContent = d.iconEmoji || '🐷';
+            prevIcon.style.display = 'inline-flex';
+          }
+        }
+
+        var btnNoIcon = document.getElementById('btnNoIcon');
+        if (btnNoIcon) btnNoIcon.classList.toggle('active', d.iconType === 'none');
+
+        syncModalUploadBar(
+          document.getElementById('titleIconThumb'),
+          document.getElementById('titleIconImgStatus'),
+          document.getElementById('btnClearTitleIconImg'),
+          d.iconType === 'image',
+          d.iconImage,
+          '也可從手機相簿選擇小圖片（自動去背）'
+        );
+
+        var sizeBtns = document.querySelectorAll('.size-btn');
+        for (var i = 0; i < sizeBtns.length; i++) {
+          var sz = Number(sizeBtns[i].getAttribute('data-size'));
+          sizeBtns[i].classList.toggle('active', sz === d.fontSize);
+        }
+
+        var stickerBtns = document.querySelectorAll('.sticker-item');
+        for (var j = 0; j < stickerBtns.length; j++) {
+          var idx = Number(stickerBtns[j].getAttribute('data-preset-idx'));
+          stickerBtns[j].classList.toggle('active', d.iconType === 'preset' && d.presetIndex === idx);
+        }
+
+        var hideOpts = document.querySelectorAll('.hide-icon-opt');
+        for (var h1 = 0; h1 < hideOpts.length; h1++) {
+          var hIdx = Number(hideOpts[h1].getAttribute('data-preset-idx'));
+          hideOpts[h1].classList.toggle('active', d.hideBtnIconType === 'preset' && d.hideBtnPresetIndex === hIdx);
+        }
+        syncModalUploadBar(
+          document.getElementById('hideBtnThumb'),
+          document.getElementById('hideBtnImgStatus'),
+          document.getElementById('btnClearHideIconImg'),
+          d.hideBtnIconType === 'image',
+          d.hideBtnImageData,
+          '已連結 icons/PIG 原圖自動去背'
+        );
+        syncButtonIconDisplay(
+          document.getElementById('prevHideEmoji'),
+          document.getElementById('prevHideImg'),
+          d.hideBtnIconType,
+          d.hideBtnIcon,
+          d.hideBtnImageData
+        );
+
+        var showOpts = document.querySelectorAll('.show-icon-opt');
+        for (var s1 = 0; s1 < showOpts.length; s1++) {
+          var sIdx = Number(showOpts[s1].getAttribute('data-preset-idx'));
+          showOpts[s1].classList.toggle('active', d.showBtnIconType === 'preset' && d.showBtnPresetIndex === sIdx);
+        }
+        syncModalUploadBar(
+          document.getElementById('showBtnThumb'),
+          document.getElementById('showBtnImgStatus'),
+          document.getElementById('btnClearShowIconImg'),
+          d.showBtnIconType === 'image',
+          d.showBtnImageData,
+          '已連結 icons/PIG 原圖自動去背'
+        );
+        syncButtonIconDisplay(
+          document.getElementById('prevShowEmoji'),
+          document.getElementById('prevShowImg'),
+          d.showBtnIconType,
+          d.showBtnIcon,
+          d.showBtnImageData
+        );
+      }
+
+      function openTitleModal() {
+        draftSettings = cloneSettings(currentSettings);
+        var inputTitle = document.getElementById('inputTitle');
+        var inputCustomIcon = document.getElementById('inputCustomIcon');
+        var inputHideBtnIcon = document.getElementById('inputHideBtnIcon');
+        var inputShowBtnIcon = document.getElementById('inputShowBtnIcon');
+
+        if (inputTitle) inputTitle.value = draftSettings.text;
+        if (inputCustomIcon) {
+          inputCustomIcon.value = draftSettings.iconType === 'emoji' ? draftSettings.iconEmoji : '';
+        }
+        if (inputHideBtnIcon) {
+          inputHideBtnIcon.value = draftSettings.hideBtnIconType === 'emoji' ? draftSettings.hideBtnIcon : '';
+        }
+        if (inputShowBtnIcon) {
+          inputShowBtnIcon.value = draftSettings.showBtnIconType === 'emoji' ? draftSettings.showBtnIcon : '';
+        }
+
+        updateModalPreview();
+        var modal = document.getElementById('titleModal');
+        if (modal) modal.classList.add('open');
+      }
+
+      function closeTitleModal() {
+        var modal = document.getElementById('titleModal');
+        if (modal) modal.classList.remove('open');
+      }
+
+      // =========================================================================
+      // 8. 響應式畫布尺寸重設
+      // =========================================================================
+      function resize() {
+        W = Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0, 320);
+        H = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0, 480);
+        DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+        canvas.width = Math.round(W * DPR);
+        canvas.height = Math.round(H * DPR);
+        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+        for (var i = 0; i < pigs.length; i++) {
+          pigs[i].x = Math.min(Math.max(pigs[i].x, 24), W - 24);
+          pigs[i].y = Math.min(Math.max(pigs[i].y, 26), H - 36);
+        }
+
+        if (state.gathered && pigs.length > 0) {
+          computeClockTargets();
+        }
+      }
+
+      // =========================================================================
+      // 9. 完整 UI 事件綁定與啟動流程
+      // =========================================================================
+      function bindUI() {
+        canvas.addEventListener('click', function (e) {
+          handleCanvasTap(e.clientX, e.clientY);
+        });
+
+        document.getElementById('titleTrigger').addEventListener('click', function (e) {
+          e.stopPropagation();
+          openTitleModal();
+        });
+
+        document.getElementById('btnToggleGather').addEventListener('click', function (e) {
+          e.stopPropagation();
+          setGathered(!state.gathered);
+        });
+
+        document.getElementById('btnToggleSize').addEventListener('click', function (e) {
+          e.stopPropagation();
+          state.extraLarge = !state.extraLarge;
+          this.textContent = state.extraLarge ? '時間：特大' : '時間：大';
+          if (state.gathered) computeClockTargets();
+          showToast(state.extraLarge ? '時鐘尺寸：特大' : '時鐘尺寸：大');
+        });
+
+        document.getElementById('btnToggleNight').addEventListener('click', function (e) {
+          e.stopPropagation();
+          state.nightMode = !state.nightMode;
+          document.body.classList.toggle('night', state.nightMode);
+          this.textContent = state.nightMode ? '日間模式' : '夜間模式';
+          var meta = document.getElementById('metaTheme');
+          if (meta) meta.setAttribute('content', state.nightMode ? '#050505' : '#FDF6EC');
+          showToast(state.nightMode ? '已切換為 OLED 純黑夜間模式' : '已切換為日間暖紙模式');
+        });
+
+        document.getElementById('btnWakeLock').addEventListener('click', function (e) {
+          e.stopPropagation();
+          var btn = this;
+          if (!('wakeLock' in navigator) || !navigator.wakeLock) {
+            showToast('此瀏覽器不支援自動螢幕常亮，請調長手機休眠時間');
+            return;
+          }
+          if (state.wakeLock) {
+            try { state.wakeLock.release(); } catch (err) {}
+            state.wakeLock = null;
+            btn.textContent = '螢幕常亮';
+            btn.classList.remove('primary');
+            showToast('已關閉螢幕常亮');
+          } else {
+            navigator.wakeLock.request('screen').then(function (sentinel) {
+              state.wakeLock = sentinel;
+              btn.textContent = '螢幕常亮 (開啟中)';
+              btn.classList.add('primary');
+              showToast('已開啟螢幕常亮！');
+              sentinel.addEventListener('release', function () {
+                state.wakeLock = null;
+                btn.textContent = '螢幕常亮';
+                btn.classList.remove('primary');
+              });
+            }).catch(function () {
+              showToast('無法啟用螢幕常亮（可能處於省電模式或嵌入視窗）');
+            });
+          }
+        });
+
+        document.getElementById('btnHourEaster').addEventListener('click', function (e) {
+          e.stopPropagation();
+          triggerHourParade('🎉 特殊時刻彩蛋：角色冒出來逛街囉！');
+        });
+
+        var fileStickerInput = document.getElementById('fileStickerInput');
+        var btnResetSticker = document.getElementById('btnResetSticker');
+
+        document.getElementById('btnCustomSticker').addEventListener('click', function (e) {
+          e.stopPropagation();
+          fileStickerInput.value = '';
+          fileStickerInput.click();
+        });
+
+        fileStickerInput.addEventListener('change', function () {
+          var files = this.files;
+          if (!files || !files.length) return;
+          var loadedSprites = [];
+          var pending = Math.min(files.length, 16);
+
+          for (var i = 0; i < pending; i++) {
+            (function (file) {
+              var reader = new FileReader();
+              reader.onload = function (ev) {
+                var img = new Image();
+                img.onload = function () {
+                  removeBackgroundAndTrim(img, 96, function (spr) {
+                    if (spr) loadedSprites.push(spr);
+                    pending--;
+                    if (pending <= 0 && loadedSprites.length > 0) {
+                      customClockSprites = loadedSprites;
+                      usingCustomStickers = true;
+                      btnResetSticker.classList.remove('hidden');
+                      showToast('已套用 ' + loadedSprites.length + ' 張自訂排時鐘貼圖！');
+                    }
+                  });
+                };
+                img.onerror = function () { pending--; };
+                img.src = ev.target.result;
+              };
+              reader.readAsDataURL(file);
+            })(files[i]);
+          }
+        });
+
+        btnResetSticker.addEventListener('click', function (e) {
+          e.stopPropagation();
+          usingCustomStickers = false;
+          customClockSprites = [];
+          btnResetSticker.classList.add('hidden');
+          showToast('已恢復預設排時鐘小豬！');
+        });
+
+        document.getElementById('btnOpenSettings').addEventListener('click', function (e) {
+          e.stopPropagation();
+          openTitleModal();
+        });
+
+        var bottomBarEl = document.getElementById('bottomBar');
+        var btnShowBar = document.getElementById('btnShowBar');
+
+        document.getElementById('btnHideBar').addEventListener('click', function (e) {
+          e.stopPropagation();
+          state.barHidden = true;
+          bottomBarEl.classList.add('hidden');
+          btnShowBar.classList.remove('hidden');
+          if (state.gathered) computeClockTargets();
+          showToast('已隱藏底部選項，點右下角可恢復');
+        });
+
+        btnShowBar.addEventListener('click', function (e) {
+          e.stopPropagation();
+          state.barHidden = false;
+          btnShowBar.classList.add('hidden');
+          bottomBarEl.classList.remove('hidden');
+          if (state.gathered) computeClockTargets();
+        });
+
+        var modalEl = document.getElementById('titleModal');
+        var modalBoxEl = modalEl.querySelector('.modal-box');
+        modalBoxEl.addEventListener('click', function (e) {
+          e.stopPropagation();
+        });
+
+        document.getElementById('btnCloseModal').addEventListener('click', closeTitleModal);
+        document.getElementById('btnCancelModal').addEventListener('click', closeTitleModal);
+        modalEl.addEventListener('click', function (e) {
+          if (e.target === modalEl) closeTitleModal();
+        });
+
+        document.getElementById('btnTitleVisibleOn').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.visible = true;
+          updateModalPreview();
+        });
+
+        document.getElementById('btnTitleVisibleOff').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.visible = false;
+          updateModalPreview();
+        });
+
+        document.getElementById('inputTitle').addEventListener('input', function () {
+          if (!draftSettings) return;
+          draftSettings.text = this.value;
+          updateModalPreview();
+        });
+
+        document.getElementById('btnClearTitle').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.text = '';
+          document.getElementById('inputTitle').value = '';
+          updateModalPreview();
+        });
+
+        var presetTitles = document.querySelectorAll('.preset-title');
+        for (var i = 0; i < presetTitles.length; i++) {
+          presetTitles[i].addEventListener('click', function () {
+            if (!draftSettings) return;
+            var val = this.getAttribute('data-val') || '';
+            draftSettings.text = val;
+            document.getElementById('inputTitle').value = val;
+            updateModalPreview();
+          });
+        }
+
+        var sizeBtns = document.querySelectorAll('.size-btn');
+        for (var sb = 0; sb < sizeBtns.length; sb++) {
+          sizeBtns[sb].addEventListener('click', function () {
+            if (!draftSettings) return;
+            var sz = Number(this.getAttribute('data-size')) || 26;
+            draftSettings.fontSize = Math.min(44, Math.max(16, sz));
+            updateModalPreview();
+          });
+        }
+
+        document.getElementById('inputFontSize').addEventListener('input', function () {
+          if (!draftSettings) return;
+          var sz = Number(this.value) || 26;
+          draftSettings.fontSize = Math.min(44, Math.max(16, sz));
+          updateModalPreview();
+        });
+
+        document.getElementById('btnNoIcon').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.iconType = 'none';
+          draftSettings.iconImage = '';
+          document.getElementById('inputCustomIcon').value = '';
+          updateModalPreview();
+        });
+
+        document.getElementById('titleStickerGrid').addEventListener('click', function (e) {
+          var target = e.target;
+          while (target && target !== this && !target.classList.contains('sticker-item')) {
+            target = target.parentNode;
+          }
+          if (!target || !target.classList.contains('sticker-item') || !draftSettings) return;
+          var idx = Number(target.getAttribute('data-preset-idx')) || 0;
+          draftSettings.iconType = 'preset';
+          draftSettings.presetIndex = idx;
+          draftSettings.iconImage = originalCutoutDataURLs[idx] || encodeURI(PIG_FILE_PATHS[idx]);
+          document.getElementById('inputCustomIcon').value = '';
+          updateModalPreview();
+        });
+
+        document.getElementById('inputCustomIcon').addEventListener('input', function () {
+          if (!draftSettings) return;
+          var val = this.value.trim();
+          if (!val) {
+            draftSettings.iconType = 'preset';
+            draftSettings.iconImage = originalCutoutDataURLs[draftSettings.presetIndex] || encodeURI(PIG_FILE_PATHS[draftSettings.presetIndex]);
+          } else {
+            draftSettings.iconType = 'emoji';
+            draftSettings.iconEmoji = val;
+            draftSettings.iconImage = '';
+          }
+          updateModalPreview();
+        });
+
+        var fileIconInput = document.getElementById('fileIconInput');
+        document.getElementById('btnTriggerIconUpload').addEventListener('click', function () {
+          fileIconInput.value = '';
+          fileIconInput.click();
+        });
+
+        fileIconInput.addEventListener('change', function () {
+          var file = this.files && this.files[0];
+          if (!file || !draftSettings) return;
+          var reader = new FileReader();
+          reader.onload = function (ev) {
+            var img = new Image();
+            img.onload = function () {
+              removeBackgroundAndTrim(img, 96, function (spr) {
+                if (spr && draftSettings) {
+                  draftSettings.iconType = 'image';
+                  draftSettings.iconImage = spr.toDataURL('image/png');
+                  updateModalPreview();
+                  showToast('已載入標題小圖片（按確認套用生效）');
+                }
+              });
+            };
+            img.src = ev.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+
+        document.getElementById('btnClearTitleIconImg').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.iconType = 'preset';
+          draftSettings.presetIndex = 0;
+          draftSettings.iconImage = originalCutoutDataURLs[0] || encodeURI(PIG_FILE_PATHS[0]);
+          document.getElementById('inputCustomIcon').value = '';
+          updateModalPreview();
+        });
+
+        document.getElementById('hideIconGroup').addEventListener('click', function (e) {
+          var target = e.target;
+          while (target && target !== this && !target.classList.contains('hide-icon-opt')) {
+            target = target.parentNode;
+          }
+          if (!target || !target.classList.contains('hide-icon-opt') || !draftSettings) return;
+          var idx = Number(target.getAttribute('data-preset-idx')) || 6;
+          draftSettings.hideBtnIconType = 'preset';
+          draftSettings.hideBtnPresetIndex = idx;
+          draftSettings.hideBtnImageData = originalCutoutDataURLs[idx] || encodeURI(PIG_FILE_PATHS[idx]);
+          var inp = document.getElementById('inputHideBtnIcon');
+          if (inp) inp.value = '';
+          updateModalPreview();
+        });
+
+        document.getElementById('inputHideBtnIcon').addEventListener('input', function () {
+          if (!draftSettings) return;
+          var val = this.value.trim();
+          if (!val) {
+            draftSettings.hideBtnIconType = 'preset';
+            draftSettings.hideBtnImageData = originalCutoutDataURLs[draftSettings.hideBtnPresetIndex] || encodeURI(PIG_FILE_PATHS[draftSettings.hideBtnPresetIndex]);
+          } else {
+            draftSettings.hideBtnIconType = 'emoji';
+            draftSettings.hideBtnIcon = val;
+          }
+          updateModalPreview();
+        });
+
+        var fileHideIconInput = document.getElementById('fileHideIconInput');
+        document.getElementById('btnUploadHideIcon').addEventListener('click', function () {
+          fileHideIconInput.value = '';
+          fileHideIconInput.click();
+        });
+
+        fileHideIconInput.addEventListener('change', function () {
+          var file = this.files && this.files[0];
+          if (!file || !draftSettings) return;
+          var reader = new FileReader();
+          reader.onload = function (ev) {
+            var img = new Image();
+            img.onload = function () {
+              removeBackgroundAndTrim(img, 64, function (spr) {
+                if (spr && draftSettings) {
+                  draftSettings.hideBtnIconType = 'image';
+                  draftSettings.hideBtnImageData = spr.toDataURL('image/png');
+                  updateModalPreview();
+                }
+              });
+            };
+            img.src = ev.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+
+        document.getElementById('btnClearHideIconImg').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.hideBtnIconType = 'preset';
+          draftSettings.hideBtnPresetIndex = 6;
+          draftSettings.hideBtnImageData = originalCutoutDataURLs[6] || encodeURI(PIG_FILE_PATHS[6]);
+          updateModalPreview();
+        });
+
+        document.getElementById('showIconGroup').addEventListener('click', function (e) {
+          var target = e.target;
+          while (target && target !== this && !target.classList.contains('show-icon-opt')) {
+            target = target.parentNode;
+          }
+          if (!target || !target.classList.contains('show-icon-opt') || !draftSettings) return;
+          var idx = Number(target.getAttribute('data-preset-idx')) || 4;
+          draftSettings.showBtnIconType = 'preset';
+          draftSettings.showBtnPresetIndex = idx;
+          draftSettings.showBtnImageData = originalCutoutDataURLs[idx] || encodeURI(PIG_FILE_PATHS[idx]);
+          var inp = document.getElementById('inputShowBtnIcon');
+          if (inp) inp.value = '';
+          updateModalPreview();
+        });
+
+        document.getElementById('inputShowBtnIcon').addEventListener('input', function () {
+          if (!draftSettings) return;
+          var val = this.value.trim();
+          if (!val) {
+            draftSettings.showBtnIconType = 'preset';
+            draftSettings.showBtnImageData = originalCutoutDataURLs[draftSettings.showBtnPresetIndex] || encodeURI(PIG_FILE_PATHS[draftSettings.showBtnPresetIndex]);
+          } else {
+            draftSettings.showBtnIconType = 'emoji';
+            draftSettings.showBtnIcon = val;
+          }
+          updateModalPreview();
+        });
+
+        var fileShowIconInput = document.getElementById('fileShowIconInput');
+        document.getElementById('btnUploadShowIcon').addEventListener('click', function () {
+          fileShowIconInput.value = '';
+          fileShowIconInput.click();
+        });
+
+        fileShowIconInput.addEventListener('change', function () {
+          var file = this.files && this.files[0];
+          if (!file || !draftSettings) return;
+          var reader = new FileReader();
+          reader.onload = function (ev) {
+            var img = new Image();
+            img.onload = function () {
+              removeBackgroundAndTrim(img, 64, function (spr) {
+                if (spr && draftSettings) {
+                  draftSettings.showBtnIconType = 'image';
+                  draftSettings.showBtnImageData = spr.toDataURL('image/png');
+                  updateModalPreview();
+                }
+              });
+            };
+            img.src = ev.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+
+        document.getElementById('btnClearShowIconImg').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.showBtnIconType = 'preset';
+          draftSettings.showBtnPresetIndex = 4;
+          draftSettings.showBtnImageData = originalCutoutDataURLs[4] || encodeURI(PIG_FILE_PATHS[4]);
+          updateModalPreview();
+        });
+
+        document.getElementById('btnResetDefaults').addEventListener('click', function () {
+          draftSettings = getDefaultSettings();
+          document.getElementById('inputTitle').value = draftSettings.text;
+          document.getElementById('inputCustomIcon').value = '';
+          var hInp = document.getElementById('inputHideBtnIcon');
+          var sInp = document.getElementById('inputShowBtnIcon');
+          if (hInp) hInp.value = '';
+          if (sInp) sInp.value = '';
+          updateModalPreview();
+          showToast('已重設為預設值（按「確認套用」生效）');
+        });
+
+        document.getElementById('btnApplyModal').addEventListener('click', function () {
+          if (draftSettings) {
+            if ((draftSettings.iconType === 'image' || draftSettings.iconType === 'preset') && !draftSettings.iconImage) {
+              draftSettings.iconType = 'preset';
+              draftSettings.presetIndex = 0;
+              draftSettings.iconImage = originalCutoutDataURLs[0] || encodeURI(PIG_FILE_PATHS[0]);
+            }
+            if ((draftSettings.hideBtnIconType === 'image' || draftSettings.hideBtnIconType === 'preset') && !draftSettings.hideBtnImageData) {
+              draftSettings.hideBtnIconType = 'preset';
+              draftSettings.hideBtnPresetIndex = 6;
+              draftSettings.hideBtnImageData = originalCutoutDataURLs[6] || encodeURI(PIG_FILE_PATHS[6]);
+            }
+            if ((draftSettings.showBtnIconType === 'image' || draftSettings.showBtnIconType === 'preset') && !draftSettings.showBtnImageData) {
+              draftSettings.showBtnIconType = 'preset';
+              draftSettings.showBtnPresetIndex = 4;
+              draftSettings.showBtnImageData = originalCutoutDataURLs[4] || encodeURI(PIG_FILE_PATHS[4]);
+            }
+            currentSettings = cloneSettings(draftSettings);
+            saveSettings();
+            applySettingsToScreen();
+            showToast('已套用標題與圖示設定！');
+          }
+          closeTitleModal();
+        });
+
+        window.addEventListener('resize', resize);
+        if (typeof ResizeObserver !== 'undefined') {
+          try {
+            var ro = new ResizeObserver(resize);
+            ro.observe(document.body);
+          } catch (e) {}
+        }
+        setTimeout(resize, 150);
+      }
+
+      function bootstrap() {
+        loadSettings();
+        populatePresetPickers();
+        applySettingsToScreen();
+        buildFallbackSprites();
+        initPigs();
+        bindUI();
+        resize();
+        setGathered(true);
+        requestAnimationFrame(animate);
+        loadOriginalPigIcons();
+        loadClockAndEasterAssets();
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bootstrap);
+      } else {
+        bootstrap();
+      }
     })();
   </script>
 </body>
