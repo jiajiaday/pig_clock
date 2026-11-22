@@ -673,7 +673,7 @@
 
   <footer id="bottomBar">
     <div class="toolbar-row">
-      <button id="btnToggleGather" type="button" class="pill-btn">時鐘</button>
+      <button id="btnToggleGather" type="button" class="pill-btn">自己玩 / 幾點了（時鐘)</button>
       <button id="btnGuestShow" type="button" class="pill-btn">特別來賓表演</button>
       <button id="btnWakeLock" type="button" class="pill-btn">螢幕常亮</button>
       <button id="btnToggleNight" type="button" class="pill-btn">夜間模式</button>
@@ -1718,7 +1718,7 @@
         state.gathered = !!val;
         var btn = document.getElementById('btnToggleGather');
         if (btn) {
-          btn.textContent = state.gathered ? '時鐘' : '玩耍中';
+          btn.textContent = state.gathered ? '自己玩 / 幾點了（時鐘)' : '自己玩 / 幾點了（玩耍中)';
         }
         if (state.gathered) {
           applyWeirdoMix(false);
@@ -1798,12 +1798,10 @@
           }
         }
 
-        // 散開（玩耍中）時：點擊只形成時間，不觸發角色互動
         if (!state.gathered) {
           return;
         }
 
-        // 集合（時鐘）狀態：點擊角色才觸發互動彩蛋與拖曳
         var hit = findPigAt(px, py);
         if (hit) {
           draggingPig = hit;
@@ -1828,20 +1826,32 @@
       }
 
       function handlePointerUp(clientX, clientY) {
+        var pt = toStageCoords(clientX, clientY);
+        var isTap = Math.hypot(pt.x - pointerDownPos.x, pt.y - pointerDownPos.y) <= 10;
+
         if (!state.gathered) {
-          var pt = toStageCoords(clientX, clientY);
-          if (Math.hypot(pt.x - pointerDownPos.x, pt.y - pointerDownPos.y) <= 10) {
+          if (isTap) {
             setGathered(true);
           }
           return;
         }
 
-        if (!draggingPig) return;
-        var targetPig = draggingPig;
-        draggingPig = null;
+        if (draggingPig) {
+          var targetPig = draggingPig;
+          draggingPig = null;
+          if (!pointerMoved) {
+            triggerPigEgg(targetPig, targetPig.eggTimer > 0.2);
+          }
+          return;
+        }
 
-        if (!pointerMoved) {
-          triggerPigEgg(targetPig, targetPig.eggTimer > 0.2);
+        if (isTap) {
+          var hit = findPigAt(pt.x, pt.y);
+          if (hit) {
+            triggerPigEgg(hit, hit.eggTimer > 0.2);
+          } else {
+            setGathered(false);
+          }
         }
       }
 
@@ -2527,7 +2537,6 @@
           if (state.gathered) computeClockTargets();
         });
 
-        // 彈窗內 1. 畫面轉向
         document.getElementById('btnOrientAuto').addEventListener('click', function () {
           if (!draftSettings) return;
           draftSettings.forceLandscape = false;
@@ -2540,7 +2549,6 @@
           updateModalPreview();
         });
 
-        // 彈窗內 2. 時鐘數字大小
         document.getElementById('btnSizeLarge').addEventListener('click', function () {
           if (!draftSettings) return;
           draftSettings.extraLarge = false;
@@ -2553,7 +2561,6 @@
           updateModalPreview();
         });
 
-        // 彈窗內 4. 自訂誰來玩耍
         var fileRoamerInput = document.getElementById('fileRoamerInput');
         document.getElementById('btnPickRoamerImgs').addEventListener('click', function () {
           fileRoamerInput.value = '';
@@ -2578,7 +2585,6 @@
           refreshCustomSourceUI();
         });
 
-        // 彈窗內 5. 邀請特別來賓
         var fileGuestInput = document.getElementById('fileGuestInput');
         document.getElementById('btnPickGuestImgs').addEventListener('click', function () {
           fileGuestInput.value = '';
@@ -2605,7 +2611,6 @@
           refreshCustomSourceUI();
         });
 
-        // 彈窗內 3. 頂部標題與按鈕圖示設定
         var modalEl = document.getElementById('titleModal');
         var modalBoxEl = modalEl.querySelector('.modal-box');
         modalBoxEl.addEventListener('click', function (e) {
