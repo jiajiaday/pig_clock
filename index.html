@@ -1661,6 +1661,42 @@
             pigs[i].x = pigs[i].tx;
             pigs[i].y = pigs[i].ty;
           }
+          pigs[i].currentScale = pigs[i].scale;
+          var used = new Array(pigs.length);
+        // 時鐘模式：縮小且限制上限，讓每個數字筆畫之間留出清楚空隙
+        var pigScale = Math.max(0.22, Math.min(0.32, (digitW / 96) * 0.45));
+
+        for (var t = 0; t < targets.length; t++) {
+          var bestIdx = -1;
+          var bestDist = Infinity;
+          for (var p = 0; p < pigs.length; p++) {
+            if (used[p]) continue;
+            var dx = pigs[p].x - targets[t].x;
+            var dy = pigs[p].y - targets[t].y;
+            var dist = dx * dx + dy * dy;
+            if (dist < bestDist) {
+              bestDist = dist;
+              bestIdx = p;
+            }
+          }
+          if (bestIdx !== -1) {
+            used[bestIdx] = true;
+            pigs[bestIdx].role = targets[t].role;
+            pigs[bestIdx].tx = targets[t].x;
+            pigs[bestIdx].ty = targets[t].y;
+            // 數字與冒號維持完全一致的大小
+            pigs[bestIdx].scale = pigScale;
+          }
+        }
+
+        for (var r = 0; r < pigs.length; r++) {
+          if (pigs[r].role === 'roamer') {
+            // 時鐘模式下的閒逛小豬也同步縮小，避免搶走時鐘數字的焦點
+            pigs[r].scale = pigScale * 0.9;
+            pigs[r].vx = (Math.random() - 0.5) * 75;
+            pigs[r].vy = (Math.random() - 0.5) * 75;
+          }
+        }
         }
       }
 
@@ -1802,6 +1838,7 @@
             tx: 0,
             ty: 0,
             scale: 0.42,
+            currentScale: 0.44,
             isWeirdo: false,
             overrideSprite: null,
             eggTimer: 0,
@@ -2208,10 +2245,8 @@
           var sprite = p.overrideSprite || pool[p.pose % pool.length] || fallbackSprites[0];
           if (!sprite) continue;
 
-          var drawScale = p.scale * (isFocusedEgg ? 1.45 : 1);
-          if (state.gathered && p.role === 'colon' && !isFocusedEgg) {
-            drawScale *= (1 + 0.16 * Math.sin(sec * Math.PI * 2));
-          }
+          p.currentScale += (p.scale - p.currentScale) * Math.min(1, dt * 8);
+          var drawScale = p.currentScale * (isFocusedEgg ? 1.45 : 1);
 
           var jumpOffset = 0;
           if (isFocusedEgg && p.eggAction === 0) {
