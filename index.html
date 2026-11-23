@@ -211,13 +211,14 @@
       box-shadow: 1px 1.5px 0 var(--pill-border);
     }
 
-    /* 手繪不規則外框：日期／星期小標籤 */
+    /* 手繪不規則外框：日期／星期小標籤（單獨顯示時自動繼承小豬圖示並放大） */
     .date-pill {
       position: relative;
       pointer-events: auto;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      gap: 6px;
       padding: 5px 13px;
       border-style: solid;
       border-color: var(--pill-border);
@@ -247,19 +248,26 @@
       pointer-events: none;
     }
 
+    .date-pill:hover {
+      transform: rotate(0.4deg) translateY(-1px);
+      box-shadow: 3px 4px 0 var(--pill-border);
+    }
+
     .date-pill:active {
       transform: rotate(0deg) translate(1.5px, 2px) scale(0.97);
       box-shadow: 1px 1px 0 var(--pill-border);
     }
 
-    #titleIcon {
+    #titleIcon,
+    #dateIcon {
       display: none;
       align-items: center;
       justify-content: center;
       line-height: 1;
     }
 
-    #titleIconImg {
+    #titleIconImg,
+    #dateIconImg {
       display: none;
       width: 32px;
       height: 32px;
@@ -565,6 +573,7 @@
     #previewDatePill {
       display: inline-flex;
       align-items: center;
+      gap: 5px;
       padding: 2px 9px;
       font-size: 13px;
       font-weight: 700;
@@ -575,6 +584,21 @@
       background: var(--pill-bg);
       box-shadow: 1.6px 2px 0 var(--pill-border);
       margin-left: 4px;
+    }
+
+    #previewDateIcon {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    #previewDateImg {
+      display: none;
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      vertical-align: middle;
     }
 
     .preview-btns-bar {
@@ -963,7 +987,12 @@
         <img id="titleIconImg" alt="標題小圖示" />
         <span class="edit-badge">✎</span>
       </button>
-      <div id="dateBadge" class="date-pill" title="點擊設定日期標籤">11/23 週一</div>
+      <div id="dateBadge" class="date-pill" role="button" tabindex="0" title="點擊設定日期標籤">
+        <span id="dateIcon"></span>
+        <img id="dateIconImg" alt="日期小圖示" />
+        <span id="dateText">11/23 週一</span>
+        <span id="dateEditBadge" class="edit-badge hidden">✎</span>
+      </div>
     </div>
   </header>
 
@@ -1031,7 +1060,12 @@
             <span id="previewText">不理不理左衛門時鐘</span>
             <span id="previewIcon"></span>
             <img id="previewImg" alt="預覽圖示" />
-            <span id="previewDatePill">11/23 週一</span>
+            <span id="previewDatePill">
+              <span id="previewDateIcon"></span>
+              <img id="previewDateImg" alt="" />
+              <span id="previewDateText">11/23 週一</span>
+              <span id="previewDateEdit" class="edit-badge hidden">✎</span>
+            </span>
           </div>
           <div class="preview-btns-bar">
             <span class="preview-mini-pill">
@@ -1102,7 +1136,7 @@
 
         <div class="field-group">
           <div class="field-label-row">
-            <span>標題後方小圖示</span>
+            <span>標題／日期小圖示</span>
             <button id="btnNoIcon" type="button" class="chip">無圖示</button>
           </div>
           <div class="sticker-grid" id="titleStickerGrid"></div>
@@ -1615,6 +1649,7 @@
         heartCenter: { x: 180, y: 320 },
         heartScale: 8,
         clockBox: { left: 20, right: 300, top: 120, bottom: 420 },
+        safeTopBottom: 64,
         stageRevealed: false
       };
 
@@ -2038,12 +2073,15 @@
       function getSafeBounds() {
         var topBarEl = document.getElementById('topBar');
         var bottomBarEl = document.getElementById('bottomBar');
+        var hasTopContent = currentSettings && (currentSettings.visible || currentSettings.showDateBadge);
         var topBottom = 14;
-        if (currentSettings && currentSettings.visible && topBarEl) {
+        if (hasTopContent && topBarEl) {
           topBottom = 64;
           var tr = topBarEl.getBoundingClientRect();
           if (tr && tr.bottom > 20) topBottom = Math.min(tr.bottom, H * 0.25);
         }
+        state.safeTopBottom = topBottom;
+
         var bottomTop = H - 14;
         if (!state.barHidden && bottomBarEl) {
           var br = bottomBarEl.getBoundingClientRect();
@@ -2176,7 +2214,6 @@
         var topY = centerY - digitH / 2;
         var bottomY = topY + digitH;
 
-        // 讓上下兩排貼近時鐘的 topY 與 bottomY，並確保不會撞到頂部標題與底部按鈕
         var topRowY = Math.max(safeTop + outerRowMargin, topY - rowToClockGap);
         var botRowY = Math.min(safeBottom - outerRowMargin, bottomY + rowToClockGap);
 
@@ -2267,7 +2304,6 @@
         var topRowAlpha = isAM ? 1.0 : 0.58;
         var botRowAlpha = isAM ? 0.58 : 1.0;
 
-        // 水平範圍也與時鐘左右邊界對齊，整體像包圍時鐘的相框
         var rowLeft = Math.max(20, startX - 6);
         var rowRight = Math.min(W - 20, startX + clockW + 6);
         var rowSpan = Math.max(40, rowRight - rowLeft);
@@ -2476,10 +2512,10 @@
 
       function updateDateBadgeText() {
         var label = formatTodayBadge();
-        var badgeEl = document.getElementById('dateBadge');
-        var prevEl = document.getElementById('previewDatePill');
-        if (badgeEl && badgeEl.textContent !== label) badgeEl.textContent = label;
-        if (prevEl && prevEl.textContent !== label) prevEl.textContent = label;
+        var dateTextEl = document.getElementById('dateText');
+        var prevDateTextEl = document.getElementById('previewDateText');
+        if (dateTextEl && dateTextEl.textContent !== label) dateTextEl.textContent = label;
+        if (prevDateTextEl && prevDateTextEl.textContent !== label) prevDateTextEl.textContent = label;
       }
 
       var lastTime = 0;
@@ -2556,7 +2592,8 @@
         }
 
         var box = state.clockBox;
-        var minTopY = (currentSettings && currentSettings.visible) ? 64 : 26;
+        var hasTopContent = currentSettings && (currentSettings.visible || currentSettings.showDateBadge);
+        var minTopY = hasTopContent ? Math.max(58, state.safeTopBottom + 12) : 26;
         var pool = getCurrentRoamerPool();
         var activeSecPig = null;
 
@@ -2926,6 +2963,9 @@
         var topBarEl = document.getElementById('topBar');
         var trigger = document.getElementById('titleTrigger');
         var dateBadgeEl = document.getElementById('dateBadge');
+        var dateIconEl = document.getElementById('dateIcon');
+        var dateImgEl = document.getElementById('dateIconImg');
+        var dateEditEl = document.getElementById('dateEditBadge');
         var textEl = document.getElementById('titleText');
         var iconEl = document.getElementById('titleIcon');
         var imgEl = document.getElementById('titleIconImg');
@@ -2934,17 +2974,14 @@
         var showIconEl = document.getElementById('showBtnIcon');
         var showImgEl = document.getElementById('showBtnImg');
 
+        var showAnyTop = s.visible || s.showDateBadge;
         if (topBarEl) {
-          topBarEl.classList.toggle('hidden', !s.visible);
+          topBarEl.classList.toggle('hidden', !showAnyTop);
         }
 
         if (trigger) {
+          trigger.classList.toggle('hidden', !s.visible);
           trigger.style.fontSize = s.fontSize + 'px';
-        }
-
-        if (dateBadgeEl) {
-          dateBadgeEl.classList.toggle('hidden', !s.showDateBadge);
-          dateBadgeEl.style.fontSize = Math.max(13, Math.round(s.fontSize * 0.64)) + 'px';
         }
 
         if (textEl) {
@@ -2967,6 +3004,41 @@
             imgEl.style.display = 'none';
             iconEl.textContent = s.iconEmoji || '🐷';
             iconEl.style.display = 'inline-flex';
+          }
+        }
+
+        if (dateBadgeEl) {
+          dateBadgeEl.classList.toggle('hidden', !s.showDateBadge);
+          var isSoloDate = !s.visible && s.showDateBadge;
+          if (isSoloDate) {
+            var soloDateSize = Math.max(20, Math.round(s.fontSize * 0.85));
+            dateBadgeEl.style.fontSize = soloDateSize + 'px';
+            dateBadgeEl.style.padding = '7px 16px';
+            if (dateEditEl) dateEditEl.classList.remove('hidden');
+
+            if (dateIconEl && dateImgEl) {
+              if (s.iconType === 'none') {
+                dateIconEl.style.display = 'none';
+                dateImgEl.style.display = 'none';
+              } else if ((s.iconType === 'preset' || s.iconType === 'image') && s.iconImage) {
+                dateIconEl.style.display = 'none';
+                dateImgEl.src = s.iconImage;
+                dateImgEl.style.display = 'inline-block';
+                var dDim = Math.round(soloDateSize * 1.24);
+                dateImgEl.style.width = dDim + 'px';
+                dateImgEl.style.height = dDim + 'px';
+              } else {
+                dateImgEl.style.display = 'none';
+                dateIconEl.textContent = s.iconEmoji || '🐷';
+                dateIconEl.style.display = 'inline-flex';
+              }
+            }
+          } else {
+            dateBadgeEl.style.fontSize = Math.max(13, Math.round(s.fontSize * 0.64)) + 'px';
+            dateBadgeEl.style.padding = '5px 13px';
+            if (dateEditEl) dateEditEl.classList.add('hidden');
+            if (dateIconEl) dateIconEl.style.display = 'none';
+            if (dateImgEl) dateImgEl.style.display = 'none';
           }
         }
 
@@ -3050,6 +3122,9 @@
         var prevIcon = document.getElementById('previewIcon');
         var prevImg = document.getElementById('previewImg');
         var prevDate = document.getElementById('previewDatePill');
+        var prevDateIcon = document.getElementById('previewDateIcon');
+        var prevDateImg = document.getElementById('previewDateImg');
+        var prevDateEdit = document.getElementById('previewDateEdit');
         var badge = document.getElementById('fontSizeBadge');
         var slider = document.getElementById('inputFontSize');
         var btnVisOn = document.getElementById('btnTitleVisibleOn');
@@ -3062,41 +3137,91 @@
         if (btnDateOn) btnDateOn.classList.toggle('active', d.showDateBadge);
         if (btnDateOff) btnDateOff.classList.toggle('active', !d.showDateBadge);
 
-        if (prevBox) {
-          prevBox.style.fontSize = d.fontSize + 'px';
-          prevBox.style.opacity = d.visible ? '1' : '0.45';
-        }
         if (badge) badge.textContent = d.fontSize + 'px';
         if (slider) slider.value = String(d.fontSize);
 
-        if (prevText) {
-          if (!d.visible) {
-            prevText.textContent = '已隱藏';
-          } else {
+        var showAnyTop = d.visible || d.showDateBadge;
+        var isSoloDate = !d.visible && d.showDateBadge;
+
+        if (prevBox) {
+          prevBox.style.fontSize = d.fontSize + 'px';
+          prevBox.style.opacity = showAnyTop ? '1' : '0.45';
+        }
+
+        if (d.visible) {
+          if (prevText) {
+            prevText.style.display = 'inline';
             prevText.textContent = d.text || '';
+            prevText.style.opacity = d.text ? '1' : '0.55';
           }
-          prevText.style.opacity = (d.text && d.visible) ? '1' : '0.55';
+          if (prevIcon && prevImg) {
+            if (d.iconType === 'none') {
+              prevIcon.style.display = 'none';
+              prevImg.style.display = 'none';
+            } else if ((d.iconType === 'preset' || d.iconType === 'image') && d.iconImage) {
+              prevIcon.style.display = 'none';
+              prevImg.src = d.iconImage;
+              prevImg.style.display = 'inline-block';
+              var dim = Math.round(d.fontSize * 1.24);
+              prevImg.style.width = dim + 'px';
+              prevImg.style.height = dim + 'px';
+            } else {
+              prevImg.style.display = 'none';
+              prevIcon.textContent = d.iconEmoji || '🐷';
+              prevIcon.style.display = 'inline-flex';
+            }
+          }
+        } else if (isSoloDate) {
+          if (prevText) prevText.style.display = 'none';
+          if (prevIcon) prevIcon.style.display = 'none';
+          if (prevImg) prevImg.style.display = 'none';
+        } else {
+          if (prevText) {
+            prevText.style.display = 'inline';
+            prevText.textContent = '標題與日期皆已隱藏';
+            prevText.style.opacity = '0.6';
+          }
+          if (prevIcon) prevIcon.style.display = 'none';
+          if (prevImg) prevImg.style.display = 'none';
         }
 
         if (prevDate) {
-          prevDate.style.display = (d.visible && d.showDateBadge) ? 'inline-flex' : 'none';
-        }
-
-        if (prevIcon && prevImg) {
-          if (!d.visible || d.iconType === 'none') {
-            prevIcon.style.display = 'none';
-            prevImg.style.display = 'none';
-          } else if ((d.iconType === 'preset' || d.iconType === 'image') && d.iconImage) {
-            prevIcon.style.display = 'none';
-            prevImg.src = d.iconImage;
-            prevImg.style.display = 'inline-block';
-            var dim = Math.round(d.fontSize * 1.24);
-            prevImg.style.width = dim + 'px';
-            prevImg.style.height = dim + 'px';
+          if (!d.showDateBadge) {
+            prevDate.style.display = 'none';
           } else {
-            prevImg.style.display = 'none';
-            prevIcon.textContent = d.iconEmoji || '🐷';
-            prevIcon.style.display = 'inline-flex';
+            prevDate.style.display = 'inline-flex';
+            if (isSoloDate) {
+              var prevSoloSize = Math.max(18, Math.round(d.fontSize * 0.82));
+              prevDate.style.fontSize = prevSoloSize + 'px';
+              prevDate.style.padding = '4px 12px';
+              prevDate.style.marginLeft = '0';
+              if (prevDateEdit) prevDateEdit.classList.remove('hidden');
+
+              if (prevDateIcon && prevDateImg) {
+                if (d.iconType === 'none') {
+                  prevDateIcon.style.display = 'none';
+                  prevDateImg.style.display = 'none';
+                } else if ((d.iconType === 'preset' || d.iconType === 'image') && d.iconImage) {
+                  prevDateIcon.style.display = 'none';
+                  prevDateImg.src = d.iconImage;
+                  prevDateImg.style.display = 'inline-block';
+                  var pdDim = Math.round(prevSoloSize * 1.22);
+                  prevDateImg.style.width = pdDim + 'px';
+                  prevDateImg.style.height = pdDim + 'px';
+                } else {
+                  prevDateImg.style.display = 'none';
+                  prevDateIcon.textContent = d.iconEmoji || '🐷';
+                  prevDateIcon.style.display = 'inline-flex';
+                }
+              }
+            } else {
+              prevDate.style.fontSize = Math.max(12, Math.round(d.fontSize * 0.6)) + 'px';
+              prevDate.style.padding = '2px 9px';
+              prevDate.style.marginLeft = '4px';
+              if (prevDateEdit) prevDateEdit.classList.add('hidden');
+              if (prevDateIcon) prevDateIcon.style.display = 'none';
+              if (prevDateImg) prevDateImg.style.display = 'none';
+            }
           }
         }
 
@@ -3213,6 +3338,8 @@
         canvas.height = Math.round(H * DPR);
         ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
+        getSafeBounds();
+
         for (var i = 0; i < pigs.length; i++) {
           pigs[i].x = Math.min(Math.max(pigs[i].x, 24), W - 24);
           pigs[i].y = Math.min(Math.max(pigs[i].y, 26), H - 36);
@@ -3277,9 +3404,17 @@
           openTitleModal();
         });
 
-        document.getElementById('dateBadge').addEventListener('click', function (e) {
+        var dateBadgeEl = document.getElementById('dateBadge');
+        dateBadgeEl.addEventListener('click', function (e) {
           e.stopPropagation();
           openTitleModal();
+        });
+        dateBadgeEl.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            e.stopPropagation();
+            openTitleModal();
+          }
         });
 
         document.getElementById('btnToggleGather').addEventListener('click', function (e) {
