@@ -11,8 +11,33 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="preload" href="clock-pigs/jf-openhuninn-2.0.woff2" as="font" type="font/woff2" crossorigin />
   <style>
+    /* 1. 真正的瀨戶字體（SetoFont，含數字 0-9、標點與日文/基本漢字） */
     @font-face {
-      font-family: "SetoRoundFont";
+      font-family: "SetoFontReal";
+      src:
+        local("SetoFont"),
+        local("SetoFont-SP"),
+        local("瀬戸フォント"),
+        url("clock-pigs/SetoFont.woff2") format("woff2"),
+        url("clock-pigs/SetoFont.ttf") format("truetype"),
+        url("https://cdn.leafscape.be/setofont/setofont_web.woff2") format("woff2");
+      font-weight: 100 900;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    /* 2. 內海字體（基於瀨戶字體的繁體中文補字版，補齊「衛、豬」等常用字） */
+    @font-face {
+      font-family: "NaikaiSetoExt";
+      src: url("https://cdn.jsdelivr.net/gh/max32002/naikaifont@1.89/webfont/NaikaiFont-Regular-Lite.woff2") format("woff2");
+      font-weight: 100 900;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    /* 3. 本機粉圓體離線備援 */
+    @font-face {
+      font-family: "LocalRoundFallback";
       src: url("clock-pigs/jf-openhuninn-2.0.woff2") format("woff2");
       font-weight: 100 900;
       font-style: normal;
@@ -27,7 +52,7 @@
       --modal-bg: #FDF6EC;
       --card-bg: #FFFFFF;
       --accent: #F4B89C;
-      --font-round: "SetoRoundFont", "SetoFont", "jf open 粉圓 2.0", "GenSenRounded TW", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      --font-round: "SetoFontReal", "NaikaiSetoExt", "SetoFont", "LocalRoundFallback", "jf open 粉圓 2.0", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
     }
 
     body.night {
@@ -56,14 +81,14 @@
       background-color: var(--bg);
       color: var(--ink);
       font-family: var(--font-round);
-      letter-spacing: 0.045em;
+      letter-spacing: 0.04em;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
       transition: background-color 0.25s ease, color 0.25s ease;
       touch-action: none;
     }
 
-    /* 讓中文黑體／圓體筆畫末端呈現柔和圓潤的手繪筆觸感 */
+    /* 維持瀨戶手寫字體的自然筆觸並稍微加厚辨識度 */
     #titleTrigger,
     .date-pill,
     .pill-btn,
@@ -75,7 +100,7 @@
     .size-btn,
     #modalPreview {
       font-family: var(--font-round);
-      -webkit-text-stroke: 0.16px currentColor;
+      -webkit-text-stroke: 0.22px currentColor;
       paint-order: stroke fill;
     }
 
@@ -156,9 +181,9 @@
       background: var(--pill-bg);
       color: var(--ink);
       font-size: 26px;
-      font-weight: 800;
+      font-weight: 700;
       line-height: 1.24;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.04em;
       cursor: pointer;
       transform: rotate(-0.9deg);
       box-shadow: 3px 4px 0 var(--pill-border);
@@ -201,7 +226,7 @@
       background: var(--pill-bg);
       color: var(--ink);
       font-size: 16px;
-      font-weight: 800;
+      font-weight: 700;
       line-height: 1.22;
       letter-spacing: 0.04em;
       cursor: pointer;
@@ -304,7 +329,7 @@
       font-size: 14.5px;
       line-height: 1.24;
       letter-spacing: 0.04em;
-      font-weight: 800;
+      font-weight: 700;
       cursor: pointer;
       box-shadow: 2.5px 3.2px 0 var(--pill-border);
       white-space: nowrap;
@@ -390,7 +415,7 @@
       font-size: 14px;
       line-height: 1.24;
       letter-spacing: 0.04em;
-      font-weight: 800;
+      font-weight: 700;
       opacity: 0.95;
       cursor: pointer;
       transform: rotate(-1deg);
@@ -458,7 +483,7 @@
     .modal-head h2 {
       margin: 0;
       font-size: 18px;
-      font-weight: 800;
+      font-weight: 700;
     }
 
     .close-btn {
@@ -472,7 +497,7 @@
       background: var(--card-bg);
       color: var(--ink);
       font-family: var(--font-round);
-      font-weight: 800;
+      font-weight: 700;
       cursor: pointer;
       transform: rotate(1.4deg);
       box-shadow: 1.8px 2.2px 0 var(--pill-border);
@@ -494,7 +519,7 @@
 
     .section-title {
       font-size: 14px;
-      font-weight: 800;
+      font-weight: 700;
       margin-bottom: 8px;
       display: flex;
       justify-content: space-between;
@@ -525,7 +550,7 @@
       justify-content: center;
       gap: 6px;
       font-size: 24px;
-      font-weight: 800;
+      font-weight: 700;
       line-height: 1.25;
       min-height: 36px;
     }
@@ -542,7 +567,7 @@
       align-items: center;
       padding: 2px 9px;
       font-size: 13px;
-      font-weight: 800;
+      font-weight: 700;
       border-style: solid;
       border-color: var(--pill-border);
       border-width: 1.8px 1.4px 2px 1.5px;
@@ -561,7 +586,7 @@
       gap: 10px;
       flex-wrap: wrap;
       font-size: 12px;
-      font-weight: 800;
+      font-weight: 700;
     }
 
     .preview-mini-pill {
@@ -601,7 +626,7 @@
       justify-content: space-between;
       align-items: center;
       font-size: 12.5px;
-      font-weight: 800;
+      font-weight: 700;
       margin-bottom: 6px;
     }
 
@@ -621,7 +646,7 @@
       background: var(--card-bg);
       color: var(--ink);
       font-size: 13px;
-      font-weight: 800;
+      font-weight: 700;
       cursor: pointer;
       box-shadow: 2px 2.8px 0 var(--pill-border);
       transition: transform 0.1s ease, background-color 0.2s ease, box-shadow 0.1s ease;
@@ -715,7 +740,7 @@
       background: var(--card-bg);
       color: var(--ink);
       font-size: 11px;
-      font-weight: 800;
+      font-weight: 700;
       cursor: pointer;
       box-shadow: 1.4px 2px 0 var(--pill-border);
       transition: transform 0.1s ease, background-color 0.2s ease, box-shadow 0.1s ease;
@@ -838,7 +863,7 @@
       color: var(--ink);
       font-family: var(--font-round);
       font-size: 13px;
-      font-weight: 800;
+      font-weight: 700;
       text-align: center;
       user-select: text;
       -webkit-user-select: text;
@@ -1069,9 +1094,9 @@
             <button type="button" class="size-btn" data-size="40">特大 40px</button>
           </div>
           <div class="slider-row">
-            <span style="font-size:12px;font-weight:900;opacity:0.65;">A</span>
+            <span style="font-size:12px;font-weight:700;opacity:0.65;">A</span>
             <input id="inputFontSize" type="range" min="16" max="44" step="1" value="26" />
-            <span style="font-size:18px;font-weight:900;">A</span>
+            <span style="font-size:18px;font-weight:700;">A</span>
           </div>
         </div>
 
@@ -1206,7 +1231,6 @@
         c.strokeStyle = nightMode ? 'rgba(245, 237, 228, 0.9)' : '#3B2318';
         c.lineCap = 'round';
 
-        // 主手繪微橢圓圈
         c.lineWidth = 2.1;
         c.beginPath();
         for (var i = 0; i <= 24; i++) {
@@ -1220,7 +1244,6 @@
         c.closePath();
         c.stroke();
 
-        // 第二層輕描邊，呼應按鈕手繪雙線感
         c.lineWidth = 1.05;
         c.globalAlpha *= 0.48;
         c.beginPath();
@@ -1489,7 +1512,7 @@
         }
       }
 
-      var STORAGE_KEY = 'buriburi_pig_clock_settings_v8';
+      var STORAGE_KEY = 'buriburi_pig_clock_settings_v9';
       var TOTAL_PIGS = 142;
       var DEFAULT_POSE_COUNT = 12;
 
@@ -1839,62 +1862,94 @@
         });
       }
 
-      var DIGIT_POLYLINES = {
+      /* 瀨戶字體（SetoFont）手寫圓潤風格數字路徑（每個點第 3 欄為 1 時保留手寫轉折尖角） */
+      var SETO_DIGIT_POLYLINES = {
         '0': [
-          [0.32, 0.05], [0.68, 0.05], [0.86, 0.22], [0.88, 0.50],
-          [0.86, 0.78], [0.68, 0.95], [0.32, 0.95], [0.14, 0.78],
-          [0.12, 0.50], [0.14, 0.22], [0.32, 0.05]
+          [0.48, 0.05], [0.70, 0.08], [0.84, 0.24], [0.86, 0.50],
+          [0.82, 0.78], [0.64, 0.94], [0.38, 0.95], [0.20, 0.80],
+          [0.14, 0.52], [0.18, 0.24], [0.34, 0.07], [0.48, 0.05]
         ],
         '1': [
-          [0.30, 0.20], [0.54, 0.05], [0.54, 0.95], [0.28, 0.95], [0.80, 0.95]
+          [0.30, 0.21], [0.54, 0.06, 1], [0.53, 0.50], [0.53, 0.94, 1],
+          [0.28, 0.94], [0.80, 0.94]
         ],
         '2': [
-          [0.16, 0.22], [0.32, 0.06], [0.70, 0.06], [0.86, 0.22],
-          [0.84, 0.42], [0.14, 0.94], [0.88, 0.94]
+          [0.20, 0.25], [0.34, 0.08], [0.58, 0.06], [0.78, 0.14],
+          [0.84, 0.30], [0.74, 0.48], [0.48, 0.70], [0.18, 0.93, 1],
+          [0.52, 0.94], [0.85, 0.93]
         ],
         '3': [
-          [0.18, 0.10], [0.72, 0.06], [0.86, 0.24], [0.72, 0.46],
-          [0.44, 0.48], [0.74, 0.52], [0.86, 0.74], [0.72, 0.94], [0.18, 0.90]
+          [0.22, 0.14], [0.48, 0.06], [0.74, 0.12], [0.80, 0.28],
+          [0.68, 0.42], [0.46, 0.47, 1], [0.72, 0.54], [0.84, 0.72],
+          [0.72, 0.90], [0.44, 0.95], [0.20, 0.87]
         ],
         '4': [
-          [0.72, 0.95], [0.72, 0.05], [0.12, 0.66], [0.90, 0.66]
+          [0.66, 0.94], [0.66, 0.50], [0.66, 0.06, 1], [0.40, 0.36],
+          [0.15, 0.65, 1], [0.52, 0.64], [0.87, 0.64]
         ],
         '5': [
-          [0.84, 0.06], [0.20, 0.06], [0.18, 0.44], [0.70, 0.44],
-          [0.86, 0.64], [0.72, 0.94], [0.16, 0.90]
+          [0.80, 0.07], [0.50, 0.06], [0.24, 0.07, 1], [0.21, 0.27],
+          [0.20, 0.45, 1], [0.46, 0.42], [0.74, 0.50], [0.83, 0.70],
+          [0.70, 0.90], [0.42, 0.95], [0.18, 0.86]
         ],
         '6': [
-          [0.76, 0.08], [0.34, 0.08], [0.14, 0.44], [0.14, 0.76],
-          [0.36, 0.94], [0.72, 0.94], [0.86, 0.72], [0.70, 0.50], [0.18, 0.50]
+          [0.72, 0.10], [0.46, 0.06], [0.24, 0.22], [0.16, 0.50],
+          [0.18, 0.78], [0.38, 0.94], [0.68, 0.93], [0.83, 0.74],
+          [0.74, 0.54], [0.48, 0.49], [0.20, 0.56]
         ],
         '7': [
-          [0.14, 0.06], [0.88, 0.06], [0.40, 0.95]
+          [0.17, 0.20], [0.17, 0.07, 1], [0.52, 0.06], [0.85, 0.07, 1],
+          [0.66, 0.36], [0.48, 0.66], [0.36, 0.94]
         ],
         '8': [
-          [0.48, 0.48], [0.22, 0.40], [0.18, 0.20], [0.36, 0.05],
-          [0.64, 0.05], [0.82, 0.20], [0.78, 0.40], [0.52, 0.48],
-          [0.82, 0.58], [0.86, 0.78], [0.66, 0.95], [0.34, 0.95],
-          [0.14, 0.78], [0.18, 0.58], [0.48, 0.48]
+          [0.50, 0.47], [0.28, 0.39], [0.22, 0.22], [0.36, 0.07],
+          [0.64, 0.07], [0.78, 0.22], [0.72, 0.39], [0.50, 0.47],
+          [0.78, 0.57], [0.84, 0.77], [0.68, 0.94], [0.32, 0.94],
+          [0.16, 0.77], [0.22, 0.57], [0.50, 0.47]
         ],
         '9': [
-          [0.82, 0.48], [0.28, 0.48], [0.14, 0.28], [0.28, 0.06],
-          [0.66, 0.06], [0.86, 0.28], [0.84, 0.68], [0.62, 0.94], [0.22, 0.94]
+          [0.81, 0.42], [0.60, 0.52], [0.32, 0.50], [0.17, 0.33],
+          [0.26, 0.11], [0.54, 0.06], [0.78, 0.17], [0.82, 0.44],
+          [0.74, 0.70], [0.56, 0.89], [0.28, 0.94]
         ]
       };
 
-      function samplePolyline(pts, count) {
+      /* Chaikin 手寫弧線平滑化（保留標記為尖角的轉折點） */
+      function smoothSetoPolyline(pts, iterations) {
+        var cur = pts.slice();
+        for (var it = 0; it < iterations; it++) {
+          if (cur.length < 3) break;
+          var next = [cur[0]];
+          for (var i = 0; i < cur.length - 1; i++) {
+            var p0 = cur[i];
+            var p1 = cur[i + 1];
+            if (p0[2] === 1 || p1[2] === 1) {
+              next.push(p1);
+            } else {
+              next.push([p0[0] * 0.75 + p1[0] * 0.25, p0[1] * 0.75 + p1[1] * 0.25, 0]);
+              next.push([p0[0] * 0.25 + p1[0] * 0.75, p0[1] * 0.25 + p1[1] * 0.75, 0]);
+            }
+          }
+          next.push(cur[cur.length - 1]);
+          cur = next;
+        }
+        return cur;
+      }
+
+      function samplePolyline(pts, count, smoothIter) {
+        var workPts = smoothIter ? smoothSetoPolyline(pts, smoothIter) : pts;
         var segLengths = [];
         var totalLen = 0;
-        for (var i = 0; i < pts.length - 1; i++) {
-          var dx = pts[i + 1][0] - pts[i][0];
-          var dy = pts[i + 1][1] - pts[i][1];
+        for (var i = 0; i < workPts.length - 1; i++) {
+          var dx = workPts[i + 1][0] - workPts[i][0];
+          var dy = workPts[i + 1][1] - workPts[i][1];
           var len = Math.sqrt(dx * dx + dy * dy);
           segLengths.push(len);
           totalLen += len;
         }
         var out = [];
         if (totalLen <= 0 || count <= 1) {
-          out.push({ x: pts[0][0], y: pts[0][1] });
+          out.push({ x: workPts[0][0], y: workPts[0][1] });
           return out;
         }
         for (var k = 0; k < count; k++) {
@@ -1906,8 +1961,8 @@
             if (acc + sl >= targetDist || s === segLengths.length - 1) {
               var t = sl > 0 ? Math.min(1, Math.max(0, (targetDist - acc) / sl)) : 0;
               out.push({
-                x: pts[s][0] + (pts[s + 1][0] - pts[s][0]) * t,
-                y: pts[s][1] + (pts[s + 1][1] - pts[s][1]) * t
+                x: workPts[s][0] + (workPts[s + 1][0] - workPts[s][0]) * t,
+                y: workPts[s][1] + (workPts[s + 1][1] - workPts[s][1]) * t
               });
               placed = true;
               break;
@@ -1915,7 +1970,7 @@
             acc += sl;
           }
           if (!placed) {
-            var last = pts[pts.length - 1];
+            var last = workPts[workPts.length - 1];
             out.push({ x: last[0], y: last[1] });
           }
         }
@@ -1983,13 +2038,13 @@
       function getSafeBounds() {
         var topBarEl = document.getElementById('topBar');
         var bottomBarEl = document.getElementById('bottomBar');
-        var topBottom = 16;
+        var topBottom = 14;
         if (currentSettings && currentSettings.visible && topBarEl) {
-          topBottom = 66;
+          topBottom = 64;
           var tr = topBarEl.getBoundingClientRect();
           if (tr && tr.bottom > 20) topBottom = Math.min(tr.bottom, H * 0.25);
         }
-        var bottomTop = H - 16;
+        var bottomTop = H - 14;
         if (!state.barHidden && bottomBarEl) {
           var br = bottomBarEl.getBoundingClientRect();
           if (br && br.top > 120) bottomTop = Math.max(br.top, H * 0.72);
@@ -2011,7 +2066,6 @@
         var availW = W - 44;
         var availH = Math.max(160, bounds.bottomTop - bounds.topBottom - 26);
 
-        // 參數愛心曲線 X 範圍 [-16, 16]，Y 範圍 [-17, 13]（總高約 30）
         var heartScale = Math.min(availW / 34, availH / 31);
         state.heartCenter = { x: cx, y: cy };
         state.heartScale = heartScale;
@@ -2039,7 +2093,6 @@
           }
         }
 
-        // 先沿著愛心參數曲線密集採樣並依弧長等距取出 140 個點
         var rawPts = [];
         var STEPS = 720;
         for (var s = 0; s <= STEPS; s++) {
@@ -2048,9 +2101,8 @@
           var hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
           rawPts.push([hx, hy]);
         }
-        var heartSamples = samplePolyline(rawPts, rimPigs.length + 1);
+        var heartSamples = samplePolyline(rawPts, rimPigs.length + 1, 0);
 
-        // 依小豬目前角度排序，飛入愛心輪廓時不打結
         rimPigs.sort(function (a, b) {
           return Math.atan2(a.y - cy, a.x - cx) - Math.atan2(b.y - cy, b.x - cx);
         });
@@ -2100,35 +2152,39 @@
         var topBottom = bounds.topBottom;
         var bottomTop = bounds.bottomTop;
 
-        var safeTop = topBottom + 8;
-        var safeBottom = Math.max(safeTop + 150, bottomTop - 8);
+        var safeTop = topBottom + 6;
+        var safeBottom = Math.max(safeTop + 170, bottomTop - 6);
         var safeH = safeBottom - safeTop;
 
-        // 預留上下兩排各 30 隻小豬與秒數氣泡的垂直安全空間
-        var rowPad = Math.max(25, Math.min(38, safeH * 0.088));
-        var topRowY = safeTop + rowPad * 0.78;
-        var botRowY = safeBottom - rowPad * 0.78;
+        // 上下兩排與時鐘上下緣的緊湊距離，同時預留秒數小氣泡高度
+        var outerRowMargin = 38;
+        var rowToClockGap = Math.max(32, Math.min(44, safeH * 0.075));
 
-        var digitZoneTop = topRowY + rowPad * 0.62;
-        var digitZoneBot = botRowY - rowPad * 0.62;
-        var digitZoneH = Math.max(84, digitZoneBot - digitZoneTop);
+        var digitZoneTop = safeTop + outerRowMargin + rowToClockGap * 0.55;
+        var digitZoneBot = safeBottom - outerRowMargin - rowToClockGap * 0.55;
+        var digitZoneH = Math.max(96, digitZoneBot - digitZoneTop);
 
         var clockW = W * (isExtraLarge ? (isLandscape ? 0.84 : 0.91) : (isLandscape ? 0.72 : 0.79));
         var colonW = clockW * 0.095;
         var digitGap = clockW * 0.045;
         var digitW = (clockW - colonW - digitGap * 2) / 4;
-        var ratioCap = isLandscape ? 1.35 : 1.92;
-        var digitH = Math.min(digitZoneH * (isExtraLarge ? 0.92 : 0.76), digitW * ratioCap);
+        var ratioCap = isLandscape ? 1.38 : 1.92;
+        var digitH = Math.min(digitZoneH * (isExtraLarge ? 0.94 : 0.78), digitW * ratioCap);
 
         var startX = (W - clockW) / 2;
         var centerY = (digitZoneTop + digitZoneBot) / 2;
         var topY = centerY - digitH / 2;
+        var bottomY = topY + digitH;
+
+        // 讓上下兩排貼近時鐘的 topY 與 bottomY，並確保不會撞到頂部標題與底部按鈕
+        var topRowY = Math.max(safeTop + outerRowMargin, topY - rowToClockGap);
+        var botRowY = Math.min(safeBottom - outerRowMargin, bottomY + rowToClockGap);
 
         state.clockBox = {
           left: startX - 18,
           right: startX + clockW + 18,
           top: topY - 18,
-          bottom: topY + digitH + 18
+          bottom: bottomY + 18
         };
 
         var xOffsets = [
@@ -2142,8 +2198,8 @@
         var ptsPerDigit = 20;
 
         for (var d = 0; d < 4; d++) {
-          var poly = DIGIT_POLYLINES[digits[d]] || DIGIT_POLYLINES['0'];
-          var samples = samplePolyline(poly, ptsPerDigit);
+          var poly = SETO_DIGIT_POLYLINES[digits[d]] || SETO_DIGIT_POLYLINES['0'];
+          var samples = samplePolyline(poly, ptsPerDigit, 2);
           for (var s = 0; s < samples.length; s++) {
             targets.push({
               x: xOffsets[d] + samples[s].x * digitW,
@@ -2200,7 +2256,6 @@
           }
         }
 
-        // 依目前垂直位置分為上半 30 隻與下半 30 隻，減少跨螢幕換位
         roamers.sort(function (a, b) { return a.y - b.y; });
         var halfCount = Math.floor(roamers.length / 2);
         var topRoamers = roamers.slice(0, halfCount);
@@ -2212,8 +2267,9 @@
         var topRowAlpha = isAM ? 1.0 : 0.58;
         var botRowAlpha = isAM ? 0.58 : 1.0;
 
-        var rowLeft = 22;
-        var rowRight = W - 22;
+        // 水平範圍也與時鐘左右邊界對齊，整體像包圍時鐘的相框
+        var rowLeft = Math.max(20, startX - 6);
+        var rowRight = Math.min(W - 20, startX + clockW + 6);
         var rowSpan = Math.max(40, rowRight - rowLeft);
 
         function alignPigRow(list, rowY, rScale, rAlpha, baseSlot) {
@@ -2301,7 +2357,6 @@
       }
 
       function findPigAt(px, py) {
-        // 優先偵測冒號小豬（包含外圍手繪圓圈範圍），方便觸發雙人舞＋大愛心彩蛋
         for (var c = 0; c < pigs.length; c++) {
           if (pigs[c].role === 'colon') {
             var cRadius = Math.max(30, 96 * pigs[c].scale * 0.95);
@@ -2441,7 +2496,6 @@
         var curSec = wallNow.getSeconds();
         var secFrac = curSec + wallNow.getMilliseconds() / 1000;
 
-        // 愛心雙人舞彩蛋倒數結束後恢復成時鐘
         if (state.heartShowTimer > 0) {
           state.heartShowTimer -= dt;
           if (state.heartShowTimer <= 0) {
@@ -2455,7 +2509,6 @@
           computeClockTargets();
         }
 
-        // 每分鐘 00 秒觸發上下兩排接力波浪舞報時
         var chimeKey = curHour + ':' + curMin;
         if (state.gathered && state.heartShowTimer <= 0 && curSec === 0 && state.lastChimeKey !== chimeKey) {
           state.lastChimeKey = chimeKey;
@@ -2484,12 +2537,10 @@
           }
         }
 
-        // 冒號每秒呼吸節奏（0.88x ~ 1.18x 縮放，35% ~ 100% 明暗呼吸）
         var colonBeat = 0.5 + 0.5 * Math.cos(secFrac * Math.PI * 2);
         var colonPulseScale = 0.88 + 0.30 * colonBeat;
         var colonPulseAlpha = 0.35 + 0.65 * colonBeat;
 
-        // 愛心彩蛋跳動倍率
         var heartBeat = 1 + 0.055 * Math.sin(sec * 6.2);
 
         ctx.fillStyle = state.nightMode ? '#050505' : '#FDF6EC';
@@ -2523,7 +2574,6 @@
             }
           }
 
-          // 若正在進行「大愛心＋雙人舞」，即時更新目標座標讓愛心跟着心跳脈動
           if (state.gathered && state.heartShowTimer > 0) {
             if (p.role === 'colon') {
               var sideDir = p.colonIndex === 0 ? -1 : 1;
@@ -2612,7 +2662,6 @@
             drawAlpha = colonPulseAlpha;
           }
 
-          // 波浪舞報時位移（上排 0~29 跳完接力下排 30~59）
           var waveJump = 0;
           if (state.waveActive && state.gathered && state.heartShowTimer <= 0 && p.role === 'roamer' && p.slotIndex >= 0) {
             var maxC = state.waveContinuousEnd > 0 ? Math.ceil((waveElapsed + 2) / PASS_DUR) : state.waveCycles;
@@ -2627,7 +2676,6 @@
 
           var secPopOffset = 0;
           if (isActiveSec) {
-            // 上排往上微微跳出、下排往下微微跳出，並加上秒針彈性脈動
             var secBounce = Math.sin(Math.min(1, (secFrac % 1) * 3.5) * Math.PI) * 4;
             secPopOffset = (p.slotIndex < 30 ? -1 : 1) * (5 + secBounce);
           }
@@ -2647,7 +2695,6 @@
           ctx.save();
           ctx.globalAlpha = drawAlpha;
 
-          // 冒號手繪圓圈（跟著每秒呼吸脈動）
           if (state.gathered && state.heartShowTimer <= 0 && p.role === 'colon') {
             var ringRadius = Math.max(13, 96 * drawScale * 0.62);
             if (state.nightMode) {
@@ -2681,7 +2728,6 @@
           ctx.restore();
         }
 
-        // 大愛心雙人舞彩蛋進行中：在兩隻冒號小豬正上方畫一顆跳動的小愛心
         if (state.gathered && state.heartShowTimer > 0) {
           var pulseMiniHeart = 10 + Math.sin(sec * 9) * 2.2;
           drawMiniHeart(
@@ -2693,22 +2739,22 @@
           );
         }
 
-        // 在「目前秒數」那一隻小豬的上方（上排）或下方（下排）繪製手繪秒數氣泡標籤
+        // 在「目前秒數」那一隻小豬的上方（上排）或下方（下排）繪製瀨戶字體秒數氣泡標籤
         if (activeSecPig && state.gathered && state.heartShowTimer <= 0) {
           var isTopHalf = activeSecPig.slotIndex < 30;
           var pigHalfH = 48 * activeSecPig.currentScale;
-          var labelOffset = pigHalfH + 13;
+          var labelOffset = pigHalfH + 12;
           var bx = Math.min(Math.max(activeSecPig.x, 22), W - 22);
-          var by = isTopHalf ? (activeSecPig.y - labelOffset - 3) : (activeSecPig.y + labelOffset + 3);
+          var by = isTopHalf ? (activeSecPig.y - labelOffset - 2) : (activeSecPig.y + labelOffset + 2);
           var secLabel = String(curSec).padStart(2, '0');
 
           ctx.save();
-          ctx.font = '800 12px "SetoRoundFont", "jf open 粉圓 2.0", "Noto Sans TC", sans-serif';
+          ctx.font = '700 13px "SetoFontReal", "NaikaiSetoExt", "SetoFont", "LocalRoundFallback", sans-serif';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
 
           var pillW = 26;
-          var pillH = 17;
+          var pillH = 18;
           ctx.fillStyle = state.nightMode ? 'rgba(34, 30, 28, 0.94)' : '#FFF9F0';
           ctx.strokeStyle = state.nightMode ? '#F5EDE4' : '#3B2318';
           ctx.lineWidth = 1.6;
