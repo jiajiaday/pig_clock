@@ -1230,7 +1230,7 @@
           <button type="button" class="chip colon-egg-opt" data-mode="s3">肥嘟嘟左衛門</button>
           <button type="button" class="chip colon-egg-opt" data-mode="sin2">小新濃眉嘟嘴</button>
           <button type="button" class="chip colon-egg-opt" data-mode="sin4">巧克比鱷魚山</button>
-          <button type="button" class="chip colon-egg-opt" data-mode="bo">阿呆捲髮側臉</button>
+          <button type="button" class="chip colon-egg-opt" data-mode="himawari">小葵捲髮側臉</button>
           <button type="button" class="chip colon-egg-opt" data-mode="heart">經典大愛心</button>
         </div>
       </div>
@@ -1564,12 +1564,12 @@
         }
       }
 
-      var STORAGE_KEY = 'buriburi_pig_clock_settings_v11';
+      var STORAGE_KEY = 'buriburi_pig_clock_settings_v12';
       var TOTAL_PIGS = 142;
       var DEFAULT_POSE_COUNT = 12;
 
-      var VALID_EGG_MODES = ['random5', 'sin1', 's3', 'sin2', 'sin4', 'bo', 'heart'];
-      var RANDOM5_POOL = ['sin1', 's3', 'sin2', 'sin4', 'bo'];
+      var VALID_EGG_MODES = ['random5', 'sin1', 's3', 'sin2', 'sin4', 'himawari', 'heart'];
+      var RANDOM5_POOL = ['sin1', 's3', 'sin2', 'sin4', 'himawari'];
 
       var W = 360;
       var H = 640;
@@ -1630,7 +1630,8 @@
           ? (originalCutoutDataURLs[showIdx] || encodeURI(PIG_FILE_PATHS[showIdx]))
           : (src.showBtnImageData || '');
 
-        var eggMode = VALID_EGG_MODES.indexOf(src.colonEggMode) !== -1 ? src.colonEggMode : 'random5';
+        var eggMode = src.colonEggMode === 'bo' ? 'himawari' : src.colonEggMode;
+        if (VALID_EGG_MODES.indexOf(eggMode) === -1) eggMode = 'random5';
 
         return {
           forceLandscape: typeof src.forceLandscape === 'boolean' ? src.forceLandscape : false,
@@ -2144,8 +2145,8 @@
         };
       }
 
-      /* 5 款手繪圖案（SIN1 / S3 / SIN2 / Sin4 / BO 阿呆）標準化輪廓座標（中心 (0,0)，半徑約 15） */
-      /* 1. 小新側臉（已強化右側外凸大耳朵輪廓） */
+      /* 5 款手繪圖案（SIN1 / S3 / SIN2 / Sin4 / HIMAWARI 小葵）標準化輪廓座標（中心 (0,0)，半徑約 15） */
+      /* 1. 小新側臉（右側外凸大耳朵輪廓） */
       var SIN1_OUTLINE = [
         [-1.2, -11.5], [3.6, -11.4], [7.8, -9.2], [9.8, -5.2], [10.0, -0.8, 1],
         [12.6, -1.6], [15.0, 0.2], [15.4, 3.6], [13.8, 6.6], [11.2, 7.6],
@@ -2170,7 +2171,7 @@
         [-6.8, 9.6], [-9.2, 6.2], [-8.4, 2.4], [-4.4, 1.0], [0.0, 2.2]
       ];
 
-      /* 3. 小新濃眉嘟嘴臉（已強化右側外凸大耳朵輪廓） */
+      /* 3. 小新濃眉嘟嘴臉（右側外凸大耳朵輪廓） */
       var SIN2_HEAD_OUTLINE = [
         [-3.0, -12.6], [2.6, -12.2], [7.2, -9.4], [9.2, -4.6], [9.4, -1.6, 1],
         [12.2, -2.4], [15.0, -0.2], [15.4, 3.6], [13.6, 6.6], [10.8, 7.4],
@@ -2195,8 +2196,8 @@
         [-13.8, -1.4], [-14.4, -4.4], [-11.4, -6.2], [-6.8, -5.6], [-4.6, -5.2]
       ];
 
-      /* 5. 阿呆捲髮側臉（BO：上方三圈螺旋捲劉海 + 圓臉頰 + 右側圓耳朵） */
-      var BO_OUTLINE = [
+      /* 5. 小葵捲髮側臉（HIMAWARI：額前三圈經典小捲毛 + 圓臉頰 + 右側圓耳朵） */
+      var HIMAWARI_OUTLINE = [
         [-10.8, -3.5], [-13.4, -5.2], [-13.8, -8.8], [-11.2, -11.4], [-7.6, -10.6],
         [-6.6, -7.6, 1], [-5.2, -9.8], [-1.8, -10.4], [0.8, -8.2],
         [1.8, -7.4, 1], [3.6, -9.4], [7.2, -9.2], [10.6, -6.4], [12.4, -1.6],
@@ -2389,7 +2390,6 @@
               scale: rimScale
             });
           }
-          /* 右側耳窩內側 2 隻點綴，讓耳朵更立體 */
           slots.push({ x: cx + 12.2 * figScale, y: cy + 2.0 * figScale, scale: earInnerScale });
           slots.push({ x: cx + 11.8 * figScale, y: cy + 4.3 * figScale, scale: earInnerScale });
 
@@ -2489,7 +2489,6 @@
               scale: featureScale
             });
           }
-          /* 右側耳窩內側 2 隻點綴 */
           slots.push({ x: cx + 12.0 * figScale, y: cy + 1.6 * figScale, scale: outlineScale });
           slots.push({ x: cx + 11.6 * figScale, y: cy + 4.0 * figScale, scale: outlineScale });
 
@@ -2522,36 +2521,36 @@
           assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
           spawnSin4Helpers(cx, cy, figScale);
 
-        } else if (shape === 'bo') {
-          /* 5. 阿呆捲髮側臉（BO）：三圈螺旋捲劉海＋圓臉＋右耳，2 隻冒號小豬在臉頰中央共舞 */
-          var boDuetGap = Math.max(19, Math.min(38, figScale * 2.5));
-          var boDuetScale = Math.max(0.36, Math.min(0.56, figScale * 0.042));
-          var boRimScale = Math.max(0.165, Math.min(0.25, figScale * 0.019));
+        } else if (shape === 'himawari') {
+          /* 5. 小葵捲髮側臉（HIMAWARI）：三圈螺旋捲劉海＋圓臉＋右耳，2 隻冒號小豬在臉頰中央共舞 */
+          var himaDuetGap = Math.max(19, Math.min(38, figScale * 2.5));
+          var himaDuetScale = Math.max(0.36, Math.min(0.56, figScale * 0.042));
+          var himaRimScale = Math.max(0.165, Math.min(0.25, figScale * 0.019));
 
           for (var cb = 0; cb < colonPigs.length; cb++) {
             var sideB = cb === 0 ? -1 : 1;
-            colonPigs[cb].tx = cx + sideB * boDuetGap - figScale * 1.4;
+            colonPigs[cb].tx = cx + sideB * himaDuetGap - figScale * 1.4;
             colonPigs[cb].ty = cy + figScale * 1.4;
             colonPigs[cb].heartBaseX = colonPigs[cb].tx;
             colonPigs[cb].heartBaseY = colonPigs[cb].ty;
-            colonPigs[cb].scale = boDuetScale;
+            colonPigs[cb].scale = himaDuetScale;
             colonPigs[cb].baseAlpha = 1;
             colonPigs[cb].flipX = sideB === -1 ? 1 : -1;
           }
 
-          var boEarCount = 2;
-          var boRimCount = rimPigs.length - boEarCount;
-          var boPts = samplePolyline(BO_OUTLINE, boRimCount + 1, 2);
-          for (var bi = 0; bi < boRimCount; bi++) {
+          var himaEarCount = 2;
+          var himaRimCount = rimPigs.length - himaEarCount;
+          var himaPts = samplePolyline(HIMAWARI_OUTLINE, himaRimCount + 1, 2);
+          for (var bi = 0; bi < himaRimCount; bi++) {
             slots.push({
-              x: cx + boPts[bi].x * figScale,
-              y: cy + boPts[bi].y * figScale,
-              scale: boRimScale
+              x: cx + himaPts[bi].x * figScale,
+              y: cy + himaPts[bi].y * figScale,
+              scale: himaRimScale
             });
           }
           /* 右下圓耳朵內的小弧點綴 */
-          slots.push({ x: cx + 12.5 * figScale, y: cy + 4.3 * figScale, scale: boRimScale * 0.9 });
-          slots.push({ x: cx + 13.4 * figScale, y: cy + 4.9 * figScale, scale: boRimScale * 0.9 });
+          slots.push({ x: cx + 12.5 * figScale, y: cy + 4.3 * figScale, scale: himaRimScale * 0.9 });
+          slots.push({ x: cx + 13.4 * figScale, y: cy + 4.9 * figScale, scale: himaRimScale * 0.9 });
 
           assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
 
