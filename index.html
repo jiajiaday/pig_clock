@@ -65,6 +65,7 @@
 
     /* 讓中文黑體／圓體筆畫末端呈現柔和圓潤的手繪筆觸感 */
     #titleTrigger,
+    .date-pill,
     .pill-btn,
     #btnShowBar,
     .modal-head h2,
@@ -127,6 +128,16 @@
       pointer-events: none;
     }
 
+    .top-bar-inner {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      max-width: 96vw;
+      pointer-events: none;
+    }
+
     /* 手繪不規則外框：頂部標題框 */
     #titleTrigger {
       position: relative;
@@ -173,6 +184,47 @@
     #titleTrigger:active {
       transform: rotate(0deg) translate(2px, 2.5px) scale(0.97);
       box-shadow: 1px 1.5px 0 var(--pill-border);
+    }
+
+    /* 手繪不規則外框：日期／星期小標籤 */
+    .date-pill {
+      position: relative;
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 13px;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 2.2px 1.8px 2.4px 2px;
+      border-radius: 12px 23px 13px 21px / 21px 12px 22px 13px;
+      background: var(--pill-bg);
+      color: var(--ink);
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.22;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      white-space: nowrap;
+      transform: rotate(1.15deg);
+      box-shadow: 2.5px 3.2px 0 var(--pill-border);
+      transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .date-pill::before {
+      content: "";
+      position: absolute;
+      inset: -2.5px -2px -2px -2.5px;
+      border: 1.2px solid var(--pill-border);
+      border-radius: 22px 11px 20px 12px / 11px 21px 12px 20px;
+      opacity: 0.42;
+      transform: rotate(-1.1deg);
+      pointer-events: none;
+    }
+
+    .date-pill:active {
+      transform: rotate(0deg) translate(1.5px, 2px) scale(0.97);
+      box-shadow: 1px 1px 0 var(--pill-border);
     }
 
     #titleIcon {
@@ -270,7 +322,6 @@
       pointer-events: none;
     }
 
-    /* 每顆按鈕各自有不同的手繪歪斜與輪廓節奏 */
     .toolbar-row .pill-btn:nth-child(1) {
       border-radius: 22px 9px 20px 11px / 10px 21px 9px 19px;
       transform: rotate(-0.9deg);
@@ -484,6 +535,21 @@
       width: 30px;
       height: 30px;
       object-fit: contain;
+    }
+
+    #previewDatePill {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 9px;
+      font-size: 13px;
+      font-weight: 800;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 1.8px 1.4px 2px 1.5px;
+      border-radius: 10px 18px 11px 17px / 17px 10px 18px 11px;
+      background: var(--pill-bg);
+      box-shadow: 1.6px 2px 0 var(--pill-border);
+      margin-left: 4px;
     }
 
     .preview-btns-bar {
@@ -865,12 +931,15 @@
   </div>
 
   <header id="topBar">
-    <button id="titleTrigger" type="button" title="不理不理左衛門時鐘">
-      <span id="titleText">不理不理左衛門時鐘</span>
-      <span id="titleIcon"></span>
-      <img id="titleIconImg" alt="標題小圖示" />
-      <span class="edit-badge">✎</span>
-    </button>
+    <div class="top-bar-inner">
+      <button id="titleTrigger" type="button" title="不理不理左衛門時鐘">
+        <span id="titleText">不理不理左衛門時鐘</span>
+        <span id="titleIcon"></span>
+        <img id="titleIconImg" alt="標題小圖示" />
+        <span class="edit-badge">✎</span>
+      </button>
+      <div id="dateBadge" class="date-pill" title="點擊設定日期標籤">11/23 週一</div>
+    </div>
   </header>
 
   <footer id="bottomBar">
@@ -937,6 +1006,7 @@
             <span id="previewText">不理不理左衛門時鐘</span>
             <span id="previewIcon"></span>
             <img id="previewImg" alt="預覽圖示" />
+            <span id="previewDatePill">11/23 週一</span>
           </div>
           <div class="preview-btns-bar">
             <span class="preview-mini-pill">
@@ -959,6 +1029,16 @@
           <div class="segmented-row">
             <button type="button" id="btnTitleVisibleOn" class="seg-btn active">顯示標題</button>
             <button type="button" id="btnTitleVisibleOff" class="seg-btn">隱藏標題</button>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label-row">
+            <span>日期／星期小標籤</span>
+          </div>
+          <div class="segmented-row">
+            <button type="button" id="btnDateVisibleOn" class="seg-btn active">顯示日期</button>
+            <button type="button" id="btnDateVisibleOff" class="seg-btn">隱藏日期</button>
           </div>
         </div>
 
@@ -1056,7 +1136,7 @@
           <span>4. 自訂誰來玩耍</span>
         </div>
         <div class="custom-source-row">
-          <span id="roamerSourceStatus" style="font-size:12.5px;font-weight:700;">預設（108 隻）</span>
+          <span id="roamerSourceStatus" style="font-size:12.5px;font-weight:700;">預設（142 隻）</span>
           <div style="display:flex;gap:6px;">
             <button type="button" id="btnPickRoamerImgs" class="chip">選擇圖片</button>
             <button type="button" id="btnResetRoamerImgs" class="chip hidden">恢復預設</button>
@@ -1119,6 +1199,59 @@
         c.arcTo(x, y + h, x, y, radius);
         c.arcTo(x, y, x + w, y, radius);
         c.closePath();
+      }
+
+      function drawHandDrawnCircle(c, cx, cy, r, nightMode) {
+        c.save();
+        c.strokeStyle = nightMode ? 'rgba(245, 237, 228, 0.9)' : '#3B2318';
+        c.lineCap = 'round';
+
+        // 主手繪微橢圓圈
+        c.lineWidth = 2.1;
+        c.beginPath();
+        for (var i = 0; i <= 24; i++) {
+          var a = (i / 24) * Math.PI * 2;
+          var wobble = 1 + 0.055 * Math.sin(a * 3 + 0.7) + 0.035 * Math.cos(a * 2 - 0.4);
+          var rx = cx + Math.cos(a) * r * wobble;
+          var ry = cy + Math.sin(a) * r * (2 - wobble * 0.96);
+          if (i === 0) c.moveTo(rx, ry);
+          else c.lineTo(rx, ry);
+        }
+        c.closePath();
+        c.stroke();
+
+        // 第二層輕描邊，呼應按鈕手繪雙線感
+        c.lineWidth = 1.05;
+        c.globalAlpha *= 0.48;
+        c.beginPath();
+        for (var j = 0; j <= 24; j++) {
+          var a2 = (j / 24) * Math.PI * 2;
+          var w2 = 1 + 0.05 * Math.cos(a2 * 3 - 0.5);
+          var rx2 = cx + 1.1 + Math.cos(a2) * (r * 1.06) * w2;
+          var ry2 = cy - 0.9 + Math.sin(a2) * (r * 1.04);
+          if (j === 0) c.moveTo(rx2, ry2);
+          else c.lineTo(rx2, ry2);
+        }
+        c.closePath();
+        c.stroke();
+        c.restore();
+      }
+
+      function drawMiniHeart(c, cx, cy, size, color) {
+        c.save();
+        c.translate(cx, cy);
+        c.fillStyle = color;
+        c.strokeStyle = '#3B2318';
+        c.lineWidth = 1.8;
+        c.beginPath();
+        var s = size / 16;
+        c.moveTo(0, 5 * s);
+        c.bezierCurveTo(-12 * s, -6 * s, -22 * s, 6 * s, 0, 20 * s);
+        c.bezierCurveTo(22 * s, 6 * s, 12 * s, -6 * s, 0, 5 * s);
+        c.closePath();
+        c.fill();
+        c.stroke();
+        c.restore();
       }
 
       var PIG_FILE_PATHS = [
@@ -1356,19 +1489,26 @@
         }
       }
 
-      var STORAGE_KEY = 'buriburi_pig_clock_settings_v7';
-      var TOTAL_PIGS = 108;
+      var STORAGE_KEY = 'buriburi_pig_clock_settings_v8';
+      var TOTAL_PIGS = 142;
       var DEFAULT_POSE_COUNT = 12;
 
       var W = 360;
       var H = 640;
       var DPR = Math.min(window.devicePixelRatio || 1, 2);
 
+      function formatTodayBadge() {
+        var d = new Date();
+        var weekNames = ['日', '一', '二', '三', '四', '五', '六'];
+        return (d.getMonth() + 1) + '/' + d.getDate() + ' 週' + weekNames[d.getDay()];
+      }
+
       function getDefaultSettings() {
         return {
           forceLandscape: false,
           extraLarge: true,
           visible: true,
+          showDateBadge: true,
           text: '不理不理左衛門時鐘',
           fontSize: 26,
           iconType: 'preset',
@@ -1415,6 +1555,7 @@
           forceLandscape: typeof src.forceLandscape === 'boolean' ? src.forceLandscape : false,
           extraLarge: typeof src.extraLarge === 'boolean' ? src.extraLarge : true,
           visible: typeof src.visible === 'boolean' ? src.visible : true,
+          showDateBadge: typeof src.showDateBadge === 'boolean' ? src.showDateBadge : true,
           text: typeof src.text === 'string' ? src.text : def.text,
           fontSize: typeof src.fontSize === 'number' ? Math.min(44, Math.max(16, src.fontSize)) : 26,
           iconType: titleType,
@@ -1442,6 +1583,14 @@
         barHidden: false,
         lastMinute: -1,
         lastHourTriggered: -1,
+        lastChimeKey: '',
+        waveActive: false,
+        waveStartTime: 0,
+        waveCycles: 1,
+        waveContinuousEnd: 0,
+        heartShowTimer: 0,
+        heartCenter: { x: 180, y: 320 },
+        heartScale: 8,
         clockBox: { left: 20, right: 300, top: 120, bottom: 420 },
         stageRevealed: false
       };
@@ -1788,10 +1937,15 @@
             wiggleFreq: 3.6 + Math.random() * 2.4,
             flipX: Math.random() > 0.5 ? 1 : -1,
             role: 'roamer',
+            colonIndex: -1,
+            slotIndex: -1,
+            heartBaseX: 0,
+            heartBaseY: 0,
             tx: 0,
             ty: 0,
             scale: 0.42,
             currentScale: 0.44,
+            baseAlpha: 1,
             isWeirdo: false,
             overrideSprite: null,
             eggTimer: 0,
@@ -1826,7 +1980,106 @@
         }
       }
 
+      function getSafeBounds() {
+        var topBarEl = document.getElementById('topBar');
+        var bottomBarEl = document.getElementById('bottomBar');
+        var topBottom = 16;
+        if (currentSettings && currentSettings.visible && topBarEl) {
+          topBottom = 66;
+          var tr = topBarEl.getBoundingClientRect();
+          if (tr && tr.bottom > 20) topBottom = Math.min(tr.bottom, H * 0.25);
+        }
+        var bottomTop = H - 16;
+        if (!state.barHidden && bottomBarEl) {
+          var br = bottomBarEl.getBoundingClientRect();
+          if (br && br.top > 120) bottomTop = Math.max(br.top, H * 0.72);
+        }
+        return {
+          topBottom: topBottom,
+          bottomTop: bottomTop
+        };
+      }
+
+      function triggerHeartDuetShow() {
+        if (!state.gathered) return;
+        state.heartShowTimer = 6.5;
+        state.waveActive = false;
+
+        var bounds = getSafeBounds();
+        var cx = W * 0.5;
+        var cy = (bounds.topBottom + bounds.bottomTop) * 0.5 + 4;
+        var availW = W - 44;
+        var availH = Math.max(160, bounds.bottomTop - bounds.topBottom - 26);
+
+        // 參數愛心曲線 X 範圍 [-16, 16]，Y 範圍 [-17, 13]（總高約 30）
+        var heartScale = Math.min(availW / 34, availH / 31);
+        state.heartCenter = { x: cx, y: cy };
+        state.heartScale = heartScale;
+
+        var duetGap = Math.max(24, Math.min(48, heartScale * 3.4));
+        var duetScale = Math.max(0.42, Math.min(0.68, heartScale * 0.048));
+        var rimScale = Math.max(0.20, Math.min(0.32, heartScale * 0.024));
+
+        var rimPigs = [];
+        for (var i = 0; i < pigs.length; i++) {
+          pigs[i].eggTimer = 0;
+          if (!pigs[i].isWeirdo) pigs[i].overrideSprite = null;
+
+          if (pigs[i].role === 'colon') {
+            var side = pigs[i].colonIndex === 0 ? -1 : 1;
+            pigs[i].tx = cx + side * duetGap;
+            pigs[i].ty = cy + heartScale * 1.4;
+            pigs[i].heartBaseX = pigs[i].tx;
+            pigs[i].heartBaseY = pigs[i].ty;
+            pigs[i].scale = duetScale;
+            pigs[i].baseAlpha = 1;
+            pigs[i].flipX = side === -1 ? 1 : -1;
+          } else {
+            rimPigs.push(pigs[i]);
+          }
+        }
+
+        // 先沿著愛心參數曲線密集採樣並依弧長等距取出 140 個點
+        var rawPts = [];
+        var STEPS = 720;
+        for (var s = 0; s <= STEPS; s++) {
+          var t = (s / STEPS) * Math.PI * 2;
+          var hx = 16 * Math.pow(Math.sin(t), 3);
+          var hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+          rawPts.push([hx, hy]);
+        }
+        var heartSamples = samplePolyline(rawPts, rimPigs.length + 1);
+
+        // 依小豬目前角度排序，飛入愛心輪廓時不打結
+        rimPigs.sort(function (a, b) {
+          return Math.atan2(a.y - cy, a.x - cx) - Math.atan2(b.y - cy, b.x - cx);
+        });
+
+        var sampleObjs = [];
+        for (var k = 0; k < rimPigs.length; k++) {
+          var sx = cx + heartSamples[k].x * heartScale;
+          var sy = cy + heartSamples[k].y * heartScale;
+          sampleObjs.push({
+            x: sx,
+            y: sy,
+            ang: Math.atan2(sy - cy, sx - cx)
+          });
+        }
+        sampleObjs.sort(function (a, b) { return a.ang - b.ang; });
+
+        for (var m = 0; m < rimPigs.length; m++) {
+          rimPigs[m].tx = sampleObjs[m].x;
+          rimPigs[m].ty = sampleObjs[m].y;
+          rimPigs[m].heartBaseX = sampleObjs[m].x;
+          rimPigs[m].heartBaseY = sampleObjs[m].y;
+          rimPigs[m].scale = rimScale;
+          rimPigs[m].baseAlpha = 1;
+        }
+      }
+
       function computeClockTargets() {
+        if (state.heartShowTimer > 0) return;
+
         var now = new Date();
         var curMin = now.getMinutes();
         var curHour = now.getHours();
@@ -1843,33 +2096,32 @@
         var isExtraLarge = currentSettings ? currentSettings.extraLarge : true;
         var isLandscape = W > H;
 
-        var topBarEl = document.getElementById('topBar');
-        var bottomBarEl = document.getElementById('bottomBar');
-        var topBottom = 18;
-        if (currentSettings && currentSettings.visible && topBarEl) {
-          topBottom = 68;
-          var tr = topBarEl.getBoundingClientRect();
-          if (tr && tr.bottom > 20) topBottom = Math.min(tr.bottom, H * 0.25);
-        }
-        var bottomTop = H - 18;
-        if (!state.barHidden && bottomBarEl) {
-          var br = bottomBarEl.getBoundingClientRect();
-          if (br && br.top > 120) bottomTop = Math.max(br.top, H * 0.72);
-        }
+        var bounds = getSafeBounds();
+        var topBottom = bounds.topBottom;
+        var bottomTop = bounds.bottomTop;
 
-        var safeTop = topBottom + 14;
-        var safeBottom = Math.max(safeTop + 120, bottomTop - 14);
+        var safeTop = topBottom + 8;
+        var safeBottom = Math.max(safeTop + 150, bottomTop - 8);
         var safeH = safeBottom - safeTop;
+
+        // 預留上下兩排各 30 隻小豬與秒數氣泡的垂直安全空間
+        var rowPad = Math.max(25, Math.min(38, safeH * 0.088));
+        var topRowY = safeTop + rowPad * 0.78;
+        var botRowY = safeBottom - rowPad * 0.78;
+
+        var digitZoneTop = topRowY + rowPad * 0.62;
+        var digitZoneBot = botRowY - rowPad * 0.62;
+        var digitZoneH = Math.max(84, digitZoneBot - digitZoneTop);
 
         var clockW = W * (isExtraLarge ? (isLandscape ? 0.84 : 0.91) : (isLandscape ? 0.72 : 0.79));
         var colonW = clockW * 0.095;
         var digitGap = clockW * 0.045;
         var digitW = (clockW - colonW - digitGap * 2) / 4;
         var ratioCap = isLandscape ? 1.35 : 1.92;
-        var digitH = Math.min(safeH * (isExtraLarge ? 0.76 : 0.62), digitW * ratioCap);
+        var digitH = Math.min(digitZoneH * (isExtraLarge ? 0.92 : 0.76), digitW * ratioCap);
 
         var startX = (W - clockW) / 2;
-        var centerY = (safeTop + safeBottom) / 2;
+        var centerY = (digitZoneTop + digitZoneBot) / 2;
         var topY = centerY - digitH / 2;
 
         state.clockBox = {
@@ -1896,22 +2148,25 @@
             targets.push({
               x: xOffsets[d] + samples[s].x * digitW,
               y: topY + samples[s].y * digitH,
-              role: 'digit'
+              role: 'digit',
+              colonIndex: -1
             });
           }
         }
 
         var colonX = startX + digitW * 2 + digitGap + colonW * 0.5;
-        targets.push({ x: colonX, y: topY + digitH * 0.34, role: 'colon' });
-        targets.push({ x: colonX, y: topY + digitH * 0.68, role: 'colon' });
+        targets.push({ x: colonX, y: topY + digitH * 0.34, role: 'colon', colonIndex: 0 });
+        targets.push({ x: colonX, y: topY + digitH * 0.68, role: 'colon', colonIndex: 1 });
 
         for (var i = 0; i < pigs.length; i++) {
           pigs[i].role = 'roamer';
+          pigs[i].colonIndex = -1;
+          pigs[i].slotIndex = -1;
+          pigs[i].baseAlpha = 1;
         }
 
         var used = new Array(pigs.length);
-        // 時鐘模式：縮小且限制上限，讓每個數字筆畫之間留出清楚空隙
-        var pigScale = Math.max(0.22, Math.min(0.32, (digitW / 96) * 0.45));
+        var pigScale = Math.max(0.21, Math.min(0.32, (digitW / 96) * 0.45));
 
         for (var t = 0; t < targets.length; t++) {
           var bestIdx = -1;
@@ -1929,55 +2184,54 @@
           if (bestIdx !== -1) {
             used[bestIdx] = true;
             pigs[bestIdx].role = targets[t].role;
+            pigs[bestIdx].colonIndex = targets[t].colonIndex;
             pigs[bestIdx].tx = targets[t].x;
             pigs[bestIdx].ty = targets[t].y;
-            // 數字與冒號維持完全一致的大小
             pigs[bestIdx].scale = pigScale;
+            pigs[bestIdx].baseAlpha = 1;
           }
         }
 
-        // 未排到時間的小豬：依時段分組排成一排，靜止不動、搖身體
-        var topRoamers = [];
-        var botRoamers = [];
+        // 未排到時間的 60 隻小豬：分成上下兩排各 30 隻（00~29 秒在上方，30~59 秒在下方）
+        var roamers = [];
         for (var r = 0; r < pigs.length; r++) {
           if (pigs[r].role === 'roamer') {
-            if (curHour >= 1 && curHour <= 11) {
-              // 上午 1:00 ~ 11:59：全數排在時鐘上方
-              topRoamers.push(pigs[r]);
-            } else if (curHour >= 13 && curHour <= 23) {
-              // 下午 1:00 ~ 11:59：全數排在時鐘下方
-              botRoamers.push(pigs[r]);
-            } else {
-              // 上午與下午 12:00 ~ 12:59 (curHour === 0 或 12)：在時鐘上方的留上方、下方的留下方
-              if (pigs[r].y < centerY) {
-                topRoamers.push(pigs[r]);
-              } else {
-                botRoamers.push(pigs[r]);
-              }
-            }
+            roamers.push(pigs[r]);
           }
         }
 
-        var topRowY = Math.max(topBottom + 16, (safeTop + topY) * 0.5);
-        var botRowY = Math.min(bottomTop - 16, (topY + digitH + safeBottom) * 0.5);
-        var rowLeft = 24;
-        var rowRight = W - 24;
+        // 依目前垂直位置分為上半 30 隻與下半 30 隻，減少跨螢幕換位
+        roamers.sort(function (a, b) { return a.y - b.y; });
+        var halfCount = Math.floor(roamers.length / 2);
+        var topRoamers = roamers.slice(0, halfCount);
+        var botRoamers = roamers.slice(halfCount);
+
+        var isAM = curHour < 12;
+        var topRowScale = pigScale * (isAM ? 0.90 : 0.64);
+        var botRowScale = pigScale * (isAM ? 0.64 : 0.90);
+        var topRowAlpha = isAM ? 1.0 : 0.58;
+        var botRowAlpha = isAM ? 0.58 : 1.0;
+
+        var rowLeft = 22;
+        var rowRight = W - 22;
         var rowSpan = Math.max(40, rowRight - rowLeft);
 
-        function alignPigRow(list, rowY) {
+        function alignPigRow(list, rowY, rScale, rAlpha, baseSlot) {
           if (list.length === 0) return;
           list.sort(function (a, b) { return a.x - b.x; });
           for (var k = 0; k < list.length; k++) {
+            list[k].slotIndex = baseSlot + k;
             list[k].tx = list.length === 1 ? (W * 0.5) : (rowLeft + (k / (list.length - 1)) * rowSpan);
             list[k].ty = rowY;
-            list[k].scale = pigScale * 0.88;
+            list[k].scale = rScale;
+            list[k].baseAlpha = rAlpha;
             list[k].vx = 0;
             list[k].vy = 0;
           }
         }
 
-        alignPigRow(topRoamers, topRowY);
-        alignPigRow(botRoamers, botRowY);
+        alignPigRow(topRoamers, topRowY, topRowScale, topRowAlpha, 0);
+        alignPigRow(botRoamers, botRowY, botRowScale, botRowAlpha, halfCount);
       }
 
       function applyWeirdoMix(enable) {
@@ -1989,6 +2243,7 @@
             pigs[i].isWeirdo = true;
             pigs[i].overrideSprite = wPool[(i / 6) % wPool.length];
             pigs[i].scale = 0.56;
+            pigs[i].baseAlpha = 1;
             var ang = Math.random() * Math.PI * 2;
             var spd = 55 + Math.random() * 45;
             pigs[i].vx = Math.cos(ang) * spd;
@@ -1999,6 +2254,7 @@
 
       function setGathered(val, snapImmediate) {
         state.gathered = !!val;
+        state.heartShowTimer = 0;
         var btn = document.getElementById('btnToggleGather');
         if (btn) {
           btn.textContent = state.gathered ? '自己玩 / 幾點了（時鐘)' : '自己玩 / 幾點了（玩耍中)';
@@ -2010,9 +2266,12 @@
             snapClockPigsToTargets();
           }
         } else {
+          state.waveActive = false;
           applyWeirdoMix(true);
           for (var i = 0; i < pigs.length; i++) {
             pigs[i].role = 'roamer';
+            pigs[i].slotIndex = -1;
+            pigs[i].baseAlpha = 1;
             if (!pigs[i].isWeirdo) pigs[i].scale = 0.44;
             var angle = Math.random() * Math.PI * 2;
             var spd = 45 + Math.random() * 55;
@@ -2042,9 +2301,18 @@
       }
 
       function findPigAt(px, py) {
+        // 優先偵測冒號小豬（包含外圍手繪圓圈範圍），方便觸發雙人舞＋大愛心彩蛋
+        for (var c = 0; c < pigs.length; c++) {
+          if (pigs[c].role === 'colon') {
+            var cRadius = Math.max(30, 96 * pigs[c].scale * 0.95);
+            if (Math.hypot(px - pigs[c].x, py - pigs[c].y) <= cRadius) {
+              return pigs[c];
+            }
+          }
+        }
         for (var i = pigs.length - 1; i >= 0; i--) {
           var p = pigs[i];
-          var hitRadius = Math.max(26, 96 * p.scale * 0.65);
+          var hitRadius = Math.max(24, 96 * p.scale * 0.65);
           if (Math.hypot(px - p.x, py - p.y) <= hitRadius) {
             return p;
           }
@@ -2090,13 +2358,19 @@
 
         var hit = findPigAt(px, py);
         if (hit) {
-          draggingPig = hit;
-          hit.eggTimer = Math.max(hit.eggTimer, 3.6);
+          if (hit.role === 'colon') {
+            triggerHeartDuetShow();
+            return;
+          }
+          if (state.heartShowTimer <= 0) {
+            draggingPig = hit;
+            hit.eggTimer = Math.max(hit.eggTimer, 3.6);
+          }
         }
       }
 
       function handlePointerMove(clientX, clientY) {
-        if (!draggingPig || !state.gathered) return;
+        if (!draggingPig || !state.gathered || state.heartShowTimer > 0) return;
         var pt = toStageCoords(clientX, clientY);
         var px = pt.x;
         var py = pt.y;
@@ -2134,11 +2408,23 @@
         if (isTap) {
           var hit = findPigAt(pt.x, pt.y);
           if (hit) {
-            triggerPigEgg(hit, hit.eggTimer > 0.2);
-          } else {
+            if (hit.role === 'colon') {
+              triggerHeartDuetShow();
+            } else if (state.heartShowTimer <= 0) {
+              triggerPigEgg(hit, hit.eggTimer > 0.2);
+            }
+          } else if (state.heartShowTimer <= 0) {
             setGathered(false);
           }
         }
+      }
+
+      function updateDateBadgeText() {
+        var label = formatTodayBadge();
+        var badgeEl = document.getElementById('dateBadge');
+        var prevEl = document.getElementById('previewDatePill');
+        if (badgeEl && badgeEl.textContent !== label) badgeEl.textContent = label;
+        if (prevEl && prevEl.textContent !== label) prevEl.textContent = label;
       }
 
       var lastTime = 0;
@@ -2149,10 +2435,62 @@
         lastTime = now;
         var sec = now / 1000;
 
-        var curMin = new Date().getMinutes();
-        if (state.gathered && curMin !== state.lastMinute) {
+        var wallNow = new Date();
+        var curHour = wallNow.getHours();
+        var curMin = wallNow.getMinutes();
+        var curSec = wallNow.getSeconds();
+        var secFrac = curSec + wallNow.getMilliseconds() / 1000;
+
+        // 愛心雙人舞彩蛋倒數結束後恢復成時鐘
+        if (state.heartShowTimer > 0) {
+          state.heartShowTimer -= dt;
+          if (state.heartShowTimer <= 0) {
+            state.heartShowTimer = 0;
+            if (state.gathered) computeClockTargets();
+          }
+        }
+
+        if (state.gathered && state.heartShowTimer <= 0 && curMin !== state.lastMinute) {
+          updateDateBadgeText();
           computeClockTargets();
         }
+
+        // 每分鐘 00 秒觸發上下兩排接力波浪舞報時
+        var chimeKey = curHour + ':' + curMin;
+        if (state.gathered && state.heartShowTimer <= 0 && curSec === 0 && state.lastChimeKey !== chimeKey) {
+          state.lastChimeKey = chimeKey;
+          if (curMin === 0) {
+            state.waveActive = true;
+            state.waveStartTime = now;
+            state.waveCycles = 99;
+            state.waveContinuousEnd = now + 6500;
+          } else {
+            var cycles = curMin <= 15 ? 1 : (curMin <= 30 ? 2 : (curMin <= 45 ? 3 : 4));
+            state.waveActive = true;
+            state.waveStartTime = now;
+            state.waveCycles = cycles;
+            state.waveContinuousEnd = 0;
+          }
+        }
+
+        var waveElapsed = 0;
+        var PASS_DUR = 1.62;
+        if (state.waveActive) {
+          waveElapsed = (now - state.waveStartTime) / 1000;
+          if (state.waveContinuousEnd > 0) {
+            if (now > state.waveContinuousEnd) state.waveActive = false;
+          } else if (waveElapsed > state.waveCycles * PASS_DUR + 0.35) {
+            state.waveActive = false;
+          }
+        }
+
+        // 冒號每秒呼吸節奏（0.88x ~ 1.18x 縮放，35% ~ 100% 明暗呼吸）
+        var colonBeat = 0.5 + 0.5 * Math.cos(secFrac * Math.PI * 2);
+        var colonPulseScale = 0.88 + 0.30 * colonBeat;
+        var colonPulseAlpha = 0.35 + 0.65 * colonBeat;
+
+        // 愛心彩蛋跳動倍率
+        var heartBeat = 1 + 0.055 * Math.sin(sec * 6.2);
 
         ctx.fillStyle = state.nightMode ? '#050505' : '#FDF6EC';
         ctx.fillRect(0, 0, W, H);
@@ -2169,18 +2507,35 @@
         var box = state.clockBox;
         var minTopY = (currentSettings && currentSettings.visible) ? 64 : 26;
         var pool = getCurrentRoamerPool();
+        var activeSecPig = null;
 
         for (var i = 0; i < pigs.length; i++) {
           var p = pigs[i];
           p.wigglePhase += dt * p.wiggleFreq;
 
-          var isFocusedEgg = p.eggTimer > 0;
+          var isFocusedEgg = p.eggTimer > 0 && state.heartShowTimer <= 0;
           if (isFocusedEgg) {
             p.eggTimer -= dt;
             if (p.eggTimer <= 0) {
               p.eggTimer = 0;
               p.wiggleFreq = 3.6 + (i % 5) * 0.45;
               if (!p.isWeirdo) p.overrideSprite = null;
+            }
+          }
+
+          // 若正在進行「大愛心＋雙人舞」，即時更新目標座標讓愛心跟着心跳脈動
+          if (state.gathered && state.heartShowTimer > 0) {
+            if (p.role === 'colon') {
+              var sideDir = p.colonIndex === 0 ? -1 : 1;
+              var duetSway = Math.sin(sec * 5.2) * 7;
+              p.tx = p.heartBaseX + duetSway;
+              p.ty = p.heartBaseY - Math.abs(Math.sin(sec * 7.5 + p.colonIndex * 1.4)) * 10;
+              p.flipX = sideDir === -1 ? 1 : -1;
+            } else {
+              var relX = p.heartBaseX - state.heartCenter.x;
+              var relY = p.heartBaseY - state.heartCenter.y;
+              p.tx = state.heartCenter.x + relX * heartBeat;
+              p.ty = state.heartCenter.y + relY * heartBeat;
             }
           }
 
@@ -2191,10 +2546,10 @@
           } else if (state.gathered && !isFocusedEgg) {
             var dx = p.tx - p.x;
             var dy = p.ty - p.y;
-            if (Math.abs(dx) > 0.4 || Math.abs(dy) > 0.4) {
-              p.x += dx * Math.min(1, dt * 7.5);
-              p.y += dy * Math.min(1, dt * 7.5);
-              if (Math.abs(dx) > 1.5) {
+            if (Math.abs(dx) > 0.35 || Math.abs(dy) > 0.35) {
+              p.x += dx * Math.min(1, dt * 8.2);
+              p.y += dy * Math.min(1, dt * 8.2);
+              if (state.heartShowTimer <= 0 && Math.abs(dx) > 1.5) {
                 p.flipX = dx >= 0 ? 1 : -1;
               }
             } else {
@@ -2240,18 +2595,69 @@
           var sprite = p.overrideSprite || pool[p.pose % pool.length] || fallbackSprites[0];
           if (!sprite) continue;
 
-          p.currentScale += (p.scale - p.currentScale) * Math.min(1, dt * 8);
-          var drawScale = p.currentScale * (isFocusedEgg ? 1.45 : 1);
+          var isActiveSec = state.gathered && state.heartShowTimer <= 0 && p.role === 'roamer' && p.slotIndex === curSec;
+          if (isActiveSec) activeSecPig = p;
 
-          var jumpOffset = 0;
-          if (isFocusedEgg && p.eggAction === 0) {
-            jumpOffset = -Math.abs(Math.sin(sec * 9 + p.id)) * 18;
+          var targetScale = p.scale;
+          if (isActiveSec) {
+            targetScale = Math.max(p.scale * 1.48, 0.34);
           }
 
-          var bobY = Math.sin(p.wigglePhase * 0.7) * (isFocusedEgg ? 4 : 1.8) + jumpOffset;
+          p.currentScale += (targetScale - p.currentScale) * Math.min(1, dt * 10);
+          var drawScale = p.currentScale * (isFocusedEgg ? 1.45 : 1);
+          var drawAlpha = (state.gathered && state.heartShowTimer <= 0) ? (isActiveSec ? 1 : p.baseAlpha) : 1;
+
+          if (state.gathered && state.heartShowTimer <= 0 && p.role === 'colon') {
+            drawScale *= colonPulseScale;
+            drawAlpha = colonPulseAlpha;
+          }
+
+          // 波浪舞報時位移（上排 0~29 跳完接力下排 30~59）
+          var waveJump = 0;
+          if (state.waveActive && state.gathered && state.heartShowTimer <= 0 && p.role === 'roamer' && p.slotIndex >= 0) {
+            var maxC = state.waveContinuousEnd > 0 ? Math.ceil((waveElapsed + 2) / PASS_DUR) : state.waveCycles;
+            for (var wc = 0; wc < maxC; wc++) {
+              var localT = waveElapsed - wc * PASS_DUR - p.slotIndex * 0.022;
+              if (localT >= 0 && localT <= 0.32) {
+                waveJump = -Math.sin((localT / 0.32) * Math.PI) * 19;
+                break;
+              }
+            }
+          }
+
+          var secPopOffset = 0;
+          if (isActiveSec) {
+            // 上排往上微微跳出、下排往下微微跳出，並加上秒針彈性脈動
+            var secBounce = Math.sin(Math.min(1, (secFrac % 1) * 3.5) * Math.PI) * 4;
+            secPopOffset = (p.slotIndex < 30 ? -1 : 1) * (5 + secBounce);
+          }
+
+          var jumpOffset = waveJump + secPopOffset;
+          if (isFocusedEgg && p.eggAction === 0) {
+            jumpOffset -= Math.abs(Math.sin(sec * 9 + p.id)) * 18;
+          }
+
+          var bobY = Math.sin(p.wigglePhase * 0.7) * (isFocusedEgg ? 4 : 1.7) + jumpOffset;
           var wiggleAngle = Math.sin(p.wigglePhase) * (isFocusedEgg ? 0.25 : 0.08);
+          if (state.gathered && state.heartShowTimer > 0 && p.role === 'colon') {
+            var sideTilt = p.colonIndex === 0 ? 1 : -1;
+            wiggleAngle = Math.sin(sec * 7.5) * 0.24 * sideTilt;
+          }
 
           ctx.save();
+          ctx.globalAlpha = drawAlpha;
+
+          // 冒號手繪圓圈（跟著每秒呼吸脈動）
+          if (state.gathered && state.heartShowTimer <= 0 && p.role === 'colon') {
+            var ringRadius = Math.max(13, 96 * drawScale * 0.62);
+            if (state.nightMode) {
+              ctx.shadowColor = 'rgba(255, 240, 210, 0.85)';
+              ctx.shadowBlur = 10;
+            }
+            drawHandDrawnCircle(ctx, p.x, p.y + bobY, ringRadius, state.nightMode);
+            ctx.shadowBlur = 0;
+          }
+
           ctx.translate(p.x, p.y + bobY);
           ctx.rotate(wiggleAngle);
           ctx.scale(p.flipX * p.clickFlip * drawScale, drawScale);
@@ -2262,13 +2668,56 @@
             ctx.fill();
           }
 
-          if (state.nightMode) {
+          if (isActiveSec) {
+            ctx.shadowColor = state.nightMode ? 'rgba(255, 224, 150, 0.95)' : 'rgba(244, 155, 110, 0.88)';
+            ctx.shadowBlur = 13;
+          } else if (state.nightMode) {
             ctx.shadowColor = 'rgba(255, 245, 225, 0.62)';
             ctx.shadowBlur = 9;
           }
 
           ctx.drawImage(sprite, -48, -48, 96, 96);
           ctx.shadowBlur = 0;
+          ctx.restore();
+        }
+
+        // 大愛心雙人舞彩蛋進行中：在兩隻冒號小豬正上方畫一顆跳動的小愛心
+        if (state.gathered && state.heartShowTimer > 0) {
+          var pulseMiniHeart = 10 + Math.sin(sec * 9) * 2.2;
+          drawMiniHeart(
+            ctx,
+            state.heartCenter.x + Math.sin(sec * 5.2) * 5,
+            state.heartCenter.y - state.heartScale * 1.6 + Math.cos(sec * 7.5) * 3,
+            pulseMiniHeart,
+            '#F26B83'
+          );
+        }
+
+        // 在「目前秒數」那一隻小豬的上方（上排）或下方（下排）繪製手繪秒數氣泡標籤
+        if (activeSecPig && state.gathered && state.heartShowTimer <= 0) {
+          var isTopHalf = activeSecPig.slotIndex < 30;
+          var pigHalfH = 48 * activeSecPig.currentScale;
+          var labelOffset = pigHalfH + 13;
+          var bx = Math.min(Math.max(activeSecPig.x, 22), W - 22);
+          var by = isTopHalf ? (activeSecPig.y - labelOffset - 3) : (activeSecPig.y + labelOffset + 3);
+          var secLabel = String(curSec).padStart(2, '0');
+
+          ctx.save();
+          ctx.font = '800 12px "SetoRoundFont", "jf open 粉圓 2.0", "Noto Sans TC", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+
+          var pillW = 26;
+          var pillH = 17;
+          ctx.fillStyle = state.nightMode ? 'rgba(34, 30, 28, 0.94)' : '#FFF9F0';
+          ctx.strokeStyle = state.nightMode ? '#F5EDE4' : '#3B2318';
+          ctx.lineWidth = 1.6;
+          drawRoundRect(ctx, bx - pillW / 2, by - pillH / 2, pillW, pillH, 7);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = state.nightMode ? '#FFD89C' : '#3B2318';
+          ctx.fillText(secLabel, bx, by + 0.5);
           ctx.restore();
         }
 
@@ -2426,9 +2875,11 @@
       function applySettingsToScreen() {
         var s = currentSettings;
         applyOrientationClass(s.forceLandscape);
+        updateDateBadgeText();
 
         var topBarEl = document.getElementById('topBar');
         var trigger = document.getElementById('titleTrigger');
+        var dateBadgeEl = document.getElementById('dateBadge');
         var textEl = document.getElementById('titleText');
         var iconEl = document.getElementById('titleIcon');
         var imgEl = document.getElementById('titleIconImg');
@@ -2443,6 +2894,11 @@
 
         if (trigger) {
           trigger.style.fontSize = s.fontSize + 'px';
+        }
+
+        if (dateBadgeEl) {
+          dateBadgeEl.classList.toggle('hidden', !s.showDateBadge);
+          dateBadgeEl.style.fontSize = Math.max(13, Math.round(s.fontSize * 0.64)) + 'px';
         }
 
         if (textEl) {
@@ -2496,7 +2952,7 @@
         var rReset = document.getElementById('btnResetRoamerImgs');
         var rThumbs = document.getElementById('roamerThumbs');
         if (rStatus) {
-          rStatus.textContent = usingCustomRoamer ? ('自訂中（' + customRoamerSprites.length + ' 張）') : '預設（108 隻）';
+          rStatus.textContent = usingCustomRoamer ? ('自訂中（' + customRoamerSprites.length + ' 張）') : '預設（142 隻）';
         }
         if (rReset) rReset.classList.toggle('hidden', !usingCustomRoamer);
         if (rThumbs) {
@@ -2531,6 +2987,8 @@
         var d = draftSettings;
         if (!d) return;
 
+        updateDateBadgeText();
+
         var btnOriAuto = document.getElementById('btnOrientAuto');
         var btnOriForce = document.getElementById('btnOrientForceLandscape');
         if (btnOriAuto) btnOriAuto.classList.toggle('active', !d.forceLandscape);
@@ -2545,13 +3003,18 @@
         var prevText = document.getElementById('previewText');
         var prevIcon = document.getElementById('previewIcon');
         var prevImg = document.getElementById('previewImg');
+        var prevDate = document.getElementById('previewDatePill');
         var badge = document.getElementById('fontSizeBadge');
         var slider = document.getElementById('inputFontSize');
         var btnVisOn = document.getElementById('btnTitleVisibleOn');
         var btnVisOff = document.getElementById('btnTitleVisibleOff');
+        var btnDateOn = document.getElementById('btnDateVisibleOn');
+        var btnDateOff = document.getElementById('btnDateVisibleOff');
 
         if (btnVisOn) btnVisOn.classList.toggle('active', d.visible);
         if (btnVisOff) btnVisOff.classList.toggle('active', !d.visible);
+        if (btnDateOn) btnDateOn.classList.toggle('active', d.showDateBadge);
+        if (btnDateOff) btnDateOff.classList.toggle('active', !d.showDateBadge);
 
         if (prevBox) {
           prevBox.style.fontSize = d.fontSize + 'px';
@@ -2567,6 +3030,10 @@
             prevText.textContent = d.text || '';
           }
           prevText.style.opacity = (d.text && d.visible) ? '1' : '0.55';
+        }
+
+        if (prevDate) {
+          prevDate.style.display = (d.visible && d.showDateBadge) ? 'inline-flex' : 'none';
         }
 
         if (prevIcon && prevImg) {
@@ -2706,7 +3173,11 @@
         }
 
         if (state.gathered && pigs.length > 0) {
-          computeClockTargets();
+          if (state.heartShowTimer > 0) {
+            triggerHeartDuetShow();
+          } else {
+            computeClockTargets();
+          }
         }
       }
 
@@ -2756,6 +3227,11 @@
         });
 
         document.getElementById('titleTrigger').addEventListener('click', function (e) {
+          e.stopPropagation();
+          openTitleModal();
+        });
+
+        document.getElementById('dateBadge').addEventListener('click', function (e) {
           e.stopPropagation();
           openTitleModal();
         });
@@ -2815,7 +3291,7 @@
           state.barHidden = true;
           bottomBarEl.classList.add('hidden');
           btnShowBar.classList.remove('hidden');
-          if (state.gathered) computeClockTargets();
+          if (state.gathered && state.heartShowTimer <= 0) computeClockTargets();
         });
 
         btnShowBar.addEventListener('click', function (e) {
@@ -2823,7 +3299,7 @@
           state.barHidden = false;
           btnShowBar.classList.add('hidden');
           bottomBarEl.classList.remove('hidden');
-          if (state.gathered) computeClockTargets();
+          if (state.gathered && state.heartShowTimer <= 0) computeClockTargets();
         });
 
         document.getElementById('btnOrientAuto').addEventListener('click', function () {
@@ -2921,6 +3397,18 @@
         document.getElementById('btnTitleVisibleOff').addEventListener('click', function () {
           if (!draftSettings) return;
           draftSettings.visible = false;
+          updateModalPreview();
+        });
+
+        document.getElementById('btnDateVisibleOn').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.showDateBadge = true;
+          updateModalPreview();
+        });
+
+        document.getElementById('btnDateVisibleOff').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.showDateBadge = false;
           updateModalPreview();
         });
 
