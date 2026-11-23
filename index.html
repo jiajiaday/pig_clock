@@ -1226,11 +1226,11 @@
         </div>
         <div class="chip-wrap" id="colonEggChoiceGroup" style="margin-top:0;">
           <button type="button" class="chip colon-egg-opt active" data-mode="random5">5 款隨機輪流</button>
+          <button type="button" class="chip colon-egg-opt" data-mode="himawari">小葵捲髮側臉</button>
           <button type="button" class="chip colon-egg-opt" data-mode="sin1">小新側臉</button>
           <button type="button" class="chip colon-egg-opt" data-mode="s3">肥嘟嘟左衛門</button>
           <button type="button" class="chip colon-egg-opt" data-mode="sin2">小新濃眉嘟嘴</button>
           <button type="button" class="chip colon-egg-opt" data-mode="sin4">巧克比鱷魚山</button>
-          <button type="button" class="chip colon-egg-opt" data-mode="himawari">小葵捲髮側臉</button>
           <button type="button" class="chip colon-egg-opt" data-mode="heart">經典大愛心</button>
         </div>
       </div>
@@ -1568,8 +1568,8 @@
       var TOTAL_PIGS = 142;
       var DEFAULT_POSE_COUNT = 12;
 
-      var VALID_EGG_MODES = ['random5', 'sin1', 's3', 'sin2', 'sin4', 'himawari', 'heart'];
-      var RANDOM5_POOL = ['sin1', 's3', 'sin2', 'sin4', 'himawari'];
+      var VALID_EGG_MODES = ['random5', 'himawari', 'sin1', 's3', 'sin2', 'sin4', 'heart'];
+      var RANDOM5_POOL = ['himawari', 'sin1', 's3', 'sin2', 'sin4'];
 
       var W = 360;
       var H = 640;
@@ -1672,7 +1672,7 @@
         waveCycles: 1,
         waveContinuousEnd: 0,
         heartShowTimer: 0,
-        activeEggShape: 'sin1',
+        activeEggShape: 'himawari',
         eggDeck: [],
         lastDrawnEggShape: '',
         heartCenter: { x: 180, y: 320 },
@@ -1729,7 +1729,7 @@
         return weirdoSprites;
       }
 
-      /* 彙整系統現有圖庫供巧克比鱷魚山（Sin4）偷借臨時援軍（眼眶＋牙齒） */
+      /* 彙整系統現有圖庫供彩蛋圖案臨時借調細節援軍 */
       function getSystemHelperSpritePool() {
         var list = [];
         var sources = [repoClockSprites, clickSprites, weirdoSprites, hourSprites];
@@ -2145,65 +2145,92 @@
         };
       }
 
-      /* 5 款手繪圖案（SIN1 / S3 / SIN2 / Sin4 / HIMAWARI 小葵）標準化輪廓座標（中心 (0,0)，半徑約 15） */
-      /* 1. 小新側臉（右側外凸大耳朵輪廓） */
-      var SIN1_OUTLINE = [
-        [-1.2, -11.5], [3.6, -11.4], [7.8, -9.2], [9.8, -5.2], [10.0, -0.8, 1],
-        [12.6, -1.6], [15.0, 0.2], [15.4, 3.6], [13.8, 6.6], [11.2, 7.6],
-        [9.4, 6.8, 1], [7.4, 7.8], [1.4, 8.9], [-6.2, 9.2], [-12.2, 8.4],
-        [-15.2, 5.4], [-15.2, 1.2], [-12.8, -1.8], [-11.0, -2.8], [-9.6, -7.2],
-        [-5.8, -10.5], [-1.2, -11.5]
+      /* ============================================================================
+         5 款精細手繪彩蛋圖案標準化座標（中心 (0,0)，半徑約 15，標記 1 為銳利折角不磨平）
+         ============================================================================ */
+
+      /* 1. 小葵捲髮側臉（HIMAWARI）：
+            額前三道立體螺旋捲毛（帶深凹 V 型波谷），配合額頭內側螺旋捲線與右側圓耳朵 */
+      var HIMAWARI_OUTLINE = [
+        /* 左臉頰到額角 */
+        [-11.2, -3.2],
+        /* 第 1 捲（左側前額最突出捲毛） */
+        [-14.2, -4.4], [-15.2, -7.8], [-12.6, -11.0], [-8.8, -10.6], [-7.6, -6.8, 1],
+        /* 第 2 捲（頭頂中央大螺旋捲毛） */
+        [-6.6, -10.6], [-2.8, -12.0], [0.6, -9.8], [1.4, -6.2, 1],
+        /* 第 3 捲（右側額角捲毛） */
+        [2.6, -9.4], [6.4, -9.8], [9.4, -7.2],
+        /* 後腦勺圓弧到右耳 */
+        [11.4, -3.6], [11.6, 0.2, 1],
+        /* 右側小圓耳朵 */
+        [14.2, 0.2], [15.6, 3.0], [14.4, 6.2], [11.6, 6.8, 1],
+        /* 圓潤下巴與左側嘟嘟臉頰 */
+        [8.4, 8.6], [1.2, 9.6], [-6.8, 9.4], [-12.4, 7.2],
+        [-14.6, 3.6], [-13.6, -0.2], [-11.2, -3.2]
       ];
 
-      /* 2. 肥嘟嘟左衛門豬頭（S3） */
+      /* 2. 蠟筆小新側臉（SIN1）：經典馬鈴薯頭型＋鼓鼓左臉頰＋右側大耳朵 */
+      var SIN1_OUTLINE = [
+        [-1.8, -12.0], [3.2, -11.8], [7.6, -9.4], [9.6, -5.2], [9.8, -1.0, 1],
+        /* 右側外凸大耳朵 */
+        [12.6, -1.8], [15.2, 0.2], [15.6, 3.8], [13.8, 6.8], [11.0, 7.6],
+        [9.4, 6.8, 1],
+        /* 平順下巴到左側鼓鼓臉頰 */
+        [6.8, 8.2], [0.6, 9.2], [-7.2, 9.6], [-13.2, 8.6],
+        [-15.6, 5.4], [-15.4, 1.0], [-12.6, -2.0], [-10.8, -3.0],
+        [-9.6, -7.6], [-6.0, -11.0], [-1.8, -12.0]
+      ];
+
+      /* 3. 肥嘟嘟左衛門豬頭（S3）：左右招風豬耳＋圓臉＋中間大豬鼻 */
       var S3_HEAD_OUTLINE = [
-        [-4.2, -8.2], [0.0, -7.2], [4.2, -8.2],
-        [7.6, -11.5, 1], [10.5, -10.2], [11.2, -5.8], [10.5, -2.8, 1],
-        [13.8, -0.5], [14.6, 3.6], [12.4, 7.2], [8.2, 8.4, 1],
-        [4.8, 10.6], [0.0, 10.0], [-4.8, 10.6], [-8.2, 8.4, 1],
-        [-12.4, 7.2], [-14.6, 3.6], [-13.8, -0.5], [-10.5, -2.8, 1],
-        [-11.2, -5.8], [-10.5, -10.2], [-7.6, -11.5, 1], [-4.2, -8.2]
+        [-4.2, -8.4], [0.0, -7.4], [4.2, -8.4],
+        /* 右耳 */
+        [7.8, -12.0, 1], [11.2, -10.6], [11.6, -5.8], [10.6, -2.8, 1],
+        /* 右臉頰與雙下巴 */
+        [14.0, -0.4], [14.8, 3.8], [12.4, 7.4], [8.2, 8.6, 1],
+        [4.8, 10.8], [0.0, 10.2], [-4.8, 10.8], [-8.2, 8.6, 1],
+        /* 左臉頰與左耳 */
+        [-12.4, 7.4], [-14.8, 3.8], [-14.0, -0.4], [-10.6, -2.8, 1],
+        [-11.6, -5.8], [-11.2, -10.6], [-7.8, -12.0, 1], [-4.2, -8.4]
       ];
 
       var S3_SNOUT_OUTLINE = [
-        [0.0, 2.2], [4.4, 1.0], [8.4, 2.4], [9.2, 6.2],
+        [0.0, 2.0], [4.6, 0.8], [8.6, 2.4], [9.4, 6.2],
         [6.8, 9.6], [2.6, 9.4], [0.0, 8.6], [-2.6, 9.4],
-        [-6.8, 9.6], [-9.2, 6.2], [-8.4, 2.4], [-4.4, 1.0], [0.0, 2.2]
+        [-6.8, 9.6], [-9.4, 6.2], [-8.6, 2.4], [-4.6, 0.8], [0.0, 2.0]
       ];
 
-      /* 3. 小新濃眉嘟嘴臉（右側外凸大耳朵輪廓） */
+      /* 4. 蠟筆小新濃眉嘟嘴（SIN2）：馬鈴薯頭＋粗黑毛毛蟲濃眉＋嘟嘴＋右耳 */
       var SIN2_HEAD_OUTLINE = [
-        [-3.0, -12.6], [2.6, -12.2], [7.2, -9.4], [9.2, -4.6], [9.4, -1.6, 1],
-        [12.2, -2.4], [15.0, -0.2], [15.4, 3.6], [13.6, 6.6], [10.8, 7.4],
-        [9.0, 6.4, 1], [5.4, 8.6], [-1.8, 9.6], [-9.0, 9.2], [-14.0, 6.8],
-        [-15.2, 2.4], [-13.6, -1.6], [-11.2, -2.6], [-10.6, -7.2], [-7.4, -11.2],
-        [-3.0, -12.6]
+        [-2.8, -12.8], [2.8, -12.4], [7.4, -9.4], [9.4, -4.6], [9.6, -1.6, 1],
+        /* 右耳 */
+        [12.4, -2.4], [15.2, -0.2], [15.6, 3.8], [13.6, 6.8], [10.8, 7.6],
+        [9.0, 6.4, 1],
+        /* 下巴與鼓臉頰 */
+        [5.2, 8.8], [-2.0, 9.8], [-9.2, 9.4], [-14.2, 6.8],
+        [-15.4, 2.4], [-13.6, -1.6], [-11.2, -2.6], [-10.6, -7.4], [-7.4, -11.4],
+        [-2.8, -12.8]
       ];
 
+      /* 濃眉加厚成雙層弧線，遠看像超粗毛毛蟲眉毛 */
       var SIN2_BROW_LEFT = [
-        [-10.8, -5.8], [-8.8, -8.6], [-6.0, -8.6], [-3.8, -6.2]
+        [-11.4, -5.8], [-9.4, -8.8], [-6.2, -9.0], [-4.0, -6.4],
+        [-4.6, -5.4], [-6.6, -7.4], [-9.2, -7.2], [-10.8, -5.0]
       ];
 
       var SIN2_BROW_RIGHT = [
-        [-1.0, -6.2], [1.6, -9.0], [4.8, -9.0], [7.0, -6.2]
+        [-1.2, -6.4], [1.4, -9.2], [4.8, -9.2], [7.2, -6.2],
+        [6.4, -5.2], [4.4, -7.6], [1.6, -7.6], [-0.4, -5.4]
       ];
 
-      /* 4. 巧克比鱷魚山先生（Sin4） */
+      /* 5. 巧克比鱷魚山先生（Sin4）：長吻鼻孔＋張開大嘴＋鋸齒牙＋大眼 */
       var SIN4_BODY_OUTLINE = [
-        [4.8, -5.0], [9.6, -4.8], [13.2, -2.2], [14.4, 2.2], [13.8, 6.8],
-        [10.2, 9.6], [2.0, 9.8], [-6.8, 9.4], [-9.2, 7.4], [-7.2, 5.4],
-        [2.5, 5.4], [6.8, 3.8], [6.8, 1.4], [2.5, 0.2], [-9.8, 0.2],
-        [-13.8, -1.4], [-14.4, -4.4], [-11.4, -6.2], [-6.8, -5.6], [-4.6, -5.2]
-      ];
-
-      /* 5. 小葵捲髮側臉（HIMAWARI：額前三圈經典小捲毛 + 圓臉頰 + 右側圓耳朵） */
-      var HIMAWARI_OUTLINE = [
-        [-10.8, -3.5], [-13.4, -5.2], [-13.8, -8.8], [-11.2, -11.4], [-7.6, -10.6],
-        [-6.6, -7.6, 1], [-5.2, -9.8], [-1.8, -10.4], [0.8, -8.2],
-        [1.8, -7.4, 1], [3.6, -9.4], [7.2, -9.2], [10.6, -6.4], [12.4, -1.6],
-        [12.2, 1.4, 1], [14.6, 1.6], [15.4, 4.4], [13.8, 7.2], [11.0, 7.4, 1],
-        [7.4, 8.6], [0.0, 9.2], [-7.8, 8.8], [-13.2, 6.4], [-14.4, 2.6],
-        [-12.6, -0.8], [-10.8, -3.5]
+        [4.8, -5.2], [9.8, -4.8], [13.4, -2.0], [14.6, 2.4], [13.8, 7.0],
+        [10.2, 9.8], [2.0, 10.0], [-7.2, 9.6], [-9.6, 7.6], [-7.6, 5.4],
+        [2.6, 5.4], [7.0, 3.8], [7.0, 1.4], [2.6, 0.2], [-10.4, 0.2],
+        /* 鱷魚吻部前端與鼻孔小隆起 */
+        [-14.4, -1.4], [-15.0, -4.6], [-12.6, -6.6], [-10.6, -5.6],
+        [-8.4, -6.4], [-5.2, -5.4]
       ];
 
       function buildCirclePts(cx, cy, rx, ry, steps) {
@@ -2287,47 +2314,25 @@
         }
       }
 
-      function spawnSin4Helpers(cx, cy, figScale) {
+      /* 召喚少量精巧援軍來刻畫五官／髮捲／牙齒細節，彩蛋結束自動跑步離場 */
+      function spawnDetailHelpers(cx, cy, figScale, helperSlots) {
         eggHelpers = [];
         var helperPool = getSystemHelperSpritePool();
-        if (!helperPool || helperPool.length === 0) return;
-
-        var eyeL = samplePolyline(buildCirclePts(-2.3, -8.4, 2.7, 3.1, 36), 11, 0);
-        var eyeR = samplePolyline(buildCirclePts(3.5, -8.4, 2.7, 3.1, 36), 11, 0);
-        var toothX = [-7.2, -3.5, 0.2, 3.9];
-        var helperSlots = [];
-        var eyeScale = Math.max(0.14, Math.min(0.21, figScale * 0.0155));
-        var toothScale = Math.max(0.135, Math.min(0.20, figScale * 0.015));
-
-        for (var e1 = 0; e1 < eyeL.length - 1; e1++) {
-          helperSlots.push({ x: cx + eyeL[e1].x * figScale, y: cy + eyeL[e1].y * figScale, scale: eyeScale });
-        }
-        for (var e2 = 0; e2 < eyeR.length - 1; e2++) {
-          helperSlots.push({ x: cx + eyeR[e2].x * figScale, y: cy + eyeR[e2].y * figScale, scale: eyeScale });
-        }
-        for (var t = 0; t < toothX.length; t++) {
-          var tx = toothX[t];
-          var toothPts = [[tx, 0.9], [tx + 0.15, 2.7], [tx + 0.3, 4.6]];
-          for (var p = 0; p < toothPts.length; p++) {
-            helperSlots.push({
-              x: cx + toothPts[p][0] * figScale,
-              y: cy + toothPts[p][1] * figScale,
-              scale: toothScale
-            });
-          }
-        }
+        if (!helperPool || helperPool.length === 0 || !helperSlots || helperSlots.length === 0) return;
 
         for (var k = 0; k < helperSlots.length; k++) {
           var slot = helperSlots[k];
-          var fromLeft = slot.x < cx;
+          var sx = cx + slot.x * figScale;
+          var sy = cy + slot.y * figScale;
+          var fromLeft = sx < cx;
           eggHelpers.push({
             sprite: helperPool[k % helperPool.length],
-            x: fromLeft ? (-36 - (k % 6) * 18) : (W + 36 + (k % 6) * 18),
-            y: slot.y + (Math.random() - 0.5) * 30,
-            tx: slot.x,
-            ty: slot.y,
-            heartBaseX: slot.x,
-            heartBaseY: slot.y,
+            x: fromLeft ? (-36 - (k % 6) * 16) : (W + 36 + (k % 6) * 16),
+            y: sy + (Math.random() - 0.5) * 26,
+            tx: sx,
+            ty: sy,
+            heartBaseX: sx,
+            heartBaseY: sy,
             scale: slot.scale,
             flipX: fromLeft ? 1 : -1,
             phase: Math.random() * Math.PI * 2,
@@ -2362,17 +2367,70 @@
 
         var slots = [];
 
-        if (shape === 'sin1') {
-          /* 1. 蠟筆小新側臉輪廓（SIN1）：含完整外凸大耳朵＋耳窩細節，2 隻冒號小豬站臉頰中央 */
-          var duetGap = Math.max(19, Math.min(38, figScale * 2.5));
-          var duetScale = Math.max(0.36, Math.min(0.56, figScale * 0.042));
-          var rimScale = Math.max(0.18, Math.min(0.28, figScale * 0.0215));
-          var earInnerScale = Math.max(0.15, Math.min(0.23, figScale * 0.0175));
+        if (shape === 'himawari') {
+          /* ======================================================================
+             1. 小葵捲髮側臉（HIMAWARI）：
+             額前 3 圈立體螺旋捲毛（外圈深凹波浪 + 內側螺旋髮捲線條）＋圓臉＋右耳
+             ====================================================================== */
+          var himaDuetGap = Math.max(18, Math.min(36, figScale * 2.3));
+          var himaDuetScale = Math.max(0.32, Math.min(0.48, figScale * 0.036));
+          /* 縮小輪廓小豬尺寸，讓三圈捲毛的波谷線條清晰分明不糊在一起 */
+          var himaRimScale = Math.max(0.135, Math.min(0.20, figScale * 0.015));
+
+          for (var cb = 0; cb < colonPigs.length; cb++) {
+            var sideB = cb === 0 ? -1 : 1;
+            colonPigs[cb].tx = cx + sideB * himaDuetGap - figScale * 1.4;
+            colonPigs[cb].ty = cy + figScale * 2.2;
+            colonPigs[cb].heartBaseX = colonPigs[cb].tx;
+            colonPigs[cb].heartBaseY = colonPigs[cb].ty;
+            colonPigs[cb].scale = himaDuetScale;
+            colonPigs[cb].baseAlpha = 1;
+            colonPigs[cb].flipX = sideB === -1 ? 1 : -1;
+          }
+
+          /* 140 隻主體全部用來精細勾勒小葵的三圈捲毛＋臉型＋耳朵（smoothIter=1 保留捲毛凹谷） */
+          var himaPts = samplePolyline(HIMAWARI_OUTLINE, rimPigs.length + 1, 1);
+          for (var bi = 0; bi < rimPigs.length; bi++) {
+            slots.push({
+              x: cx + himaPts[bi].x * figScale,
+              y: cy + himaPts[bi].y * figScale,
+              scale: himaRimScale
+            });
+          }
+          assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
+
+          /* 援軍在額頭內側補上三圈螺旋捲毛的內捲渦紋 + 右耳耳窩，讓捲捲髮超立體 */
+          var curlHelperScale = Math.max(0.125, Math.min(0.185, figScale * 0.0138));
+          var curlDetails = [
+            /* 左第 1 捲內渦 */
+            { x: -11.4, y: -7.6, scale: curlHelperScale },
+            { x: -10.2, y: -6.4, scale: curlHelperScale },
+            { x: -9.2, y: -7.6, scale: curlHelperScale },
+            /* 中第 2 捲內渦 */
+            { x: -4.2, y: -8.6, scale: curlHelperScale },
+            { x: -2.8, y: -7.2, scale: curlHelperScale },
+            { x: -1.6, y: -8.4, scale: curlHelperScale },
+            /* 右第 3 捲內渦 */
+            { x: 4.4, y: -6.8, scale: curlHelperScale },
+            { x: 5.8, y: -5.6, scale: curlHelperScale },
+            /* 右耳耳窩 */
+            { x: 12.6, y: 2.6, scale: curlHelperScale },
+            { x: 12.4, y: 4.6, scale: curlHelperScale }
+          ];
+          spawnDetailHelpers(cx, cy, figScale, curlDetails);
+
+        } else if (shape === 'sin1') {
+          /* ======================================================================
+             2. 蠟筆小新側臉（SIN1）：馬鈴薯頭型＋鼓臉頰＋右大耳＋耳窩＋小眉眼
+             ====================================================================== */
+          var duetGap = Math.max(18, Math.min(36, figScale * 2.4));
+          var duetScale = Math.max(0.33, Math.min(0.50, figScale * 0.038));
+          var rimScale = Math.max(0.145, Math.min(0.215, figScale * 0.016));
 
           for (var c1 = 0; c1 < colonPigs.length; c1++) {
             var side1 = c1 === 0 ? -1 : 1;
             colonPigs[c1].tx = cx + side1 * duetGap - figScale * 1.8;
-            colonPigs[c1].ty = cy + figScale * 0.4;
+            colonPigs[c1].ty = cy + figScale * 0.8;
             colonPigs[c1].heartBaseX = colonPigs[c1].tx;
             colonPigs[c1].heartBaseY = colonPigs[c1].ty;
             colonPigs[c1].scale = duetScale;
@@ -2380,26 +2438,34 @@
             colonPigs[c1].flipX = side1 === -1 ? 1 : -1;
           }
 
-          var earInnerCount = 2;
-          var mainRimCount = rimPigs.length - earInnerCount;
-          var sin1Pts = samplePolyline(SIN1_OUTLINE, mainRimCount + 1, 2);
-          for (var s1 = 0; s1 < mainRimCount; s1++) {
+          var sin1Pts = samplePolyline(SIN1_OUTLINE, rimPigs.length + 1, 1);
+          for (var s1 = 0; s1 < rimPigs.length; s1++) {
             slots.push({
               x: cx + sin1Pts[s1].x * figScale,
               y: cy + sin1Pts[s1].y * figScale,
               scale: rimScale
             });
           }
-          slots.push({ x: cx + 12.2 * figScale, y: cy + 2.0 * figScale, scale: earInnerScale });
-          slots.push({ x: cx + 11.8 * figScale, y: cy + 4.3 * figScale, scale: earInnerScale });
-
           assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
 
+          /* 援軍補上右耳耳窩線條＋額頭小濃眉 */
+          var sin1DetailScale = Math.max(0.13, Math.min(0.19, figScale * 0.0145));
+          spawnDetailHelpers(cx, cy, figScale, [
+            { x: 12.4, y: 1.6, scale: sin1DetailScale },
+            { x: 12.0, y: 4.0, scale: sin1DetailScale },
+            { x: -7.5, y: -5.8, scale: sin1DetailScale },
+            { x: -5.2, y: -6.4, scale: sin1DetailScale },
+            { x: -1.5, y: -6.2, scale: sin1DetailScale },
+            { x: 1.0, y: -5.6, scale: sin1DetailScale }
+          ]);
+
         } else if (shape === 's3') {
-          /* 2. 肥嘟嘟左衛門豬頭（S3）：雙耳頭型 + 豬鼻外框，2 隻冒號小豬剛好站進兩個鼻孔 */
-          var nostrilScale = Math.max(0.24, Math.min(0.38, figScale * 0.028));
-          var headScale = Math.max(0.18, Math.min(0.28, figScale * 0.021));
-          var snoutScale = Math.max(0.165, Math.min(0.25, figScale * 0.019));
+          /* ======================================================================
+             3. 肥嘟嘟左衛門豬頭（S3）：雙耳頭型＋豬鼻外框＋鼻孔冒號豬＋瞇瞇眼＋小嘴
+             ====================================================================== */
+          var nostrilScale = Math.max(0.22, Math.min(0.34, figScale * 0.025));
+          var headScale = Math.max(0.145, Math.min(0.215, figScale * 0.016));
+          var snoutScale = Math.max(0.135, Math.min(0.20, figScale * 0.015));
 
           for (var c2 = 0; c2 < colonPigs.length; c2++) {
             var side2 = c2 === 0 ? -1 : 1;
@@ -2412,7 +2478,7 @@
             colonPigs[c2].flipX = side2 === -1 ? 1 : -1;
           }
 
-          var snoutCount = 34;
+          var snoutCount = 36;
           var headCount = rimPigs.length - snoutCount;
           var headPts = samplePolyline(S3_HEAD_OUTLINE, headCount + 1, 1);
           var snoutPts = samplePolyline(S3_SNOUT_OUTLINE, snoutCount + 1, 2);
@@ -2433,11 +2499,25 @@
           }
           assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
 
+          /* 援軍補上肥嘟嘟左衛門經典的「半月不屑眼」與「八字小嘴」 */
+          var s3DetailScale = Math.max(0.135, Math.min(0.195, figScale * 0.0148));
+          spawnDetailHelpers(cx, cy, figScale, [
+            { x: -6.6, y: -2.4, scale: s3DetailScale },
+            { x: -4.4, y: -2.4, scale: s3DetailScale },
+            { x: 4.4, y: -2.4, scale: s3DetailScale },
+            { x: 6.6, y: -2.4, scale: s3DetailScale },
+            { x: -2.0, y: 11.8, scale: s3DetailScale },
+            { x: 0.0, y: 11.2, scale: s3DetailScale },
+            { x: 2.0, y: 11.8, scale: s3DetailScale }
+          ]);
+
         } else if (shape === 'sin2') {
-          /* 3. 蠟筆小新濃眉嘟嘴臉（SIN2）：已補上右側外凸大耳朵＋耳窩細節，並縮小單隻比例讓五官分明 */
-          var cheekScale = Math.max(0.25, Math.min(0.38, figScale * 0.028));
-          var outlineScale = Math.max(0.145, Math.min(0.215, figScale * 0.016));
-          var featureScale = Math.max(0.175, Math.min(0.255, figScale * 0.019));
+          /* ======================================================================
+             4. 蠟筆小新濃眉嘟嘴（SIN2）：毛毛蟲雙層粗眉＋圓嘟嘴＋右耳＋耳窩
+             ====================================================================== */
+          var cheekScale = Math.max(0.22, Math.min(0.34, figScale * 0.025));
+          var outlineScale = Math.max(0.135, Math.min(0.195, figScale * 0.0148));
+          var featureScale = Math.max(0.155, Math.min(0.225, figScale * 0.017));
 
           for (var c3 = 0; c3 < colonPigs.length; c3++) {
             var side3 = c3 === 0 ? -1 : 1;
@@ -2450,16 +2530,15 @@
             colonPigs[c3].flipX = side3 === -1 ? 1 : -1;
           }
 
-          var browLCount = 15;
-          var browRCount = 15;
+          var browLCount = 16;
+          var browRCount = 16;
           var mouthCount = 14;
-          var earSin2Count = 2;
-          var headSin2Count = rimPigs.length - browLCount - browRCount - mouthCount - earSin2Count;
+          var headSin2Count = rimPigs.length - browLCount - browRCount - mouthCount;
 
-          var hSin2Pts = samplePolyline(SIN2_HEAD_OUTLINE, headSin2Count + 1, 2);
-          var bLPts = samplePolyline(SIN2_BROW_LEFT, browLCount, 2);
-          var bRPts = samplePolyline(SIN2_BROW_RIGHT, browRCount, 2);
-          var mouthPts = samplePolyline(buildCirclePts(-6.0, 7.6, 2.5, 2.5, 48), mouthCount + 1, 0);
+          var hSin2Pts = samplePolyline(SIN2_HEAD_OUTLINE, headSin2Count + 1, 1);
+          var bLPts = samplePolyline(SIN2_BROW_LEFT, browLCount, 1);
+          var bRPts = samplePolyline(SIN2_BROW_RIGHT, browRCount, 1);
+          var mouthPts = samplePolyline(buildCirclePts(-5.8, 7.2, 2.3, 2.3, 48), mouthCount + 1, 0);
 
           for (var hs = 0; hs < headSin2Count; hs++) {
             slots.push({
@@ -2489,15 +2568,20 @@
               scale: featureScale
             });
           }
-          slots.push({ x: cx + 12.0 * figScale, y: cy + 1.6 * figScale, scale: outlineScale });
-          slots.push({ x: cx + 11.6 * figScale, y: cy + 4.0 * figScale, scale: outlineScale });
-
           assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
 
+          /* 援軍補上右耳耳窩線條 */
+          spawnDetailHelpers(cx, cy, figScale, [
+            { x: 12.2, y: 1.5, scale: outlineScale },
+            { x: 11.8, y: 3.9, scale: outlineScale }
+          ]);
+
         } else if (shape === 'sin4') {
-          /* 4. 巧克比鱷魚山先生（Sin4）：140 隻排鱷魚頭＋上下顎，2 隻冒號站眼珠，援軍排眼眶＋牙齒 */
-          var pupilScale = Math.max(0.22, Math.min(0.34, figScale * 0.025));
-          var crocScale = Math.max(0.155, Math.min(0.23, figScale * 0.0175));
+          /* ======================================================================
+             5. 巧克比鱷魚山先生（Sin4）：鱷魚輪廓＋骨碌碌冒號眼珠＋大眼眶＋交錯鋸齒尖牙
+             ====================================================================== */
+          var pupilScale = Math.max(0.21, Math.min(0.32, figScale * 0.024));
+          var crocScale = Math.max(0.145, Math.min(0.215, figScale * 0.016));
 
           for (var c4 = 0; c4 < colonPigs.length; c4++) {
             var eyeX = c4 === 0 ? -2.3 : 3.5;
@@ -2519,43 +2603,33 @@
             });
           }
           assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
-          spawnSin4Helpers(cx, cy, figScale);
 
-        } else if (shape === 'himawari') {
-          /* 5. 小葵捲髮側臉（HIMAWARI）：三圈螺旋捲劉海＋圓臉＋右耳，2 隻冒號小豬在臉頰中央共舞 */
-          var himaDuetGap = Math.max(19, Math.min(38, figScale * 2.5));
-          var himaDuetScale = Math.max(0.36, Math.min(0.56, figScale * 0.042));
-          var himaRimScale = Math.max(0.165, Math.min(0.25, figScale * 0.019));
+          /* 援軍負責刻畫左右大眼眶 + 上下交錯鋸齒牙齒 */
+          var eyeL = samplePolyline(buildCirclePts(-2.3, -8.4, 2.7, 3.1, 36), 11, 0);
+          var eyeR = samplePolyline(buildCirclePts(3.5, -8.4, 2.7, 3.1, 36), 11, 0);
+          var eyeScale = Math.max(0.135, Math.min(0.195, figScale * 0.0148));
+          var toothScale = Math.max(0.13, Math.min(0.19, figScale * 0.0142));
+          var crocDetails = [];
 
-          for (var cb = 0; cb < colonPigs.length; cb++) {
-            var sideB = cb === 0 ? -1 : 1;
-            colonPigs[cb].tx = cx + sideB * himaDuetGap - figScale * 1.4;
-            colonPigs[cb].ty = cy + figScale * 1.4;
-            colonPigs[cb].heartBaseX = colonPigs[cb].tx;
-            colonPigs[cb].heartBaseY = colonPigs[cb].ty;
-            colonPigs[cb].scale = himaDuetScale;
-            colonPigs[cb].baseAlpha = 1;
-            colonPigs[cb].flipX = sideB === -1 ? 1 : -1;
+          for (var e1 = 0; e1 < eyeL.length - 1; e1++) {
+            crocDetails.push({ x: eyeL[e1].x, y: eyeL[e1].y, scale: eyeScale });
           }
-
-          var himaEarCount = 2;
-          var himaRimCount = rimPigs.length - himaEarCount;
-          var himaPts = samplePolyline(HIMAWARI_OUTLINE, himaRimCount + 1, 2);
-          for (var bi = 0; bi < himaRimCount; bi++) {
-            slots.push({
-              x: cx + himaPts[bi].x * figScale,
-              y: cy + himaPts[bi].y * figScale,
-              scale: himaRimScale
-            });
+          for (var e2 = 0; e2 < eyeR.length - 1; e2++) {
+            crocDetails.push({ x: eyeR[e2].x, y: eyeR[e2].y, scale: eyeScale });
           }
-          /* 右下圓耳朵內的小弧點綴 */
-          slots.push({ x: cx + 12.5 * figScale, y: cy + 4.3 * figScale, scale: himaRimScale * 0.9 });
-          slots.push({ x: cx + 13.4 * figScale, y: cy + 4.9 * figScale, scale: himaRimScale * 0.9 });
-
-          assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
+          var toothX = [-7.8, -4.0, -0.2, 3.6];
+          for (var t = 0; t < toothX.length; t++) {
+            var tx = toothX[t];
+            crocDetails.push({ x: tx, y: 1.0, scale: toothScale });
+            crocDetails.push({ x: tx + 0.2, y: 2.8, scale: toothScale });
+            crocDetails.push({ x: tx + 0.4, y: 4.5, scale: toothScale });
+          }
+          spawnDetailHelpers(cx, cy, figScale, crocDetails);
 
         } else {
-          /* 6. 經典大愛心（heart） */
+          /* ======================================================================
+             6. 經典大愛心（heart）
+             ====================================================================== */
           var heartDuetGap = Math.max(24, Math.min(48, figScale * 3.4));
           var heartDuetScale = Math.max(0.42, Math.min(0.68, figScale * 0.048));
           var heartRimScale = Math.max(0.20, Math.min(0.32, figScale * 0.024));
@@ -3048,7 +3122,6 @@
             if (p.role === 'colon') {
               var sideDir = p.colonIndex === 0 ? -1 : 1;
               if (state.activeEggShape === 'sin4') {
-                /* 鱷魚眼珠左右骨碌碌轉動 */
                 p.tx = p.heartBaseX + Math.sin(sec * 4.5) * 3.5;
                 p.ty = p.heartBaseY + Math.cos(sec * 4.5) * 1.8;
                 p.flipX = -1;
@@ -3205,7 +3278,7 @@
           ctx.restore();
         }
 
-        /* 巧克比鱷魚山（Sin4）借調的臨時援軍（眼眶＋垂直牙齒）進場與退場動畫 */
+        /* 彩蛋臨時細節援軍（小葵螺旋髮捲渦紋、鱷魚眼眶牙齒、左衛門瞇眼等）進場與退場動畫 */
         for (var eh = eggHelpers.length - 1; eh >= 0; eh--) {
           var helper = eggHelpers[eh];
           if (!helper.leaving && state.heartShowTimer > 0) {
