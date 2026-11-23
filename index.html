@@ -1225,11 +1225,12 @@
           <span>6. 冒號點擊彩蛋圖案</span>
         </div>
         <div class="chip-wrap" id="colonEggChoiceGroup" style="margin-top:0;">
-          <button type="button" class="chip colon-egg-opt active" data-mode="random4">4 款隨機輪流</button>
+          <button type="button" class="chip colon-egg-opt active" data-mode="random5">5 款隨機輪流</button>
           <button type="button" class="chip colon-egg-opt" data-mode="sin1">小新側臉</button>
           <button type="button" class="chip colon-egg-opt" data-mode="s3">肥嘟嘟左衛門</button>
           <button type="button" class="chip colon-egg-opt" data-mode="sin2">小新濃眉嘟嘴</button>
           <button type="button" class="chip colon-egg-opt" data-mode="sin4">巧克比鱷魚山</button>
+          <button type="button" class="chip colon-egg-opt" data-mode="bo">阿呆捲髮側臉</button>
           <button type="button" class="chip colon-egg-opt" data-mode="heart">經典大愛心</button>
         </div>
       </div>
@@ -1563,12 +1564,12 @@
         }
       }
 
-      var STORAGE_KEY = 'buriburi_pig_clock_settings_v10';
+      var STORAGE_KEY = 'buriburi_pig_clock_settings_v11';
       var TOTAL_PIGS = 142;
       var DEFAULT_POSE_COUNT = 12;
 
-      var VALID_EGG_MODES = ['random4', 'sin1', 's3', 'sin2', 'sin4', 'heart'];
-      var RANDOM4_POOL = ['sin1', 's3', 'sin2', 'sin4'];
+      var VALID_EGG_MODES = ['random5', 'sin1', 's3', 'sin2', 'sin4', 'bo', 'heart'];
+      var RANDOM5_POOL = ['sin1', 's3', 'sin2', 'sin4', 'bo'];
 
       var W = 360;
       var H = 640;
@@ -1586,7 +1587,7 @@
           extraLarge: true,
           visible: true,
           showDateBadge: true,
-          colonEggMode: 'random4',
+          colonEggMode: 'random5',
           text: '不理不理左衛門時鐘',
           fontSize: 26,
           iconType: 'preset',
@@ -1629,7 +1630,7 @@
           ? (originalCutoutDataURLs[showIdx] || encodeURI(PIG_FILE_PATHS[showIdx]))
           : (src.showBtnImageData || '');
 
-        var eggMode = VALID_EGG_MODES.indexOf(src.colonEggMode) !== -1 ? src.colonEggMode : 'random4';
+        var eggMode = VALID_EGG_MODES.indexOf(src.colonEggMode) !== -1 ? src.colonEggMode : 'random5';
 
         return {
           forceLandscape: typeof src.forceLandscape === 'boolean' ? src.forceLandscape : false,
@@ -2143,15 +2144,17 @@
         };
       }
 
-      /* 4 款上傳手繪圖案（SIN1 / S3 / SIN2 / Sin4）的標準化輪廓座標（中心 (0,0)，半徑約 15） */
+      /* 5 款手繪圖案（SIN1 / S3 / SIN2 / Sin4 / BO 阿呆）標準化輪廓座標（中心 (0,0)，半徑約 15） */
+      /* 1. 小新側臉（已強化右側外凸大耳朵輪廓） */
       var SIN1_OUTLINE = [
-        [0.0, -11.5], [4.6, -11.4], [8.8, -9.2], [10.8, -5.2], [10.8, -0.4],
-        [11.3, 0.2], [13.5, 0.3], [15.1, 2.3], [14.7, 5.4], [12.5, 7.1],
-        [10.2, 6.7], [8.6, 7.4], [2.4, 8.7], [-5.2, 9.2], [-11.5, 8.4],
-        [-14.7, 5.6], [-14.8, 1.5], [-12.5, -1.6], [-10.6, -2.5], [-9.2, -6.9],
-        [-5.2, -10.3], [0.0, -11.5]
+        [-1.2, -11.5], [3.6, -11.4], [7.8, -9.2], [9.8, -5.2], [10.0, -0.8, 1],
+        [12.6, -1.6], [15.0, 0.2], [15.4, 3.6], [13.8, 6.6], [11.2, 7.6],
+        [9.4, 6.8, 1], [7.4, 7.8], [1.4, 8.9], [-6.2, 9.2], [-12.2, 8.4],
+        [-15.2, 5.4], [-15.2, 1.2], [-12.8, -1.8], [-11.0, -2.8], [-9.6, -7.2],
+        [-5.8, -10.5], [-1.2, -11.5]
       ];
 
+      /* 2. 肥嘟嘟左衛門豬頭（S3） */
       var S3_HEAD_OUTLINE = [
         [-4.2, -8.2], [0.0, -7.2], [4.2, -8.2],
         [7.6, -11.5, 1], [10.5, -10.2], [11.2, -5.8], [10.5, -2.8, 1],
@@ -2167,26 +2170,39 @@
         [-6.8, 9.6], [-9.2, 6.2], [-8.4, 2.4], [-4.4, 1.0], [0.0, 2.2]
       ];
 
+      /* 3. 小新濃眉嘟嘴臉（已強化右側外凸大耳朵輪廓） */
       var SIN2_HEAD_OUTLINE = [
-        [-2.0, -12.6], [3.5, -12.2], [8.2, -9.4], [10.2, -4.5], [10.4, -1.2],
-        [12.4, -1.4], [14.8, 0.8], [15.0, 4.4], [12.5, 6.6], [9.8, 6.2],
-        [6.2, 8.4], [-1.0, 9.5], [-8.2, 9.2], [-13.4, 7.0], [-14.8, 2.6],
-        [-13.2, -1.4], [-10.6, -2.5], [-10.2, -7.2], [-6.8, -11.2], [-2.0, -12.6]
+        [-3.0, -12.6], [2.6, -12.2], [7.2, -9.4], [9.2, -4.6], [9.4, -1.6, 1],
+        [12.2, -2.4], [15.0, -0.2], [15.4, 3.6], [13.6, 6.6], [10.8, 7.4],
+        [9.0, 6.4, 1], [5.4, 8.6], [-1.8, 9.6], [-9.0, 9.2], [-14.0, 6.8],
+        [-15.2, 2.4], [-13.6, -1.6], [-11.2, -2.6], [-10.6, -7.2], [-7.4, -11.2],
+        [-3.0, -12.6]
       ];
 
       var SIN2_BROW_LEFT = [
-        [-10.2, -5.8], [-8.2, -8.6], [-5.4, -8.6], [-3.2, -6.2]
+        [-10.8, -5.8], [-8.8, -8.6], [-6.0, -8.6], [-3.8, -6.2]
       ];
 
       var SIN2_BROW_RIGHT = [
-        [-0.4, -6.2], [2.2, -9.0], [5.4, -9.0], [7.6, -6.2]
+        [-1.0, -6.2], [1.6, -9.0], [4.8, -9.0], [7.0, -6.2]
       ];
 
+      /* 4. 巧克比鱷魚山先生（Sin4） */
       var SIN4_BODY_OUTLINE = [
         [4.8, -5.0], [9.6, -4.8], [13.2, -2.2], [14.4, 2.2], [13.8, 6.8],
         [10.2, 9.6], [2.0, 9.8], [-6.8, 9.4], [-9.2, 7.4], [-7.2, 5.4],
         [2.5, 5.4], [6.8, 3.8], [6.8, 1.4], [2.5, 0.2], [-9.8, 0.2],
         [-13.8, -1.4], [-14.4, -4.4], [-11.4, -6.2], [-6.8, -5.6], [-4.6, -5.2]
+      ];
+
+      /* 5. 阿呆捲髮側臉（BO：上方三圈螺旋捲劉海 + 圓臉頰 + 右側圓耳朵） */
+      var BO_OUTLINE = [
+        [-10.8, -3.5], [-13.4, -5.2], [-13.8, -8.8], [-11.2, -11.4], [-7.6, -10.6],
+        [-6.6, -7.6, 1], [-5.2, -9.8], [-1.8, -10.4], [0.8, -8.2],
+        [1.8, -7.4, 1], [3.6, -9.4], [7.2, -9.2], [10.6, -6.4], [12.4, -1.6],
+        [12.2, 1.4, 1], [14.6, 1.6], [15.4, 4.4], [13.8, 7.2], [11.0, 7.4, 1],
+        [7.4, 8.6], [0.0, 9.2], [-7.8, 8.8], [-13.2, 6.4], [-14.4, 2.6],
+        [-12.6, -0.8], [-10.8, -3.5]
       ];
 
       function buildCirclePts(cx, cy, rx, ry, steps) {
@@ -2199,14 +2215,14 @@
       }
 
       function pickNextColonEggShape() {
-        var mode = (currentSettings && currentSettings.colonEggMode) ? currentSettings.colonEggMode : 'random4';
-        if (mode !== 'random4') {
+        var mode = (currentSettings && currentSettings.colonEggMode) ? currentSettings.colonEggMode : 'random5';
+        if (mode !== 'random5') {
           state.activeEggShape = mode;
           state.lastDrawnEggShape = mode;
           return mode;
         }
         if (!state.eggDeck || state.eggDeck.length === 0) {
-          var deck = RANDOM4_POOL.slice();
+          var deck = RANDOM5_POOL.slice();
           for (var i = deck.length - 1; i > 0; i--) {
             var j = Math.floor(Math.random() * (i + 1));
             var tmp = deck[i];
@@ -2346,15 +2362,16 @@
         var slots = [];
 
         if (shape === 'sin1') {
-          /* 1. 蠟筆小新側臉輪廓（SIN1）：140 隻排單一封閉外框，2 隻冒號小豬站臉頰中央 */
-          var duetGap = Math.max(20, Math.min(42, figScale * 2.8));
-          var duetScale = Math.max(0.38, Math.min(0.60, figScale * 0.044));
-          var rimScale = Math.max(0.19, Math.min(0.30, figScale * 0.023));
+          /* 1. 蠟筆小新側臉輪廓（SIN1）：含完整外凸大耳朵＋耳窩細節，2 隻冒號小豬站臉頰中央 */
+          var duetGap = Math.max(19, Math.min(38, figScale * 2.5));
+          var duetScale = Math.max(0.36, Math.min(0.56, figScale * 0.042));
+          var rimScale = Math.max(0.18, Math.min(0.28, figScale * 0.0215));
+          var earInnerScale = Math.max(0.15, Math.min(0.23, figScale * 0.0175));
 
           for (var c1 = 0; c1 < colonPigs.length; c1++) {
             var side1 = c1 === 0 ? -1 : 1;
-            colonPigs[c1].tx = cx + side1 * duetGap - figScale * 1.2;
-            colonPigs[c1].ty = cy + figScale * 0.5;
+            colonPigs[c1].tx = cx + side1 * duetGap - figScale * 1.8;
+            colonPigs[c1].ty = cy + figScale * 0.4;
             colonPigs[c1].heartBaseX = colonPigs[c1].tx;
             colonPigs[c1].heartBaseY = colonPigs[c1].ty;
             colonPigs[c1].scale = duetScale;
@@ -2362,14 +2379,20 @@
             colonPigs[c1].flipX = side1 === -1 ? 1 : -1;
           }
 
-          var sin1Pts = samplePolyline(SIN1_OUTLINE, rimPigs.length + 1, 2);
-          for (var s1 = 0; s1 < rimPigs.length; s1++) {
+          var earInnerCount = 2;
+          var mainRimCount = rimPigs.length - earInnerCount;
+          var sin1Pts = samplePolyline(SIN1_OUTLINE, mainRimCount + 1, 2);
+          for (var s1 = 0; s1 < mainRimCount; s1++) {
             slots.push({
               x: cx + sin1Pts[s1].x * figScale,
               y: cy + sin1Pts[s1].y * figScale,
               scale: rimScale
             });
           }
+          /* 右側耳窩內側 2 隻點綴，讓耳朵更立體 */
+          slots.push({ x: cx + 12.2 * figScale, y: cy + 2.0 * figScale, scale: earInnerScale });
+          slots.push({ x: cx + 11.8 * figScale, y: cy + 4.3 * figScale, scale: earInnerScale });
+
           assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
 
         } else if (shape === 's3') {
@@ -2411,14 +2434,14 @@
           assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
 
         } else if (shape === 'sin2') {
-          /* 3. 蠟筆小新濃眉嘟嘴臉（SIN2）：縮小單隻比例讓外框、兩道粗眉與圓形嘟嘴清楚分明 */
-          var cheekScale = Math.max(0.26, Math.min(0.40, figScale * 0.030));
-          var outlineScale = Math.max(0.145, Math.min(0.22, figScale * 0.0165));
-          var featureScale = Math.max(0.175, Math.min(0.26, figScale * 0.0195));
+          /* 3. 蠟筆小新濃眉嘟嘴臉（SIN2）：已補上右側外凸大耳朵＋耳窩細節，並縮小單隻比例讓五官分明 */
+          var cheekScale = Math.max(0.25, Math.min(0.38, figScale * 0.028));
+          var outlineScale = Math.max(0.145, Math.min(0.215, figScale * 0.016));
+          var featureScale = Math.max(0.175, Math.min(0.255, figScale * 0.019));
 
           for (var c3 = 0; c3 < colonPigs.length; c3++) {
             var side3 = c3 === 0 ? -1 : 1;
-            colonPigs[c3].tx = cx + (side3 === -1 ? -6.2 : 2.6) * figScale;
+            colonPigs[c3].tx = cx + (side3 === -1 ? -6.8 : 2.0) * figScale;
             colonPigs[c3].ty = cy + figScale * 0.2;
             colonPigs[c3].heartBaseX = colonPigs[c3].tx;
             colonPigs[c3].heartBaseY = colonPigs[c3].ty;
@@ -2430,12 +2453,13 @@
           var browLCount = 15;
           var browRCount = 15;
           var mouthCount = 14;
-          var headSin2Count = rimPigs.length - browLCount - browRCount - mouthCount;
+          var earSin2Count = 2;
+          var headSin2Count = rimPigs.length - browLCount - browRCount - mouthCount - earSin2Count;
 
           var hSin2Pts = samplePolyline(SIN2_HEAD_OUTLINE, headSin2Count + 1, 2);
           var bLPts = samplePolyline(SIN2_BROW_LEFT, browLCount, 2);
           var bRPts = samplePolyline(SIN2_BROW_RIGHT, browRCount, 2);
-          var mouthPts = samplePolyline(buildCirclePts(-5.4, 7.6, 2.5, 2.5, 48), mouthCount + 1, 0);
+          var mouthPts = samplePolyline(buildCirclePts(-6.0, 7.6, 2.5, 2.5, 48), mouthCount + 1, 0);
 
           for (var hs = 0; hs < headSin2Count; hs++) {
             slots.push({
@@ -2465,6 +2489,10 @@
               scale: featureScale
             });
           }
+          /* 右側耳窩內側 2 隻點綴 */
+          slots.push({ x: cx + 12.0 * figScale, y: cy + 1.6 * figScale, scale: outlineScale });
+          slots.push({ x: cx + 11.6 * figScale, y: cy + 4.0 * figScale, scale: outlineScale });
+
           assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
 
         } else if (shape === 'sin4') {
@@ -2494,8 +2522,41 @@
           assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
           spawnSin4Helpers(cx, cy, figScale);
 
+        } else if (shape === 'bo') {
+          /* 5. 阿呆捲髮側臉（BO）：三圈螺旋捲劉海＋圓臉＋右耳，2 隻冒號小豬在臉頰中央共舞 */
+          var boDuetGap = Math.max(19, Math.min(38, figScale * 2.5));
+          var boDuetScale = Math.max(0.36, Math.min(0.56, figScale * 0.042));
+          var boRimScale = Math.max(0.165, Math.min(0.25, figScale * 0.019));
+
+          for (var cb = 0; cb < colonPigs.length; cb++) {
+            var sideB = cb === 0 ? -1 : 1;
+            colonPigs[cb].tx = cx + sideB * boDuetGap - figScale * 1.4;
+            colonPigs[cb].ty = cy + figScale * 1.4;
+            colonPigs[cb].heartBaseX = colonPigs[cb].tx;
+            colonPigs[cb].heartBaseY = colonPigs[cb].ty;
+            colonPigs[cb].scale = boDuetScale;
+            colonPigs[cb].baseAlpha = 1;
+            colonPigs[cb].flipX = sideB === -1 ? 1 : -1;
+          }
+
+          var boEarCount = 2;
+          var boRimCount = rimPigs.length - boEarCount;
+          var boPts = samplePolyline(BO_OUTLINE, boRimCount + 1, 2);
+          for (var bi = 0; bi < boRimCount; bi++) {
+            slots.push({
+              x: cx + boPts[bi].x * figScale,
+              y: cy + boPts[bi].y * figScale,
+              scale: boRimScale
+            });
+          }
+          /* 右下圓耳朵內的小弧點綴 */
+          slots.push({ x: cx + 12.5 * figScale, y: cy + 4.3 * figScale, scale: boRimScale * 0.9 });
+          slots.push({ x: cx + 13.4 * figScale, y: cy + 4.9 * figScale, scale: boRimScale * 0.9 });
+
+          assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
+
         } else {
-          /* 5. 經典大愛心（heart） */
+          /* 6. 經典大愛心（heart） */
           var heartDuetGap = Math.max(24, Math.min(48, figScale * 3.4));
           var heartDuetScale = Math.max(0.42, Math.min(0.68, figScale * 0.048));
           var heartRimScale = Math.max(0.20, Math.min(0.32, figScale * 0.024));
@@ -3935,7 +3996,7 @@
         for (var ce = 0; ce < colonEggOpts.length; ce++) {
           colonEggOpts[ce].addEventListener('click', function () {
             if (!draftSettings) return;
-            var mode = this.getAttribute('data-mode') || 'random4';
+            var mode = this.getAttribute('data-mode') || 'random5';
             draftSettings.colonEggMode = mode;
             updateModalPreview();
           });
