@@ -9,6 +9,7 @@
   <title>不理不理左衛門時鐘</title>
   <meta name="mobile-web-app-capable" content="yes" />
   <link rel="manifest" href="manifest.json" />
+  <link rel="preload" href="clock-pigs/jf-openhuninn-2.0.woff2" as="font" type="font/woff2" crossorigin />
   <style>
     <style>
   @font-face {
@@ -1674,7 +1675,7 @@
       }
 
       function loadClockAndEasterAssets() {
-        setTimeout(revealClockStage, 260);
+        setTimeout(revealClockStage, 1600);
 
         loadFolderSprites(CLOCK_PIGS_DIR, CLOCK_PIG_FILES, 96, function (loaded) {
           if (loaded.length > 0) {
