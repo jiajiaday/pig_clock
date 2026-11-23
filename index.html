@@ -18,14 +18,14 @@
       --modal-bg: #FDF6EC;
       --card-bg: #FFFFFF;
       --accent: #F4B89C;
-      --font-round: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "Hiragino Maru Gothic ProN", sans-serif;
+      --font-round: "jf open 粉圓 2.0", "jf-openhuninn-2.0", "jf open 粉圓 1.1", "jf-openhuninn-1.1", "GenSenRounded TW", "GenSenRounded", "SetoFont", "JasonHandwriting1", "Yuanti TC", "Hannotate TC", "Hiragino Maru Gothic ProN", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", ui-rounded, sans-serif;
     }
 
     body.night {
       --bg: #050505;
       --ink: #F5EDE4;
-      --pill-bg: rgba(28, 28, 32, 0.92);
-      --pill-border: rgba(245, 237, 228, 0.72);
+      --pill-bg: rgba(28, 28, 32, 0.94);
+      --pill-border: rgba(245, 237, 228, 0.82);
       --modal-bg: #18181B;
       --card-bg: #242429;
       --accent: #D98A6C;
@@ -47,8 +47,26 @@
       background-color: var(--bg);
       color: var(--ink);
       font-family: var(--font-round);
+      letter-spacing: 0.045em;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
       transition: background-color 0.25s ease, color 0.25s ease;
       touch-action: none;
+    }
+
+    /* 讓中文黑體／圓體筆畫末端呈現柔和圓潤的手繪筆觸感 */
+    #titleTrigger,
+    .pill-btn,
+    #btnShowBar,
+    .modal-head h2,
+    .section-title,
+    .seg-btn,
+    .chip,
+    .size-btn,
+    #modalPreview {
+      font-family: var(--font-round);
+      -webkit-text-stroke: 0.32px currentColor;
+      paint-order: stroke fill;
     }
 
     #stageRoot {
@@ -100,7 +118,9 @@
       pointer-events: none;
     }
 
+    /* 手繪不規則外框：頂部標題框 */
     #titleTrigger {
+      position: relative;
       pointer-events: auto;
       display: inline-flex;
       flex-wrap: wrap;
@@ -108,23 +128,42 @@
       justify-content: center;
       gap: 6px;
       max-width: 95vw;
-      padding: 6px 14px;
-      border: 1.8px solid var(--pill-border);
-      border-radius: 16px;
+      padding: 7px 17px;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 2.5px 2px 2.8px 2.2px;
+      border-radius: 26px 11px 24px 13px / 13px 25px 11px 23px;
       background: var(--pill-bg);
       color: var(--ink);
-      font-family: var(--font-round);
       font-size: 26px;
-      font-weight: 900;
-      line-height: 1.2;
-      letter-spacing: 0.03em;
+      font-weight: 800;
+      line-height: 1.24;
+      letter-spacing: 0.05em;
       cursor: pointer;
-      box-shadow: 0 2px 0 var(--pill-border);
-      transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+      transform: rotate(-0.9deg);
+      box-shadow: 3px 4px 0 var(--pill-border);
+      transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    #titleTrigger::before {
+      content: "";
+      position: absolute;
+      inset: -3px -2px -2px -3px;
+      border: 1.4px solid var(--pill-border);
+      border-radius: 13px 25px 12px 24px / 24px 12px 25px 13px;
+      opacity: 0.45;
+      transform: rotate(1.1deg);
+      pointer-events: none;
+    }
+
+    #titleTrigger:hover {
+      transform: rotate(-0.3deg) translateY(-1px);
+      box-shadow: 3.5px 5px 0 var(--pill-border);
     }
 
     #titleTrigger:active {
-      transform: scale(0.96);
+      transform: rotate(0deg) translate(2px, 2.5px) scale(0.97);
+      box-shadow: 1px 1.5px 0 var(--pill-border);
     }
 
     #titleIcon {
@@ -159,8 +198,9 @@
 
     .edit-badge {
       font-size: 0.6em;
-      opacity: 0.6;
+      opacity: 0.65;
       margin-left: 2px;
+      -webkit-text-stroke: 0;
     }
 
     #bottomBar {
@@ -182,32 +222,84 @@
       flex-wrap: wrap;
       justify-content: center;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       max-width: 98vw;
     }
 
+    /* 手繪不規則雙層描邊按鈕 */
     .pill-btn {
+      position: relative;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 4px;
-      padding: 6px 10px;
-      border: 1.8px solid var(--pill-border);
-      border-radius: 12px;
+      padding: 6px 12px;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 2.3px 1.8px 2.5px 2px;
+      border-radius: 21px 9px 19px 11px / 10px 20px 9px 19px;
       background-color: var(--pill-bg);
       color: var(--ink);
-      font-family: var(--font-round);
       font-size: 14.5px;
-      line-height: 1.2;
-      font-weight: 900;
+      line-height: 1.24;
+      letter-spacing: 0.04em;
+      font-weight: 800;
       cursor: pointer;
-      box-shadow: 0 2px 0 var(--pill-border);
+      box-shadow: 2.5px 3.2px 0 var(--pill-border);
       white-space: nowrap;
-      transition: transform 0.1s ease, background-color 0.2s ease;
+      transition: transform 0.12s ease, background-color 0.2s ease, box-shadow 0.12s ease;
+    }
+
+    .pill-btn::before {
+      content: "";
+      position: absolute;
+      inset: -2.5px -2px -2px -2.5px;
+      border: 1.25px solid var(--pill-border);
+      border-radius: 10px 21px 11px 19px / 19px 10px 20px 11px;
+      opacity: 0.42;
+      transform: rotate(0.95deg);
+      pointer-events: none;
+    }
+
+    /* 每顆按鈕各自有不同的手繪歪斜與輪廓節奏 */
+    .toolbar-row .pill-btn:nth-child(1) {
+      border-radius: 22px 9px 20px 11px / 10px 21px 9px 19px;
+      transform: rotate(-0.9deg);
+    }
+
+    .toolbar-row .pill-btn:nth-child(2) {
+      border-radius: 10px 22px 11px 20px / 20px 10px 22px 11px;
+      transform: rotate(0.85deg);
+    }
+
+    .toolbar-row .pill-btn:nth-child(3) {
+      border-radius: 19px 12px 23px 9px / 11px 19px 10px 22px;
+      transform: rotate(-0.65deg);
+    }
+
+    .toolbar-row .pill-btn:nth-child(4) {
+      border-radius: 11px 20px 9px 22px / 21px 11px 19px 10px;
+      transform: rotate(0.95deg);
+    }
+
+    .toolbar-row .pill-btn:nth-child(5) {
+      border-radius: 23px 10px 18px 12px / 9px 22px 11px 18px;
+      transform: rotate(-0.8deg);
+    }
+
+    .toolbar-row .pill-btn:nth-child(6) {
+      border-radius: 9px 21px 12px 20px / 19px 9px 21px 12px;
+      transform: rotate(0.75deg);
+    }
+
+    .pill-btn:hover {
+      transform: rotate(0deg) translateY(-1px);
+      box-shadow: 3px 4.2px 0 var(--pill-border);
     }
 
     .pill-btn:active {
-      transform: translateY(1px) scale(0.96);
+      transform: rotate(0deg) translate(1.8px, 2.2px) scale(0.96);
+      box-shadow: 0.8px 1px 0 var(--pill-border);
     }
 
     .pill-btn.primary {
@@ -219,6 +311,7 @@
       display: none !important;
     }
 
+    /* 手繪不規則外框：「顯示選項」懸浮鈕 */
     #btnShowBar {
       position: fixed;
       right: 12px;
@@ -227,24 +320,39 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      padding: 6px 10px;
-      border: 1.8px solid var(--pill-border);
-      border-radius: 12px;
+      padding: 6px 12px;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 2.3px 1.8px 2.5px 2px;
+      border-radius: 21px 9px 19px 11px / 10px 20px 9px 19px;
       background-color: var(--pill-bg);
       color: var(--ink);
-      font-family: var(--font-round);
       font-size: 14px;
-      line-height: 1.2;
-      font-weight: 900;
-      opacity: 0.9;
+      line-height: 1.24;
+      letter-spacing: 0.04em;
+      font-weight: 800;
+      opacity: 0.95;
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-      transition: opacity 0.2s ease, transform 0.1s ease;
+      transform: rotate(-1deg);
+      box-shadow: 2.5px 3.2px 0 var(--pill-border), 0 4px 10px rgba(0, 0, 0, 0.16);
+      transition: opacity 0.2s ease, transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    #btnShowBar::before {
+      content: "";
+      position: absolute;
+      inset: -2.5px -2px -2px -2.5px;
+      border: 1.25px solid var(--pill-border);
+      border-radius: 10px 21px 11px 19px / 19px 10px 20px 11px;
+      opacity: 0.44;
+      transform: rotate(1deg);
+      pointer-events: none;
     }
 
     #btnShowBar:active {
       opacity: 1;
-      transform: scale(0.96);
+      transform: rotate(0deg) translate(1.5px, 2px) scale(0.96);
+      box-shadow: 1px 1px 0 var(--pill-border);
     }
 
     #titleModal {
@@ -271,10 +379,13 @@
       overscroll-behavior: contain;
       background-color: var(--modal-bg);
       color: var(--ink);
-      border: 2px solid var(--pill-border);
-      border-radius: 18px;
+      font-family: var(--font-round);
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 2.5px 2px 2.8px 2.2px;
+      border-radius: 26px 14px 28px 16px / 15px 26px 14px 25px;
       padding: 16px;
-      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.3);
+      box-shadow: 4px 5px 0 var(--pill-border), 0 14px 36px rgba(0, 0, 0, 0.3);
     }
 
     .modal-head {
@@ -286,32 +397,44 @@
 
     .modal-head h2 {
       margin: 0;
-      font-size: 17px;
-      font-weight: 900;
+      font-size: 18px;
+      font-weight: 800;
     }
 
     .close-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 10px;
-      border: 1.5px solid var(--pill-border);
+      position: relative;
+      width: 33px;
+      height: 33px;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 2px 1.6px 2.2px 1.8px;
+      border-radius: 14px 8px 15px 9px / 9px 15px 8px 14px;
       background: var(--card-bg);
       color: var(--ink);
-      font-weight: 900;
+      font-family: var(--font-round);
+      font-weight: 800;
       cursor: pointer;
+      transform: rotate(1.4deg);
+      box-shadow: 1.8px 2.2px 0 var(--pill-border);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    .close-btn:active {
+      transform: rotate(0deg) translate(1px, 1.5px);
+      box-shadow: 0.5px 1px 0 var(--pill-border);
     }
 
     .section-card {
       margin-bottom: 13px;
       padding: 11px 12px;
-      border-radius: 14px;
+      border-radius: 18px 11px 19px 12px / 12px 18px 11px 17px;
       background: rgba(128, 128, 128, 0.06);
-      border: 1px solid rgba(128, 128, 128, 0.2);
+      border: 1.4px solid rgba(128, 128, 128, 0.28);
     }
 
     .section-title {
       font-size: 14px;
-      font-weight: 900;
+      font-weight: 800;
       margin-bottom: 8px;
       display: flex;
       justify-content: space-between;
@@ -320,8 +443,8 @@
 
     .preview-panel {
       background: var(--card-bg);
-      border: 1.5px dashed rgba(128, 128, 128, 0.42);
-      border-radius: 14px;
+      border: 1.8px dashed rgba(128, 128, 128, 0.48);
+      border-radius: 20px 11px 21px 12px / 12px 20px 11px 19px;
       padding: 10px;
       margin-bottom: 11px;
       text-align: center;
@@ -331,7 +454,7 @@
       display: block;
       font-size: 11px;
       font-weight: 700;
-      opacity: 0.62;
+      opacity: 0.65;
       margin-bottom: 4px;
     }
 
@@ -341,9 +464,8 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      font-family: var(--font-round);
       font-size: 24px;
-      font-weight: 900;
+      font-weight: 800;
       line-height: 1.25;
       min-height: 36px;
     }
@@ -371,9 +493,13 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      padding: 3px 9px;
-      border-radius: 10px;
-      border: 1px solid rgba(128, 128, 128, 0.35);
+      padding: 3px 10px;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 1.8px 1.4px 2px 1.5px;
+      border-radius: 16px 8px 15px 9px / 9px 15px 8px 16px;
+      background: var(--pill-bg);
+      box-shadow: 1.8px 2.2px 0 var(--pill-border);
     }
 
     .preview-mini-img {
@@ -407,19 +533,37 @@
     .segmented-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      gap: 9px;
     }
 
     .seg-btn {
+      position: relative;
       padding: 8px 10px;
-      border: 1.6px solid var(--pill-border);
-      border-radius: 12px;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 2.1px 1.7px 2.3px 1.9px;
+      border-radius: 19px 9px 18px 10px / 10px 18px 9px 19px;
       background: var(--card-bg);
       color: var(--ink);
-      font-family: inherit;
       font-size: 13px;
       font-weight: 800;
       cursor: pointer;
+      box-shadow: 2px 2.8px 0 var(--pill-border);
+      transition: transform 0.1s ease, background-color 0.2s ease, box-shadow 0.1s ease;
+    }
+
+    .seg-btn:nth-child(1) {
+      transform: rotate(-0.75deg);
+    }
+
+    .seg-btn:nth-child(2) {
+      border-radius: 9px 19px 10px 18px / 18px 10px 19px 9px;
+      transform: rotate(0.75deg);
+    }
+
+    .seg-btn:active {
+      transform: rotate(0deg) translate(1.2px, 1.8px);
+      box-shadow: 0.6px 1px 0 var(--pill-border);
     }
 
     .seg-btn.active {
@@ -430,11 +574,13 @@
     .text-box {
       width: 100%;
       padding: 8px 12px;
-      border: 1.6px solid var(--pill-border);
-      border-radius: 12px;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 2px 1.7px 2.2px 1.8px;
+      border-radius: 16px 9px 17px 10px / 10px 16px 9px 15px;
       background: var(--card-bg);
       color: var(--ink);
-      font-family: inherit;
+      font-family: var(--font-round);
       font-size: 14px;
       font-weight: 700;
       user-select: text;
@@ -444,20 +590,33 @@
     .chip-wrap {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 6px;
+      gap: 7px;
+      margin-top: 7px;
     }
 
     .chip {
-      padding: 5px 10px;
-      border: 1.4px solid var(--pill-border);
-      border-radius: 10px;
+      position: relative;
+      padding: 5px 11px;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 1.9px 1.5px 2.1px 1.7px;
+      border-radius: 16px 8px 15px 9px / 9px 16px 8px 15px;
       background: var(--card-bg);
       color: var(--ink);
-      font-family: inherit;
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
+      box-shadow: 1.8px 2.3px 0 var(--pill-border);
+      transition: transform 0.1s ease, background-color 0.2s ease, box-shadow 0.1s ease;
+    }
+
+    .chip:nth-child(even) {
+      border-radius: 8px 16px 9px 15px / 15px 8px 16px 9px;
+    }
+
+    .chip:active {
+      transform: translate(1.2px, 1.5px);
+      box-shadow: 0.5px 1px 0 var(--pill-border);
     }
 
     .chip.active {
@@ -468,20 +627,32 @@
     .size-row {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap: 5px;
+      gap: 6px;
       margin-bottom: 8px;
     }
 
     .size-btn {
       padding: 6px 2px;
-      border: 1.4px solid var(--pill-border);
-      border-radius: 10px;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 1.8px 1.5px 2px 1.6px;
+      border-radius: 14px 8px 13px 9px / 9px 14px 8px 13px;
       background: var(--card-bg);
       color: var(--ink);
-      font-family: inherit;
       font-size: 11px;
       font-weight: 800;
       cursor: pointer;
+      box-shadow: 1.4px 2px 0 var(--pill-border);
+      transition: transform 0.1s ease, background-color 0.2s ease, box-shadow 0.1s ease;
+    }
+
+    .size-btn:nth-child(even) {
+      border-radius: 8px 14px 9px 13px / 13px 8px 14px 9px;
+    }
+
+    .size-btn:active {
+      transform: translate(1px, 1.2px);
+      box-shadow: 0.5px 0.5px 0 var(--pill-border);
     }
 
     .size-btn.active {
@@ -509,8 +680,10 @@
 
     .sticker-item {
       aspect-ratio: 1;
-      border: 1.5px solid rgba(128, 128, 128, 0.35);
-      border-radius: 10px;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 1.8px 1.5px 2px 1.6px;
+      border-radius: 13px 8px 14px 9px / 9px 13px 8px 14px;
       background: #FFFDF9;
       display: flex;
       align-items: center;
@@ -518,6 +691,11 @@
       cursor: pointer;
       padding: 2px;
       touch-action: manipulation;
+      box-shadow: 1.3px 1.8px 0 var(--pill-border);
+    }
+
+    .sticker-item:nth-child(even) {
+      border-radius: 8px 13px 9px 14px / 14px 8px 13px 9px;
     }
 
     .sticker-item img {
@@ -530,7 +708,7 @@
     .sticker-item.active {
       border-color: var(--pill-border);
       background: var(--accent);
-      box-shadow: 0 1px 0 var(--pill-border);
+      box-shadow: 1.8px 2.3px 0 var(--pill-border);
     }
 
     .icon-pick-row {
@@ -544,14 +722,21 @@
     .mini-icon-btn {
       width: 38px;
       height: 38px;
-      border: 1.5px solid rgba(128, 128, 128, 0.35);
-      border-radius: 10px;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 1.8px 1.5px 2px 1.6px;
+      border-radius: 13px 8px 14px 9px / 9px 13px 8px 14px;
       background: #FFFDF9;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       padding: 2px;
+      box-shadow: 1.4px 2px 0 var(--pill-border);
+    }
+
+    .mini-icon-btn:nth-child(even) {
+      border-radius: 8px 13px 9px 14px / 14px 8px 13px 9px;
     }
 
     .mini-icon-btn img {
@@ -564,17 +749,19 @@
     .mini-icon-btn.active {
       border-color: var(--pill-border);
       background: var(--accent);
-      box-shadow: 0 1px 0 var(--pill-border);
+      box-shadow: 1.8px 2.3px 0 var(--pill-border);
     }
 
     .mini-icon-input {
       width: 68px;
       padding: 6px 8px;
-      border: 1.5px solid var(--pill-border);
-      border-radius: 10px;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 1.8px 1.5px 2px 1.6px;
+      border-radius: 14px 8px 13px 9px / 9px 14px 8px 13px;
       background: var(--card-bg);
       color: var(--ink);
-      font-family: inherit;
+      font-family: var(--font-round);
       font-size: 13px;
       font-weight: 800;
       text-align: center;
@@ -589,9 +776,9 @@
       gap: 8px;
       margin-top: 7px;
       padding: 6px 9px;
-      border-radius: 10px;
+      border-radius: 15px 9px 16px 10px / 10px 15px 9px 16px;
       background: var(--card-bg);
-      border: 1.2px dashed rgba(128, 128, 128, 0.35);
+      border: 1.5px dashed rgba(128, 128, 128, 0.45);
       font-size: 12px;
       font-weight: 700;
     }
@@ -608,7 +795,7 @@
       width: 24px;
       height: 24px;
       object-fit: contain;
-      border-radius: 5px;
+      border-radius: 6px;
       border: 1px solid rgba(128, 128, 128, 0.3);
       background: #FFFFFF;
     }
@@ -640,9 +827,9 @@
       width: 28px;
       height: 28px;
       object-fit: contain;
-      border-radius: 6px;
+      border-radius: 10px 6px 11px 7px / 7px 10px 6px 11px;
       background: #FFFDF9;
-      border: 1px solid rgba(128, 128, 128, 0.3);
+      border: 1.4px solid var(--pill-border);
       padding: 2px;
     }
 
