@@ -1647,10 +1647,8 @@
         if (!state.gathered) return;
         computeClockTargets();
         for (var i = 0; i < pigs.length; i++) {
-          if (pigs[i].role === 'digit' || pigs[i].role === 'colon') {
-            pigs[i].x = pigs[i].tx;
-            pigs[i].y = pigs[i].ty;
-          }
+          pigs[i].x = pigs[i].tx;
+          pigs[i].y = pigs[i].ty;
           pigs[i].currentScale = pigs[i].scale;
         }
       }
@@ -1868,7 +1866,7 @@
         var digitGap = clockW * 0.045;
         var digitW = (clockW - colonW - digitGap * 2) / 4;
         var ratioCap = isLandscape ? 1.35 : 1.92;
-        var digitH = Math.min(safeH * (isExtraLarge ? 0.85 : 0.68), digitW * ratioCap);
+        var digitH = Math.min(safeH * (isExtraLarge ? 0.76 : 0.62), digitW * ratioCap);
 
         var startX = (W - clockW) / 2;
         var centerY = (safeTop + safeBottom) / 2;
@@ -1938,14 +1936,48 @@
           }
         }
 
+        // 未排到時間的小豬：依時段分組排成一排，靜止不動、搖身體
+        var topRoamers = [];
+        var botRoamers = [];
         for (var r = 0; r < pigs.length; r++) {
           if (pigs[r].role === 'roamer') {
-            // 時鐘模式下的閒逛小豬也同步縮小，避免搶走時鐘數字的焦點
-            pigs[r].scale = pigScale * 0.9;
-            pigs[r].vx = (Math.random() - 0.5) * 75;
-            pigs[r].vy = (Math.random() - 0.5) * 75;
+            if (curHour >= 1 && curHour <= 11) {
+              // 上午 1:00 ~ 11:59：全數排在時鐘上方
+              topRoamers.push(pigs[r]);
+            } else if (curHour >= 13 && curHour <= 23) {
+              // 下午 1:00 ~ 11:59：全數排在時鐘下方
+              botRoamers.push(pigs[r]);
+            } else {
+              // 上午與下午 12:00 ~ 12:59 (curHour === 0 或 12)：在時鐘上方的留上方、下方的留下方
+              if (pigs[r].y < centerY) {
+                topRoamers.push(pigs[r]);
+              } else {
+                botRoamers.push(pigs[r]);
+              }
+            }
           }
         }
+
+        var topRowY = Math.max(topBottom + 16, (safeTop + topY) * 0.5);
+        var botRowY = Math.min(bottomTop - 16, (topY + digitH + safeBottom) * 0.5);
+        var rowLeft = 24;
+        var rowRight = W - 24;
+        var rowSpan = Math.max(40, rowRight - rowLeft);
+
+        function alignPigRow(list, rowY) {
+          if (list.length === 0) return;
+          list.sort(function (a, b) { return a.x - b.x; });
+          for (var k = 0; k < list.length; k++) {
+            list[k].tx = list.length === 1 ? (W * 0.5) : (rowLeft + (k / (list.length - 1)) * rowSpan);
+            list[k].ty = rowY;
+            list[k].scale = pigScale * 0.88;
+            list[k].vx = 0;
+            list[k].vy = 0;
+          }
+        }
+
+        alignPigRow(topRoamers, topRowY);
+        alignPigRow(botRoamers, botRowY);
       }
 
       function applyWeirdoMix(enable) {
@@ -2156,13 +2188,18 @@
             // 拖曳中
           } else if (isFocusedEgg && p.eggAction === 1) {
             p.y += Math.sin(sec * 8 + p.id) * 0.4;
-          } else if (state.gathered && !isFocusedEgg && (p.role === 'digit' || p.role === 'colon')) {
+          } else if (state.gathered && !isFocusedEgg) {
             var dx = p.tx - p.x;
             var dy = p.ty - p.y;
-            p.x += dx * Math.min(1, dt * 7.5);
-            p.y += dy * Math.min(1, dt * 7.5);
-            if (Math.abs(dx) > 1.5) {
-              p.flipX = dx >= 0 ? 1 : -1;
+            if (Math.abs(dx) > 0.4 || Math.abs(dy) > 0.4) {
+              p.x += dx * Math.min(1, dt * 7.5);
+              p.y += dy * Math.min(1, dt * 7.5);
+              if (Math.abs(dx) > 1.5) {
+                p.flipX = dx >= 0 ? 1 : -1;
+              }
+            } else {
+              p.x = p.tx;
+              p.y = p.ty;
             }
           } else {
             p.poseTimer -= dt;
