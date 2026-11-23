@@ -1219,6 +1219,21 @@
         <div id="guestThumbs" class="custom-source-thumbs"></div>
       </div>
 
+      <!-- 6. 冒號點擊彩蛋圖案 -->
+      <div class="section-card">
+        <div class="section-title">
+          <span>6. 冒號點擊彩蛋圖案</span>
+        </div>
+        <div class="chip-wrap" id="colonEggChoiceGroup" style="margin-top:0;">
+          <button type="button" class="chip colon-egg-opt active" data-mode="random4">4 款隨機輪流</button>
+          <button type="button" class="chip colon-egg-opt" data-mode="sin1">小新側臉</button>
+          <button type="button" class="chip colon-egg-opt" data-mode="s3">肥嘟嘟左衛門</button>
+          <button type="button" class="chip colon-egg-opt" data-mode="sin2">小新濃眉嘟嘴</button>
+          <button type="button" class="chip colon-egg-opt" data-mode="sin4">巧克比鱷魚山</button>
+          <button type="button" class="chip colon-egg-opt" data-mode="heart">經典大愛心</button>
+        </div>
+      </div>
+
       <div class="modal-actions">
         <button id="btnResetDefaults" type="button" class="chip">恢復預設值</button>
         <div class="modal-actions-right">
@@ -1469,6 +1484,7 @@
       }
 
       var originalCutoutDataURLs = new Array(16);
+      var originalCutoutCanvases = new Array(16);
       var pickerImgEls = { title: [], hide: [], show: [] };
 
       function refreshAllPresetImagesInDOM() {
@@ -1524,6 +1540,7 @@
             img.onload = function () {
               removeBackgroundAndTrim(img, 96, function (cutCanvas) {
                 if (cutCanvas) {
+                  originalCutoutCanvases[idx] = cutCanvas;
                   try {
                     originalCutoutDataURLs[idx] = cutCanvas.toDataURL('image/png');
                   } catch (e) {
@@ -1546,9 +1563,12 @@
         }
       }
 
-      var STORAGE_KEY = 'buriburi_pig_clock_settings_v9';
+      var STORAGE_KEY = 'buriburi_pig_clock_settings_v10';
       var TOTAL_PIGS = 142;
       var DEFAULT_POSE_COUNT = 12;
+
+      var VALID_EGG_MODES = ['random4', 'sin1', 's3', 'sin2', 'sin4', 'heart'];
+      var RANDOM4_POOL = ['sin1', 's3', 'sin2', 'sin4'];
 
       var W = 360;
       var H = 640;
@@ -1566,6 +1586,7 @@
           extraLarge: true,
           visible: true,
           showDateBadge: true,
+          colonEggMode: 'random4',
           text: '不理不理左衛門時鐘',
           fontSize: 26,
           iconType: 'preset',
@@ -1608,11 +1629,14 @@
           ? (originalCutoutDataURLs[showIdx] || encodeURI(PIG_FILE_PATHS[showIdx]))
           : (src.showBtnImageData || '');
 
+        var eggMode = VALID_EGG_MODES.indexOf(src.colonEggMode) !== -1 ? src.colonEggMode : 'random4';
+
         return {
           forceLandscape: typeof src.forceLandscape === 'boolean' ? src.forceLandscape : false,
           extraLarge: typeof src.extraLarge === 'boolean' ? src.extraLarge : true,
           visible: typeof src.visible === 'boolean' ? src.visible : true,
           showDateBadge: typeof src.showDateBadge === 'boolean' ? src.showDateBadge : true,
+          colonEggMode: eggMode,
           text: typeof src.text === 'string' ? src.text : def.text,
           fontSize: typeof src.fontSize === 'number' ? Math.min(44, Math.max(16, src.fontSize)) : 26,
           iconType: titleType,
@@ -1646,6 +1670,9 @@
         waveCycles: 1,
         waveContinuousEnd: 0,
         heartShowTimer: 0,
+        activeEggShape: 'sin1',
+        eggDeck: [],
+        lastDrawnEggShape: '',
         heartCenter: { x: 180, y: 320 },
         heartScale: 8,
         clockBox: { left: 20, right: 300, top: 120, bottom: 420 },
@@ -1669,6 +1696,7 @@
       var usingCustomGuest = false;
 
       var pigs = [];
+      var eggHelpers = [];
       var paradeVisitors = [];
 
       var draggingPig = null;
@@ -1697,6 +1725,28 @@
         if (usingCustomGuest && customGuestSprites.length > 0) return customGuestSprites;
         if (clickSprites.length > 0) return clickSprites;
         return weirdoSprites;
+      }
+
+      /* 彙整系統現有圖庫供巧克比鱷魚山（Sin4）偷借臨時援軍（眼眶＋牙齒） */
+      function getSystemHelperSpritePool() {
+        var list = [];
+        var sources = [repoClockSprites, clickSprites, weirdoSprites, hourSprites];
+        for (var s = 0; s < sources.length; s++) {
+          var arr = sources[s];
+          if (!arr) continue;
+          for (var i = 0; i < arr.length; i++) {
+            if (arr[i] && list.indexOf(arr[i]) === -1) {
+              list.push(arr[i]);
+            }
+          }
+        }
+        for (var p = 0; p < originalCutoutCanvases.length; p++) {
+          if (originalCutoutCanvases[p] && list.indexOf(originalCutoutCanvases[p]) === -1) {
+            list.push(originalCutoutCanvases[p]);
+          }
+        }
+        if (list.length === 0) return fallbackSprites;
+        return list;
       }
 
       function createHandDrawnPigSprite(poseIdx) {
@@ -2093,78 +2143,401 @@
         };
       }
 
-      function triggerHeartDuetShow() {
-        if (!state.gathered) return;
-        state.heartShowTimer = 6.5;
-        state.waveActive = false;
+      /* 4 款上傳手繪圖案（SIN1 / S3 / SIN2 / Sin4）的標準化輪廓座標（中心 (0,0)，半徑約 15） */
+      var SIN1_OUTLINE = [
+        [0.0, -11.5], [4.6, -11.4], [8.8, -9.2], [10.8, -5.2], [10.8, -0.4],
+        [11.3, 0.2], [13.5, 0.3], [15.1, 2.3], [14.7, 5.4], [12.5, 7.1],
+        [10.2, 6.7], [8.6, 7.4], [2.4, 8.7], [-5.2, 9.2], [-11.5, 8.4],
+        [-14.7, 5.6], [-14.8, 1.5], [-12.5, -1.6], [-10.6, -2.5], [-9.2, -6.9],
+        [-5.2, -10.3], [0.0, -11.5]
+      ];
 
+      var S3_HEAD_OUTLINE = [
+        [-4.2, -8.2], [0.0, -7.2], [4.2, -8.2],
+        [7.6, -11.5, 1], [10.5, -10.2], [11.2, -5.8], [10.5, -2.8, 1],
+        [13.8, -0.5], [14.6, 3.6], [12.4, 7.2], [8.2, 8.4, 1],
+        [4.8, 10.6], [0.0, 10.0], [-4.8, 10.6], [-8.2, 8.4, 1],
+        [-12.4, 7.2], [-14.6, 3.6], [-13.8, -0.5], [-10.5, -2.8, 1],
+        [-11.2, -5.8], [-10.5, -10.2], [-7.6, -11.5, 1], [-4.2, -8.2]
+      ];
+
+      var S3_SNOUT_OUTLINE = [
+        [0.0, 2.2], [4.4, 1.0], [8.4, 2.4], [9.2, 6.2],
+        [6.8, 9.6], [2.6, 9.4], [0.0, 8.6], [-2.6, 9.4],
+        [-6.8, 9.6], [-9.2, 6.2], [-8.4, 2.4], [-4.4, 1.0], [0.0, 2.2]
+      ];
+
+      var SIN2_HEAD_OUTLINE = [
+        [-2.0, -12.6], [3.5, -12.2], [8.2, -9.4], [10.2, -4.5], [10.4, -1.2],
+        [12.4, -1.4], [14.8, 0.8], [15.0, 4.4], [12.5, 6.6], [9.8, 6.2],
+        [6.2, 8.4], [-1.0, 9.5], [-8.2, 9.2], [-13.4, 7.0], [-14.8, 2.6],
+        [-13.2, -1.4], [-10.6, -2.5], [-10.2, -7.2], [-6.8, -11.2], [-2.0, -12.6]
+      ];
+
+      var SIN2_BROW_LEFT = [
+        [-10.2, -5.8], [-8.2, -8.6], [-5.4, -8.6], [-3.2, -6.2]
+      ];
+
+      var SIN2_BROW_RIGHT = [
+        [-0.4, -6.2], [2.2, -9.0], [5.4, -9.0], [7.6, -6.2]
+      ];
+
+      var SIN4_BODY_OUTLINE = [
+        [4.8, -5.0], [9.6, -4.8], [13.2, -2.2], [14.4, 2.2], [13.8, 6.8],
+        [10.2, 9.6], [2.0, 9.8], [-6.8, 9.4], [-9.2, 7.4], [-7.2, 5.4],
+        [2.5, 5.4], [6.8, 3.8], [6.8, 1.4], [2.5, 0.2], [-9.8, 0.2],
+        [-13.8, -1.4], [-14.4, -4.4], [-11.4, -6.2], [-6.8, -5.6], [-4.6, -5.2]
+      ];
+
+      function buildCirclePts(cx, cy, rx, ry, steps) {
+        var pts = [];
+        for (var i = 0; i <= steps; i++) {
+          var a = (i / steps) * Math.PI * 2;
+          pts.push([cx + Math.cos(a) * rx, cy + Math.sin(a) * ry]);
+        }
+        return pts;
+      }
+
+      function pickNextColonEggShape() {
+        var mode = (currentSettings && currentSettings.colonEggMode) ? currentSettings.colonEggMode : 'random4';
+        if (mode !== 'random4') {
+          state.activeEggShape = mode;
+          state.lastDrawnEggShape = mode;
+          return mode;
+        }
+        if (!state.eggDeck || state.eggDeck.length === 0) {
+          var deck = RANDOM4_POOL.slice();
+          for (var i = deck.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = deck[i];
+            deck[i] = deck[j];
+            deck[j] = tmp;
+          }
+          if (deck.length > 1 && deck[0] === state.lastDrawnEggShape) {
+            var swap = deck[0];
+            deck[0] = deck[deck.length - 1];
+            deck[deck.length - 1] = swap;
+          }
+          state.eggDeck = deck;
+        }
+        var nextShape = state.eggDeck.shift();
+        state.activeEggShape = nextShape;
+        state.lastDrawnEggShape = nextShape;
+        return nextShape;
+      }
+
+      function assignOrderedPointsToPigs(rimPigs, slotList, cx, cy) {
+        if (rimPigs.length === 0 || slotList.length === 0) return;
+        var sortedPigs = rimPigs.slice().sort(function (a, b) {
+          return Math.atan2(a.y - cy, a.x - cx) - Math.atan2(b.y - cy, b.x - cx);
+        });
+        var indexedSlots = [];
+        for (var i = 0; i < slotList.length; i++) {
+          indexedSlots.push({
+            x: slotList[i].x,
+            y: slotList[i].y,
+            scale: slotList[i].scale,
+            ang: Math.atan2(slotList[i].y - cy, slotList[i].x - cx)
+          });
+        }
+        indexedSlots.sort(function (a, b) { return a.ang - b.ang; });
+
+        var count = Math.min(sortedPigs.length, indexedSlots.length);
+        for (var k = 0; k < count; k++) {
+          sortedPigs[k].tx = indexedSlots[k].x;
+          sortedPigs[k].ty = indexedSlots[k].y;
+          sortedPigs[k].heartBaseX = indexedSlots[k].x;
+          sortedPigs[k].heartBaseY = indexedSlots[k].y;
+          sortedPigs[k].scale = indexedSlots[k].scale;
+          sortedPigs[k].baseAlpha = 1;
+        }
+      }
+
+      function dismissEggHelpers(immediate) {
+        if (immediate) {
+          eggHelpers = [];
+          return;
+        }
+        for (var i = 0; i < eggHelpers.length; i++) {
+          var h = eggHelpers[i];
+          if (!h.leaving) {
+            h.leaving = true;
+            var goRight = h.x >= W * 0.5;
+            h.tx = goRight ? (W + 70) : -70;
+            h.ty = h.y + (Math.random() - 0.5) * 40;
+            h.flipX = goRight ? 1 : -1;
+          }
+        }
+      }
+
+      function spawnSin4Helpers(cx, cy, figScale) {
+        eggHelpers = [];
+        var helperPool = getSystemHelperSpritePool();
+        if (!helperPool || helperPool.length === 0) return;
+
+        var eyeL = samplePolyline(buildCirclePts(-2.3, -8.4, 2.7, 3.1, 36), 11, 0);
+        var eyeR = samplePolyline(buildCirclePts(3.5, -8.4, 2.7, 3.1, 36), 11, 0);
+        var toothX = [-7.2, -3.5, 0.2, 3.9];
+        var helperSlots = [];
+        var eyeScale = Math.max(0.14, Math.min(0.21, figScale * 0.0155));
+        var toothScale = Math.max(0.135, Math.min(0.20, figScale * 0.015));
+
+        for (var e1 = 0; e1 < eyeL.length - 1; e1++) {
+          helperSlots.push({ x: cx + eyeL[e1].x * figScale, y: cy + eyeL[e1].y * figScale, scale: eyeScale });
+        }
+        for (var e2 = 0; e2 < eyeR.length - 1; e2++) {
+          helperSlots.push({ x: cx + eyeR[e2].x * figScale, y: cy + eyeR[e2].y * figScale, scale: eyeScale });
+        }
+        for (var t = 0; t < toothX.length; t++) {
+          var tx = toothX[t];
+          var toothPts = [[tx, 0.9], [tx + 0.15, 2.7], [tx + 0.3, 4.6]];
+          for (var p = 0; p < toothPts.length; p++) {
+            helperSlots.push({
+              x: cx + toothPts[p][0] * figScale,
+              y: cy + toothPts[p][1] * figScale,
+              scale: toothScale
+            });
+          }
+        }
+
+        for (var k = 0; k < helperSlots.length; k++) {
+          var slot = helperSlots[k];
+          var fromLeft = slot.x < cx;
+          eggHelpers.push({
+            sprite: helperPool[k % helperPool.length],
+            x: fromLeft ? (-36 - (k % 6) * 18) : (W + 36 + (k % 6) * 18),
+            y: slot.y + (Math.random() - 0.5) * 30,
+            tx: slot.x,
+            ty: slot.y,
+            heartBaseX: slot.x,
+            heartBaseY: slot.y,
+            scale: slot.scale,
+            flipX: fromLeft ? 1 : -1,
+            phase: Math.random() * Math.PI * 2,
+            leaving: false
+          });
+        }
+      }
+
+      function layoutColonEggShape(shape) {
         var bounds = getSafeBounds();
         var cx = W * 0.5;
         var cy = (bounds.topBottom + bounds.bottomTop) * 0.5 + 4;
-        var availW = W - 44;
-        var availH = Math.max(160, bounds.bottomTop - bounds.topBottom - 26);
+        var availW = W - 40;
+        var availH = Math.max(160, bounds.bottomTop - bounds.topBottom - 24);
 
-        var heartScale = Math.min(availW / 34, availH / 31);
+        var figScale = Math.min(availW / 33, availH / 29);
         state.heartCenter = { x: cx, y: cy };
-        state.heartScale = heartScale;
+        state.heartScale = figScale;
 
-        var duetGap = Math.max(24, Math.min(48, heartScale * 3.4));
-        var duetScale = Math.max(0.42, Math.min(0.68, heartScale * 0.048));
-        var rimScale = Math.max(0.20, Math.min(0.32, heartScale * 0.024));
-
+        var colonPigs = [];
         var rimPigs = [];
         for (var i = 0; i < pigs.length; i++) {
           pigs[i].eggTimer = 0;
           if (!pigs[i].isWeirdo) pigs[i].overrideSprite = null;
-
           if (pigs[i].role === 'colon') {
-            var side = pigs[i].colonIndex === 0 ? -1 : 1;
-            pigs[i].tx = cx + side * duetGap;
-            pigs[i].ty = cy + heartScale * 1.4;
-            pigs[i].heartBaseX = pigs[i].tx;
-            pigs[i].heartBaseY = pigs[i].ty;
-            pigs[i].scale = duetScale;
-            pigs[i].baseAlpha = 1;
-            pigs[i].flipX = side === -1 ? 1 : -1;
+            colonPigs.push(pigs[i]);
           } else {
             rimPigs.push(pigs[i]);
           }
         }
+        colonPigs.sort(function (a, b) { return a.colonIndex - b.colonIndex; });
 
-        var rawPts = [];
-        var STEPS = 720;
-        for (var s = 0; s <= STEPS; s++) {
-          var t = (s / STEPS) * Math.PI * 2;
-          var hx = 16 * Math.pow(Math.sin(t), 3);
-          var hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
-          rawPts.push([hx, hy]);
+        var slots = [];
+
+        if (shape === 'sin1') {
+          /* 1. 蠟筆小新側臉輪廓（SIN1）：140 隻排單一封閉外框，2 隻冒號小豬站臉頰中央 */
+          var duetGap = Math.max(20, Math.min(42, figScale * 2.8));
+          var duetScale = Math.max(0.38, Math.min(0.60, figScale * 0.044));
+          var rimScale = Math.max(0.19, Math.min(0.30, figScale * 0.023));
+
+          for (var c1 = 0; c1 < colonPigs.length; c1++) {
+            var side1 = c1 === 0 ? -1 : 1;
+            colonPigs[c1].tx = cx + side1 * duetGap - figScale * 1.2;
+            colonPigs[c1].ty = cy + figScale * 0.5;
+            colonPigs[c1].heartBaseX = colonPigs[c1].tx;
+            colonPigs[c1].heartBaseY = colonPigs[c1].ty;
+            colonPigs[c1].scale = duetScale;
+            colonPigs[c1].baseAlpha = 1;
+            colonPigs[c1].flipX = side1 === -1 ? 1 : -1;
+          }
+
+          var sin1Pts = samplePolyline(SIN1_OUTLINE, rimPigs.length + 1, 2);
+          for (var s1 = 0; s1 < rimPigs.length; s1++) {
+            slots.push({
+              x: cx + sin1Pts[s1].x * figScale,
+              y: cy + sin1Pts[s1].y * figScale,
+              scale: rimScale
+            });
+          }
+          assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
+
+        } else if (shape === 's3') {
+          /* 2. 肥嘟嘟左衛門豬頭（S3）：雙耳頭型 + 豬鼻外框，2 隻冒號小豬剛好站進兩個鼻孔 */
+          var nostrilScale = Math.max(0.24, Math.min(0.38, figScale * 0.028));
+          var headScale = Math.max(0.18, Math.min(0.28, figScale * 0.021));
+          var snoutScale = Math.max(0.165, Math.min(0.25, figScale * 0.019));
+
+          for (var c2 = 0; c2 < colonPigs.length; c2++) {
+            var side2 = c2 === 0 ? -1 : 1;
+            colonPigs[c2].tx = cx + side2 * figScale * 3.8;
+            colonPigs[c2].ty = cy + figScale * 5.6;
+            colonPigs[c2].heartBaseX = colonPigs[c2].tx;
+            colonPigs[c2].heartBaseY = colonPigs[c2].ty;
+            colonPigs[c2].scale = nostrilScale;
+            colonPigs[c2].baseAlpha = 1;
+            colonPigs[c2].flipX = side2 === -1 ? 1 : -1;
+          }
+
+          var snoutCount = 34;
+          var headCount = rimPigs.length - snoutCount;
+          var headPts = samplePolyline(S3_HEAD_OUTLINE, headCount + 1, 1);
+          var snoutPts = samplePolyline(S3_SNOUT_OUTLINE, snoutCount + 1, 2);
+
+          for (var h1 = 0; h1 < headCount; h1++) {
+            slots.push({
+              x: cx + headPts[h1].x * figScale,
+              y: cy + headPts[h1].y * figScale,
+              scale: headScale
+            });
+          }
+          for (var sn = 0; sn < snoutCount; sn++) {
+            slots.push({
+              x: cx + snoutPts[sn].x * figScale,
+              y: cy + snoutPts[sn].y * figScale,
+              scale: snoutScale
+            });
+          }
+          assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
+
+        } else if (shape === 'sin2') {
+          /* 3. 蠟筆小新濃眉嘟嘴臉（SIN2）：縮小單隻比例讓外框、兩道粗眉與圓形嘟嘴清楚分明 */
+          var cheekScale = Math.max(0.26, Math.min(0.40, figScale * 0.030));
+          var outlineScale = Math.max(0.145, Math.min(0.22, figScale * 0.0165));
+          var featureScale = Math.max(0.175, Math.min(0.26, figScale * 0.0195));
+
+          for (var c3 = 0; c3 < colonPigs.length; c3++) {
+            var side3 = c3 === 0 ? -1 : 1;
+            colonPigs[c3].tx = cx + (side3 === -1 ? -6.2 : 2.6) * figScale;
+            colonPigs[c3].ty = cy + figScale * 0.2;
+            colonPigs[c3].heartBaseX = colonPigs[c3].tx;
+            colonPigs[c3].heartBaseY = colonPigs[c3].ty;
+            colonPigs[c3].scale = cheekScale;
+            colonPigs[c3].baseAlpha = 1;
+            colonPigs[c3].flipX = side3 === -1 ? 1 : -1;
+          }
+
+          var browLCount = 15;
+          var browRCount = 15;
+          var mouthCount = 14;
+          var headSin2Count = rimPigs.length - browLCount - browRCount - mouthCount;
+
+          var hSin2Pts = samplePolyline(SIN2_HEAD_OUTLINE, headSin2Count + 1, 2);
+          var bLPts = samplePolyline(SIN2_BROW_LEFT, browLCount, 2);
+          var bRPts = samplePolyline(SIN2_BROW_RIGHT, browRCount, 2);
+          var mouthPts = samplePolyline(buildCirclePts(-5.4, 7.6, 2.5, 2.5, 48), mouthCount + 1, 0);
+
+          for (var hs = 0; hs < headSin2Count; hs++) {
+            slots.push({
+              x: cx + hSin2Pts[hs].x * figScale,
+              y: cy + hSin2Pts[hs].y * figScale,
+              scale: outlineScale
+            });
+          }
+          for (var bl = 0; bl < browLCount; bl++) {
+            slots.push({
+              x: cx + bLPts[bl].x * figScale,
+              y: cy + bLPts[bl].y * figScale,
+              scale: featureScale
+            });
+          }
+          for (var br = 0; br < browRCount; br++) {
+            slots.push({
+              x: cx + bRPts[br].x * figScale,
+              y: cy + bRPts[br].y * figScale,
+              scale: featureScale
+            });
+          }
+          for (var mo = 0; mo < mouthCount; mo++) {
+            slots.push({
+              x: cx + mouthPts[mo].x * figScale,
+              y: cy + mouthPts[mo].y * figScale,
+              scale: featureScale
+            });
+          }
+          assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
+
+        } else if (shape === 'sin4') {
+          /* 4. 巧克比鱷魚山先生（Sin4）：140 隻排鱷魚頭＋上下顎，2 隻冒號站眼珠，援軍排眼眶＋牙齒 */
+          var pupilScale = Math.max(0.22, Math.min(0.34, figScale * 0.025));
+          var crocScale = Math.max(0.155, Math.min(0.23, figScale * 0.0175));
+
+          for (var c4 = 0; c4 < colonPigs.length; c4++) {
+            var eyeX = c4 === 0 ? -2.3 : 3.5;
+            colonPigs[c4].tx = cx + eyeX * figScale;
+            colonPigs[c4].ty = cy - 8.4 * figScale;
+            colonPigs[c4].heartBaseX = colonPigs[c4].tx;
+            colonPigs[c4].heartBaseY = colonPigs[c4].ty;
+            colonPigs[c4].scale = pupilScale;
+            colonPigs[c4].baseAlpha = 1;
+            colonPigs[c4].flipX = -1;
+          }
+
+          var crocPts = samplePolyline(SIN4_BODY_OUTLINE, rimPigs.length, 1);
+          for (var cr = 0; cr < rimPigs.length; cr++) {
+            slots.push({
+              x: cx + crocPts[cr].x * figScale,
+              y: cy + crocPts[cr].y * figScale,
+              scale: crocScale
+            });
+          }
+          assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
+          spawnSin4Helpers(cx, cy, figScale);
+
+        } else {
+          /* 5. 經典大愛心（heart） */
+          var heartDuetGap = Math.max(24, Math.min(48, figScale * 3.4));
+          var heartDuetScale = Math.max(0.42, Math.min(0.68, figScale * 0.048));
+          var heartRimScale = Math.max(0.20, Math.min(0.32, figScale * 0.024));
+
+          for (var c5 = 0; c5 < colonPigs.length; c5++) {
+            var side5 = c5 === 0 ? -1 : 1;
+            colonPigs[c5].tx = cx + side5 * heartDuetGap;
+            colonPigs[c5].ty = cy + figScale * 1.4;
+            colonPigs[c5].heartBaseX = colonPigs[c5].tx;
+            colonPigs[c5].heartBaseY = colonPigs[c5].ty;
+            colonPigs[c5].scale = heartDuetScale;
+            colonPigs[c5].baseAlpha = 1;
+            colonPigs[c5].flipX = side5 === -1 ? 1 : -1;
+          }
+
+          var rawPts = [];
+          var STEPS = 720;
+          for (var s = 0; s <= STEPS; s++) {
+            var t = (s / STEPS) * Math.PI * 2;
+            var hx = 16 * Math.pow(Math.sin(t), 3);
+            var hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+            rawPts.push([hx, hy]);
+          }
+          var heartSamples = samplePolyline(rawPts, rimPigs.length + 1, 0);
+          for (var k = 0; k < rimPigs.length; k++) {
+            slots.push({
+              x: cx + heartSamples[k].x * figScale,
+              y: cy + heartSamples[k].y * figScale,
+              scale: heartRimScale
+            });
+          }
+          assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
         }
-        var heartSamples = samplePolyline(rawPts, rimPigs.length + 1, 0);
+      }
 
-        rimPigs.sort(function (a, b) {
-          return Math.atan2(a.y - cy, a.x - cx) - Math.atan2(b.y - cy, b.x - cx);
-        });
-
-        var sampleObjs = [];
-        for (var k = 0; k < rimPigs.length; k++) {
-          var sx = cx + heartSamples[k].x * heartScale;
-          var sy = cy + heartSamples[k].y * heartScale;
-          sampleObjs.push({
-            x: sx,
-            y: sy,
-            ang: Math.atan2(sy - cy, sx - cx)
-          });
-        }
-        sampleObjs.sort(function (a, b) { return a.ang - b.ang; });
-
-        for (var m = 0; m < rimPigs.length; m++) {
-          rimPigs[m].tx = sampleObjs[m].x;
-          rimPigs[m].ty = sampleObjs[m].y;
-          rimPigs[m].heartBaseX = sampleObjs[m].x;
-          rimPigs[m].heartBaseY = sampleObjs[m].y;
-          rimPigs[m].scale = rimScale;
-          rimPigs[m].baseAlpha = 1;
-        }
+      function triggerHeartDuetShow() {
+        if (!state.gathered) return;
+        dismissEggHelpers(true);
+        state.heartShowTimer = 6.5;
+        state.waveActive = false;
+        var chosenShape = pickNextColonEggShape();
+        layoutColonEggShape(chosenShape);
       }
 
       function computeClockTargets() {
@@ -2194,7 +2567,6 @@
         var safeBottom = Math.max(safeTop + 170, bottomTop - 6);
         var safeH = safeBottom - safeTop;
 
-        // 上下兩排與時鐘上下緣的緊湊距離，同時預留秒數小氣泡高度
         var outerRowMargin = 38;
         var rowToClockGap = Math.max(32, Math.min(44, safeH * 0.075));
 
@@ -2285,7 +2657,6 @@
           }
         }
 
-        // 未排到時間的 60 隻小豬：分成上下兩排各 30 隻（00~29 秒在上方，30~59 秒在下方）
         var roamers = [];
         for (var r = 0; r < pigs.length; r++) {
           if (pigs[r].role === 'roamer') {
@@ -2347,6 +2718,7 @@
       function setGathered(val, snapImmediate) {
         state.gathered = !!val;
         state.heartShowTimer = 0;
+        dismissEggHelpers(false);
         var btn = document.getElementById('btnToggleGather');
         if (btn) {
           btn.textContent = state.gathered ? '自己玩 / 幾點了（時鐘)' : '自己玩 / 幾點了（玩耍中)';
@@ -2536,6 +2908,7 @@
           state.heartShowTimer -= dt;
           if (state.heartShowTimer <= 0) {
             state.heartShowTimer = 0;
+            dismissEggHelpers(false);
             if (state.gathered) computeClockTargets();
           }
         }
@@ -2577,7 +2950,7 @@
         var colonPulseScale = 0.88 + 0.30 * colonBeat;
         var colonPulseAlpha = 0.35 + 0.65 * colonBeat;
 
-        var heartBeat = 1 + 0.055 * Math.sin(sec * 6.2);
+        var shapePulse = 1 + 0.042 * Math.sin(sec * 5.8);
 
         ctx.fillStyle = state.nightMode ? '#050505' : '#FDF6EC';
         ctx.fillRect(0, 0, W, H);
@@ -2614,15 +2987,22 @@
           if (state.gathered && state.heartShowTimer > 0) {
             if (p.role === 'colon') {
               var sideDir = p.colonIndex === 0 ? -1 : 1;
-              var duetSway = Math.sin(sec * 5.2) * 7;
-              p.tx = p.heartBaseX + duetSway;
-              p.ty = p.heartBaseY - Math.abs(Math.sin(sec * 7.5 + p.colonIndex * 1.4)) * 10;
-              p.flipX = sideDir === -1 ? 1 : -1;
+              if (state.activeEggShape === 'sin4') {
+                /* 鱷魚眼珠左右骨碌碌轉動 */
+                p.tx = p.heartBaseX + Math.sin(sec * 4.5) * 3.5;
+                p.ty = p.heartBaseY + Math.cos(sec * 4.5) * 1.8;
+                p.flipX = -1;
+              } else {
+                var duetSway = Math.sin(sec * 5.2) * 5;
+                p.tx = p.heartBaseX + duetSway;
+                p.ty = p.heartBaseY - Math.abs(Math.sin(sec * 7.5 + p.colonIndex * 1.4)) * 7;
+                p.flipX = sideDir === -1 ? 1 : -1;
+              }
             } else {
               var relX = p.heartBaseX - state.heartCenter.x;
               var relY = p.heartBaseY - state.heartCenter.y;
-              p.tx = state.heartCenter.x + relX * heartBeat;
-              p.ty = state.heartCenter.y + relY * heartBeat;
+              p.tx = state.heartCenter.x + relX * shapePulse;
+              p.ty = state.heartCenter.y + relY * shapePulse;
             }
           }
 
@@ -2726,7 +3106,7 @@
           var wiggleAngle = Math.sin(p.wigglePhase) * (isFocusedEgg ? 0.25 : 0.08);
           if (state.gathered && state.heartShowTimer > 0 && p.role === 'colon') {
             var sideTilt = p.colonIndex === 0 ? 1 : -1;
-            wiggleAngle = Math.sin(sec * 7.5) * 0.24 * sideTilt;
+            wiggleAngle = Math.sin(sec * 7.5) * 0.22 * sideTilt;
           }
 
           ctx.save();
@@ -2765,7 +3145,45 @@
           ctx.restore();
         }
 
-        if (state.gathered && state.heartShowTimer > 0) {
+        /* 巧克比鱷魚山（Sin4）借調的臨時援軍（眼眶＋垂直牙齒）進場與退場動畫 */
+        for (var eh = eggHelpers.length - 1; eh >= 0; eh--) {
+          var helper = eggHelpers[eh];
+          if (!helper.leaving && state.heartShowTimer > 0) {
+            var hRelX = helper.heartBaseX - state.heartCenter.x;
+            var hRelY = helper.heartBaseY - state.heartCenter.y;
+            helper.tx = state.heartCenter.x + hRelX * shapePulse;
+            helper.ty = state.heartCenter.y + hRelY * shapePulse;
+          }
+          var hSpeed = helper.leaving ? 6.5 : 9.2;
+          helper.x += (helper.tx - helper.x) * Math.min(1, dt * hSpeed);
+          helper.y += (helper.ty - helper.y) * Math.min(1, dt * hSpeed);
+
+          var hBob = Math.sin(sec * 5 + helper.phase) * 1.4;
+          var hWiggle = Math.sin(sec * 6 + helper.phase) * 0.08;
+
+          ctx.save();
+          ctx.translate(helper.x, helper.y + hBob);
+          ctx.rotate(hWiggle);
+          ctx.scale(helper.flipX * helper.scale, helper.scale);
+          if (helper.sprite._isDarkBg) {
+            ctx.fillStyle = 'rgba(20, 18, 22, 0.85)';
+            drawRoundRect(ctx, -50, -50, 100, 100, 14);
+            ctx.fill();
+          }
+          if (state.nightMode) {
+            ctx.shadowColor = 'rgba(255, 245, 225, 0.62)';
+            ctx.shadowBlur = 8;
+          }
+          ctx.drawImage(helper.sprite, -48, -48, 96, 96);
+          ctx.shadowBlur = 0;
+          ctx.restore();
+
+          if (helper.leaving && (helper.x < -45 || helper.x > W + 45)) {
+            eggHelpers.splice(eh, 1);
+          }
+        }
+
+        if (state.gathered && state.heartShowTimer > 0 && state.activeEggShape === 'heart') {
           var pulseMiniHeart = 10 + Math.sin(sec * 9) * 2.2;
           drawMiniHeart(
             ctx,
@@ -2776,7 +3194,6 @@
           );
         }
 
-        // 在「目前秒數」那一隻小豬的上方（上排）或下方（下排）繪製瀨戶字體秒數氣泡標籤
         if (activeSecPig && state.gathered && state.heartShowTimer <= 0) {
           var isTopHalf = activeSecPig.slotIndex < 30;
           var pigHalfH = 48 * activeSecPig.currentScale;
@@ -3117,6 +3534,12 @@
         if (btnSzL) btnSzL.classList.toggle('active', !d.extraLarge);
         if (btnSzXL) btnSzXL.classList.toggle('active', !!d.extraLarge);
 
+        var eggOpts = document.querySelectorAll('.colon-egg-opt');
+        for (var eo = 0; eo < eggOpts.length; eo++) {
+          var em = eggOpts[eo].getAttribute('data-mode');
+          eggOpts[eo].classList.toggle('active', em === d.colonEggMode);
+        }
+
         var prevBox = document.getElementById('modalPreview');
         var prevText = document.getElementById('previewText');
         var prevIcon = document.getElementById('previewIcon');
@@ -3347,7 +3770,8 @@
 
         if (state.gathered && pigs.length > 0) {
           if (state.heartShowTimer > 0) {
-            triggerHeartDuetShow();
+            dismissEggHelpers(true);
+            layoutColonEggShape(state.activeEggShape);
           } else {
             computeClockTargets();
           }
@@ -3506,6 +3930,16 @@
           draftSettings.extraLarge = true;
           updateModalPreview();
         });
+
+        var colonEggOpts = document.querySelectorAll('.colon-egg-opt');
+        for (var ce = 0; ce < colonEggOpts.length; ce++) {
+          colonEggOpts[ce].addEventListener('click', function () {
+            if (!draftSettings) return;
+            var mode = this.getAttribute('data-mode') || 'random4';
+            draftSettings.colonEggMode = mode;
+            updateModalPreview();
+          });
+        }
 
         var fileRoamerInput = document.getElementById('fileRoamerInput');
         document.getElementById('btnPickRoamerImgs').addEventListener('click', function () {
