@@ -11,24 +11,14 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="preload" href="clock-pigs/jf-openhuninn-2.0.woff2" as="font" type="font/woff2" crossorigin />
   <style>
-    <style>
-  @font-face {
-    font-family: "SetoRoundFont";
-    src: url("clock-pigs/jf-openhuninn-2.0.woff2") format("woff2");
-    font-weight: 100 900;
-    font-style: normal;
-    font-display: swap;
-  }
-  :root {
-    --bg: #FDF6EC;
-    --ink: #3B2318;
-    --pill-bg: #FFFAF3;
-    --pill-border: #3B2318;
-    --modal-bg: #FDF6EC;
-    --card-bg: #FFFFFF;
-    --accent: #F4B89C;
-    --font-round: "SetoRoundFont", "SetoFont", "jf open 粉圓 2.0", "GenSenRounded TW", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
-  }
+    @font-face {
+      font-family: "SetoRoundFont";
+      src: url("clock-pigs/jf-openhuninn-2.0.woff2") format("woff2");
+      font-weight: 100 900;
+      font-style: normal;
+      font-display: swap;
+    }
+
     :root {
       --bg: #FDF6EC;
       --ink: #3B2318;
@@ -37,7 +27,7 @@
       --modal-bg: #FDF6EC;
       --card-bg: #FFFFFF;
       --accent: #F4B89C;
-      --font-round: "jf open 粉圓 2.0", "jf-openhuninn-2.0", "jf open 粉圓 1.1", "jf-openhuninn-1.1", "GenSenRounded TW", "GenSenRounded", "SetoFont", "JasonHandwriting1", "Yuanti TC", "Hannotate TC", "Hiragino Maru Gothic ProN", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", ui-rounded, sans-serif;
+      --font-round: "SetoRoundFont", "SetoFont", "jf open 粉圓 2.0", "GenSenRounded TW", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
     }
 
     body.night {
@@ -193,7 +183,7 @@
     }
 
     #titleIconImg {
-      display: inline-block;
+      display: none;
       width: 32px;
       height: 32px;
       object-fit: contain;
@@ -1662,41 +1652,6 @@
             pigs[i].y = pigs[i].ty;
           }
           pigs[i].currentScale = pigs[i].scale;
-          var used = new Array(pigs.length);
-        // 時鐘模式：縮小且限制上限，讓每個數字筆畫之間留出清楚空隙
-        var pigScale = Math.max(0.22, Math.min(0.32, (digitW / 96) * 0.45));
-
-        for (var t = 0; t < targets.length; t++) {
-          var bestIdx = -1;
-          var bestDist = Infinity;
-          for (var p = 0; p < pigs.length; p++) {
-            if (used[p]) continue;
-            var dx = pigs[p].x - targets[t].x;
-            var dy = pigs[p].y - targets[t].y;
-            var dist = dx * dx + dy * dy;
-            if (dist < bestDist) {
-              bestDist = dist;
-              bestIdx = p;
-            }
-          }
-          if (bestIdx !== -1) {
-            used[bestIdx] = true;
-            pigs[bestIdx].role = targets[t].role;
-            pigs[bestIdx].tx = targets[t].x;
-            pigs[bestIdx].ty = targets[t].y;
-            // 數字與冒號維持完全一致的大小
-            pigs[bestIdx].scale = pigScale;
-          }
-        }
-
-        for (var r = 0; r < pigs.length; r++) {
-          if (pigs[r].role === 'roamer') {
-            // 時鐘模式下的閒逛小豬也同步縮小，避免搶走時鐘數字的焦點
-            pigs[r].scale = pigScale * 0.9;
-            pigs[r].vx = (Math.random() - 0.5) * 75;
-            pigs[r].vy = (Math.random() - 0.5) * 75;
-          }
-        }
         }
       }
 
@@ -1957,7 +1912,8 @@
         }
 
         var used = new Array(pigs.length);
-        var pigScale = Math.max(0.30, Math.min(0.46, (digitW / 96) * 0.62));
+        // 時鐘模式：縮小且限制上限，讓每個數字筆畫之間留出清楚空隙
+        var pigScale = Math.max(0.22, Math.min(0.32, (digitW / 96) * 0.45));
 
         for (var t = 0; t < targets.length; t++) {
           var bestIdx = -1;
@@ -1977,13 +1933,15 @@
             pigs[bestIdx].role = targets[t].role;
             pigs[bestIdx].tx = targets[t].x;
             pigs[bestIdx].ty = targets[t].y;
-            pigs[bestIdx].scale = targets[t].role === 'colon' ? pigScale * 1.12 : pigScale;
+            // 數字與冒號維持完全一致的大小
+            pigs[bestIdx].scale = pigScale;
           }
         }
 
         for (var r = 0; r < pigs.length; r++) {
           if (pigs[r].role === 'roamer') {
-            pigs[r].scale = 0.42;
+            // 時鐘模式下的閒逛小豬也同步縮小，避免搶走時鐘數字的焦點
+            pigs[r].scale = pigScale * 0.9;
             pigs[r].vx = (Math.random() - 0.5) * 75;
             pigs[r].vy = (Math.random() - 0.5) * 75;
           }
