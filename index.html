@@ -1225,8 +1225,7 @@
           <span>6. 冒號點擊彩蛋圖案</span>
         </div>
         <div class="chip-wrap" id="colonEggChoiceGroup" style="margin-top:0;">
-          <button type="button" class="chip colon-egg-opt active" data-mode="random6">6 款隨機輪流</button>
-          <button type="button" class="chip colon-egg-opt" data-mode="shiro">小白頭部垂耳</button>
+          <button type="button" class="chip colon-egg-opt active" data-mode="random5">5 款隨機輪流</button>
           <button type="button" class="chip colon-egg-opt" data-mode="himawari">小葵捲髮側臉</button>
           <button type="button" class="chip colon-egg-opt" data-mode="sin1">小新側臉</button>
           <button type="button" class="chip colon-egg-opt" data-mode="s3">肥嘟嘟左衛門</button>
@@ -1568,10 +1567,9 @@
       var STORAGE_KEY = 'buriburi_pig_clock_settings_v12';
       var TOTAL_PIGS = 142;
       var DEFAULT_POSE_COUNT = 12;
-      var EGG_DURATION_SEC = 5.0;
 
-      var VALID_EGG_MODES = ['random6', 'random5', 'shiro', 'himawari', 'sin1', 's3', 'sin2', 'sin4', 'heart'];
-      var RANDOM6_POOL = ['shiro', 'himawari', 'sin1', 's3', 'sin2', 'sin4'];
+      var VALID_EGG_MODES = ['random5', 'himawari', 'sin1', 's3', 'sin2', 'sin4', 'heart'];
+      var RANDOM5_POOL = ['himawari', 'sin1', 's3', 'sin2', 'sin4'];
 
       var W = 360;
       var H = 640;
@@ -1589,7 +1587,7 @@
           extraLarge: true,
           visible: true,
           showDateBadge: true,
-          colonEggMode: 'random6',
+          colonEggMode: 'random5',
           text: '不理不理左衛門時鐘',
           fontSize: 26,
           iconType: 'preset',
@@ -1633,8 +1631,7 @@
           : (src.showBtnImageData || '');
 
         var eggMode = src.colonEggMode === 'bo' ? 'himawari' : src.colonEggMode;
-        if (eggMode === 'random5') eggMode = 'random6';
-        if (VALID_EGG_MODES.indexOf(eggMode) === -1) eggMode = 'random6';
+        if (VALID_EGG_MODES.indexOf(eggMode) === -1) eggMode = 'random5';
 
         return {
           forceLandscape: typeof src.forceLandscape === 'boolean' ? src.forceLandscape : false,
@@ -1675,10 +1672,9 @@
         waveCycles: 1,
         waveContinuousEnd: 0,
         heartShowTimer: 0,
-        activeEggShape: 'shiro',
+        activeEggShape: 'himawari',
         eggDeck: [],
         lastDrawnEggShape: '',
-        lastExitStyle: -1,
         heartCenter: { x: 180, y: 320 },
         heartScale: 8,
         clockBox: { left: 20, right: 300, top: 120, bottom: 420 },
@@ -2150,33 +2146,25 @@
       }
 
       /* ============================================================================
-         小白＋5 款精細手繪彩蛋圖案標準化座標（中心 (0,0)，半徑約 15，標記 1 為銳利折角不磨平）
+         5 款精細手繪彩蛋圖案標準化座標（中心 (0,0)，半徑約 15，標記 1 為銳利折角不磨平）
          ============================================================================ */
-
-      /* 0. 小白（SHIRO）：蓬鬆圓潤頭部＋左高垂耳＋右垂耳＋下巴輪廓 */
-      var SHIRO_HEAD_OUTLINE = [
-        [-4.6, -9.8], [0.2, -10.8], [5.4, -9.8], [9.8, -7.2],
-        [12.0, -3.6, 1],
-        /* 右側下垂小耳 */
-        [14.6, -2.8], [16.2, -0.4], [15.4, 2.6], [12.8, 2.2], [11.8, -0.4, 1],
-        /* 右臉頰與圓下巴 */
-        [12.2, 3.6], [9.6, 7.6], [4.2, 9.6], [-2.4, 9.8], [-8.8, 8.2],
-        /* 左臉頰 */
-        [-12.6, 4.6], [-12.8, -0.4], [-10.6, -4.8], [-9.2, -7.4, 1],
-        /* 左側高翹垂耳 */
-        [-12.6, -9.2], [-15.2, -11.6], [-13.6, -14.4], [-9.8, -13.6], [-7.4, -10.6, 1],
-        [-4.6, -9.8]
-      ];
 
       /* 1. 小葵捲髮側臉（HIMAWARI）：
             額前三道立體螺旋捲毛（帶深凹 V 型波谷），配合額頭內側螺旋捲線與右側圓耳朵 */
       var HIMAWARI_OUTLINE = [
+        /* 左臉頰到額角 */
         [-11.2, -3.2],
+        /* 第 1 捲（左側前額最突出捲毛） */
         [-14.2, -4.4], [-15.2, -7.8], [-12.6, -11.0], [-8.8, -10.6], [-7.6, -6.8, 1],
+        /* 第 2 捲（頭頂中央大螺旋捲毛） */
         [-6.6, -10.6], [-2.8, -12.0], [0.6, -9.8], [1.4, -6.2, 1],
+        /* 第 3 捲（右側額角捲毛） */
         [2.6, -9.4], [6.4, -9.8], [9.4, -7.2],
+        /* 後腦勺圓弧到右耳 */
         [11.4, -3.6], [11.6, 0.2, 1],
+        /* 右側小圓耳朵 */
         [14.2, 0.2], [15.6, 3.0], [14.4, 6.2], [11.6, 6.8, 1],
+        /* 圓潤下巴與左側嘟嘟臉頰 */
         [8.4, 8.6], [1.2, 9.6], [-6.8, 9.4], [-12.4, 7.2],
         [-14.6, 3.6], [-13.6, -0.2], [-11.2, -3.2]
       ];
@@ -2184,8 +2172,10 @@
       /* 2. 蠟筆小新側臉（SIN1）：經典馬鈴薯頭型＋鼓鼓左臉頰＋右側大耳朵 */
       var SIN1_OUTLINE = [
         [-1.8, -12.0], [3.2, -11.8], [7.6, -9.4], [9.6, -5.2], [9.8, -1.0, 1],
+        /* 右側外凸大耳朵 */
         [12.6, -1.8], [15.2, 0.2], [15.6, 3.8], [13.8, 6.8], [11.0, 7.6],
         [9.4, 6.8, 1],
+        /* 平順下巴到左側鼓鼓臉頰 */
         [6.8, 8.2], [0.6, 9.2], [-7.2, 9.6], [-13.2, 8.6],
         [-15.6, 5.4], [-15.4, 1.0], [-12.6, -2.0], [-10.8, -3.0],
         [-9.6, -7.6], [-6.0, -11.0], [-1.8, -12.0]
@@ -2194,9 +2184,12 @@
       /* 3. 肥嘟嘟左衛門豬頭（S3）：左右招風豬耳＋圓臉＋中間大豬鼻 */
       var S3_HEAD_OUTLINE = [
         [-4.2, -8.4], [0.0, -7.4], [4.2, -8.4],
+        /* 右耳 */
         [7.8, -12.0, 1], [11.2, -10.6], [11.6, -5.8], [10.6, -2.8, 1],
+        /* 右臉頰與雙下巴 */
         [14.0, -0.4], [14.8, 3.8], [12.4, 7.4], [8.2, 8.6, 1],
         [4.8, 10.8], [0.0, 10.2], [-4.8, 10.8], [-8.2, 8.6, 1],
+        /* 左臉頰與左耳 */
         [-12.4, 7.4], [-14.8, 3.8], [-14.0, -0.4], [-10.6, -2.8, 1],
         [-11.6, -5.8], [-11.2, -10.6], [-7.8, -12.0, 1], [-4.2, -8.4]
       ];
@@ -2210,13 +2203,16 @@
       /* 4. 蠟筆小新濃眉嘟嘴（SIN2）：馬鈴薯頭＋粗黑毛毛蟲濃眉＋嘟嘴＋右耳 */
       var SIN2_HEAD_OUTLINE = [
         [-2.8, -12.8], [2.8, -12.4], [7.4, -9.4], [9.4, -4.6], [9.6, -1.6, 1],
+        /* 右耳 */
         [12.4, -2.4], [15.2, -0.2], [15.6, 3.8], [13.6, 6.8], [10.8, 7.6],
         [9.0, 6.4, 1],
+        /* 下巴與鼓臉頰 */
         [5.2, 8.8], [-2.0, 9.8], [-9.2, 9.4], [-14.2, 6.8],
         [-15.4, 2.4], [-13.6, -1.6], [-11.2, -2.6], [-10.6, -7.4], [-7.4, -11.4],
         [-2.8, -12.8]
       ];
 
+      /* 濃眉加厚成雙層弧線，遠看像超粗毛毛蟲眉毛 */
       var SIN2_BROW_LEFT = [
         [-11.4, -5.8], [-9.4, -8.8], [-6.2, -9.0], [-4.0, -6.4],
         [-4.6, -5.4], [-6.6, -7.4], [-9.2, -7.2], [-10.8, -5.0]
@@ -2232,6 +2228,7 @@
         [4.8, -5.2], [9.8, -4.8], [13.4, -2.0], [14.6, 2.4], [13.8, 7.0],
         [10.2, 9.8], [2.0, 10.0], [-7.2, 9.6], [-9.6, 7.6], [-7.6, 5.4],
         [2.6, 5.4], [7.0, 3.8], [7.0, 1.4], [2.6, 0.2], [-10.4, 0.2],
+        /* 鱷魚吻部前端與鼻孔小隆起 */
         [-14.4, -1.4], [-15.0, -4.6], [-12.6, -6.6], [-10.6, -5.6],
         [-8.4, -6.4], [-5.2, -5.4]
       ];
@@ -2246,15 +2243,14 @@
       }
 
       function pickNextColonEggShape() {
-        var mode = (currentSettings && currentSettings.colonEggMode) ? currentSettings.colonEggMode : 'random6';
-        if (mode === 'random5') mode = 'random6';
-        if (mode !== 'random6') {
+        var mode = (currentSettings && currentSettings.colonEggMode) ? currentSettings.colonEggMode : 'random5';
+        if (mode !== 'random5') {
           state.activeEggShape = mode;
           state.lastDrawnEggShape = mode;
           return mode;
         }
         if (!state.eggDeck || state.eggDeck.length === 0) {
-          var deck = RANDOM6_POOL.slice();
+          var deck = RANDOM5_POOL.slice();
           for (var i = deck.length - 1; i > 0; i--) {
             var j = Math.floor(Math.random() * (i + 1));
             var tmp = deck[i];
@@ -2301,74 +2297,24 @@
         }
       }
 
-      /* 小幫手退場模式：
-         - 'shrink'：使用者中途點擊跳回時間，原地縮水變小消失／回鍋
-         - 'exit1'：集體轉圈後向兩側噴射退場
-         - 'exit2'：螺旋擴散／炸開後分流離場
-         - 'exit3'：排隊波浪跳躍後退場 */
-      function dismissEggHelpers(immediate, modeOverride) {
+      function dismissEggHelpers(immediate) {
         if (immediate) {
           eggHelpers = [];
           return;
         }
-        if (eggHelpers.length === 0) return;
-
-        var exitMode = modeOverride;
-        if (!exitMode) {
-          var choices = ['exit1', 'exit2', 'exit3'];
-          var idx = Math.floor(Math.random() * choices.length);
-          if (choices.length > 1 && idx === state.lastExitStyle) {
-            idx = (idx + 1) % choices.length;
-          }
-          state.lastExitStyle = idx;
-          exitMode = choices[idx];
-        }
-
-        var cx = state.heartCenter ? state.heartCenter.x : W * 0.5;
-        var cy = state.heartCenter ? state.heartCenter.y : H * 0.5;
-
         for (var i = 0; i < eggHelpers.length; i++) {
           var h = eggHelpers[i];
           if (!h.leaving) {
             h.leaving = true;
-            h.exitMode = exitMode;
-            h.exitProgress = 0;
-            h.exitStartX = h.x;
-            h.exitStartY = h.y;
-            h.exitBaseScale = h.scale;
-            h.exitOrder = i / Math.max(1, eggHelpers.length - 1);
-
-            var angFromCenter = Math.atan2(h.y - cy, h.x - cx);
-            var goRight = Math.cos(angFromCenter) >= 0;
-
-            if (exitMode === 'shrink') {
-              h.tx = h.x;
-              h.ty = h.y;
-            } else if (exitMode === 'exit1') {
-              /* 先在原地加速轉圈一圈，再向左右兩側噴射衝出畫面 */
-              h.tx = goRight ? (W + 120) : -120;
-              h.ty = h.y + (Math.sin(i * 1.7) * 32);
-              h.flipX = goRight ? 1 : -1;
-            } else if (exitMode === 'exit2') {
-              /* 先以彩蛋中心為圓心螺旋炸開一小圈，再往左右滑出螢幕 */
-              var burstAng = angFromCenter + 0.65;
-              var burstR = Math.max(55, Math.min(W, H) * 0.22);
-              h.burstX = cx + Math.cos(burstAng) * burstR;
-              h.burstY = cy + Math.sin(burstAng) * burstR;
-              h.tx = goRight ? (W + 110) : -110;
-              h.ty = h.burstY + (Math.sin(burstAng) * 45);
-              h.flipX = goRight ? 1 : -1;
-            } else {
-              /* 排隊波浪跳躍後往左右兩側小跑步離開 */
-              h.tx = goRight ? (W + 100) : -100;
-              h.ty = h.y;
-              h.flipX = goRight ? 1 : -1;
-            }
+            var goRight = h.x >= W * 0.5;
+            h.tx = goRight ? (W + 70) : -70;
+            h.ty = h.y + (Math.random() - 0.5) * 40;
+            h.flipX = goRight ? 1 : -1;
           }
         }
       }
 
-      /* 召喚精巧援軍來刻畫五官／髮捲／牙齒細節，彩蛋結束依橋段退場 */
+      /* 召喚少量精巧援軍來刻畫五官／髮捲／牙齒細節，彩蛋結束自動跑步離場 */
       function spawnDetailHelpers(cx, cy, figScale, helperSlots) {
         eggHelpers = [];
         var helperPool = getSystemHelperSpritePool();
@@ -2390,15 +2336,7 @@
             scale: slot.scale,
             flipX: fromLeft ? 1 : -1,
             phase: Math.random() * Math.PI * 2,
-            leaving: false,
-            exitMode: '',
-            exitProgress: 0,
-            exitStartX: sx,
-            exitStartY: sy,
-            exitBaseScale: slot.scale,
-            exitOrder: 0,
-            burstX: sx,
-            burstY: sy
+            leaving: false
           });
         }
       }
@@ -2429,59 +2367,14 @@
 
         var slots = [];
 
-        if (shape === 'shiro') {
+        if (shape === 'himawari') {
           /* ======================================================================
-0. 小白（SHIRO）：蓬鬆頭部外框＋左高右垂雙耳＋冒號圓亮雙眼＋小黑鼻／拱眉／藍項圈
-             ====================================================================== */
-          var shiroEyeScale = Math.max(0.22, Math.min(0.34, figScale * 0.025));
-          var shiroRimScale = Math.max(0.135, Math.min(0.20, figScale * 0.015));
-
-          for (var c0 = 0; c0 < colonPigs.length; c0++) {
-            var eSide = c0 === 0 ? -1 : 1;
-            colonPigs[c0].tx = cx + eSide * 5.2 * figScale;
-            colonPigs[c0].ty = cy - 1.4 * figScale;
-            colonPigs[c0].heartBaseX = colonPigs[c0].tx;
-            colonPigs[c0].heartBaseY = colonPigs[c0].ty;
-            colonPigs[c0].scale = shiroEyeScale;
-            colonPigs[c0].baseAlpha = 1;
-            colonPigs[c0].flipX = eSide === -1 ? 1 : -1;
-          }
-
-          var shiroPts = samplePolyline(SHIRO_HEAD_OUTLINE, rimPigs.length + 1, 1);
-          for (var sh = 0; sh < rimPigs.length; sh++) {
-            slots.push({
-              x: cx + shiroPts[sh].x * figScale,
-              y: cy + shiroPts[sh].y * figScale,
-              scale: shiroRimScale
-            });
-          }
-          assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
-
-          var shiroDetailScale = Math.max(0.13, Math.min(0.19, figScale * 0.0145));
-          spawnDetailHelpers(cx, cy, figScale, [
-            /* 左拱眉與右拱眉 */
-            { x: -6.8, y: -5.4, scale: shiroDetailScale },
-            { x: -4.8, y: -6.2, scale: shiroDetailScale },
-            { x: 4.8, y: -6.2, scale: shiroDetailScale },
-            { x: 6.8, y: -5.4, scale: shiroDetailScale },
-            /* 圓黑小鼻與微笑嘴角 */
-            { x: -1.4, y: 2.2, scale: shiroDetailScale },
-            { x: 0.6, y: 2.6, scale: shiroDetailScale },
-            { x: 2.4, y: 2.2, scale: shiroDetailScale },
-            /* 小白標誌性藍色項圈與左耳內側 */
-            { x: -3.2, y: 10.6, scale: shiroDetailScale },
-            { x: 0.2, y: 11.2, scale: shiroDetailScale },
-            { x: 3.4, y: 10.6, scale: shiroDetailScale },
-            { x: -11.4, y: -11.2, scale: shiroDetailScale }
-          ]);
-
-        } else if (shape === 'himawari') {
-          /* ======================================================================
-1. 小葵捲髮側臉（HIMAWARI）：
+             1. 小葵捲髮側臉（HIMAWARI）：
              額前 3 圈立體螺旋捲毛（外圈深凹波浪 + 內側螺旋髮捲線條）＋圓臉＋右耳
              ====================================================================== */
           var himaDuetGap = Math.max(18, Math.min(36, figScale * 2.3));
           var himaDuetScale = Math.max(0.32, Math.min(0.48, figScale * 0.036));
+          /* 縮小輪廓小豬尺寸，讓三圈捲毛的波谷線條清晰分明不糊在一起 */
           var himaRimScale = Math.max(0.135, Math.min(0.20, figScale * 0.015));
 
           for (var cb = 0; cb < colonPigs.length; cb++) {
@@ -2495,6 +2388,7 @@
             colonPigs[cb].flipX = sideB === -1 ? 1 : -1;
           }
 
+          /* 140 隻主體全部用來精細勾勒小葵的三圈捲毛＋臉型＋耳朵（smoothIter=1 保留捲毛凹谷） */
           var himaPts = samplePolyline(HIMAWARI_OUTLINE, rimPigs.length + 1, 1);
           for (var bi = 0; bi < rimPigs.length; bi++) {
             slots.push({
@@ -2505,27 +2399,29 @@
           }
           assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
 
+          /* 援軍在額頭內側補上三圈螺旋捲毛的內捲渦紋 + 右耳耳窩，讓捲捲髮超立體 */
           var curlHelperScale = Math.max(0.125, Math.min(0.185, figScale * 0.0138));
           var curlDetails = [
+            /* 左第 1 捲內渦 */
             { x: -11.4, y: -7.6, scale: curlHelperScale },
             { x: -10.2, y: -6.4, scale: curlHelperScale },
             { x: -9.2, y: -7.6, scale: curlHelperScale },
+            /* 中第 2 捲內渦 */
             { x: -4.2, y: -8.6, scale: curlHelperScale },
             { x: -2.8, y: -7.2, scale: curlHelperScale },
             { x: -1.6, y: -8.4, scale: curlHelperScale },
+            /* 右第 3 捲內渦 */
             { x: 4.4, y: -6.8, scale: curlHelperScale },
             { x: 5.8, y: -5.6, scale: curlHelperScale },
+            /* 右耳耳窩 */
             { x: 12.6, y: 2.6, scale: curlHelperScale },
-            { x: 12.4, y: 4.6, scale: curlHelperScale },
-            /* 額頭下方眉弧與臉頰細節補強 */
-            { x: -6.6, y: -2.2, scale: curlHelperScale },
-            { x: 1.6, y: -2.2, scale: curlHelperScale }
+            { x: 12.4, y: 4.6, scale: curlHelperScale }
           ];
           spawnDetailHelpers(cx, cy, figScale, curlDetails);
 
         } else if (shape === 'sin1') {
           /* ======================================================================
-2. 蠟筆小新側臉（SIN1）：馬鈴薯頭型＋鼓臉頰＋右大耳＋耳窩＋小眉眼
+             2. 蠟筆小新側臉（SIN1）：馬鈴薯頭型＋鼓臉頰＋右大耳＋耳窩＋小眉眼
              ====================================================================== */
           var duetGap = Math.max(18, Math.min(36, figScale * 2.4));
           var duetScale = Math.max(0.33, Math.min(0.50, figScale * 0.038));
@@ -2552,20 +2448,20 @@
           }
           assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
 
+          /* 援軍補上右耳耳窩線條＋額頭小濃眉 */
           var sin1DetailScale = Math.max(0.13, Math.min(0.19, figScale * 0.0145));
           spawnDetailHelpers(cx, cy, figScale, [
             { x: 12.4, y: 1.6, scale: sin1DetailScale },
             { x: 12.0, y: 4.0, scale: sin1DetailScale },
-            { x: -8.2, y: -5.8, scale: sin1DetailScale },
-            { x: -5.6, y: -6.6, scale: sin1DetailScale },
-            { x: -1.8, y: -6.4, scale: sin1DetailScale },
-            { x: 0.8, y: -5.6, scale: sin1DetailScale },
-            { x: -12.6, y: 3.4, scale: sin1DetailScale }
+            { x: -7.5, y: -5.8, scale: sin1DetailScale },
+            { x: -5.2, y: -6.4, scale: sin1DetailScale },
+            { x: -1.5, y: -6.2, scale: sin1DetailScale },
+            { x: 1.0, y: -5.6, scale: sin1DetailScale }
           ]);
 
         } else if (shape === 's3') {
           /* ======================================================================
-3. 肥嘟嘟左衛門豬頭（S3）：雙耳頭型＋豬鼻外框＋鼻孔冒號豬＋瞇瞇眼＋小嘴
+             3. 肥嘟嘟左衛門豬頭（S3）：雙耳頭型＋豬鼻外框＋鼻孔冒號豬＋瞇瞇眼＋小嘴
              ====================================================================== */
           var nostrilScale = Math.max(0.22, Math.min(0.34, figScale * 0.025));
           var headScale = Math.max(0.145, Math.min(0.215, figScale * 0.016));
@@ -2603,16 +2499,13 @@
           }
           assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
 
+          /* 援軍補上肥嘟嘟左衛門經典的「半月不屑眼」與「八字小嘴」 */
           var s3DetailScale = Math.max(0.135, Math.min(0.195, figScale * 0.0148));
           spawnDetailHelpers(cx, cy, figScale, [
-            { x: -7.2, y: -2.6, scale: s3DetailScale },
-            { x: -4.8, y: -2.2, scale: s3DetailScale },
-            { x: -2.6, y: -2.6, scale: s3DetailScale },
-            { x: 2.6, y: -2.6, scale: s3DetailScale },
-            { x: 4.8, y: -2.2, scale: s3DetailScale },
-            { x: 7.2, y: -2.6, scale: s3DetailScale },
-            { x: -7.6, y: 0.6, scale: s3DetailScale },
-            { x: 7.6, y: 0.6, scale: s3DetailScale },
+            { x: -6.6, y: -2.4, scale: s3DetailScale },
+            { x: -4.4, y: -2.4, scale: s3DetailScale },
+            { x: 4.4, y: -2.4, scale: s3DetailScale },
+            { x: 6.6, y: -2.4, scale: s3DetailScale },
             { x: -2.0, y: 11.8, scale: s3DetailScale },
             { x: 0.0, y: 11.2, scale: s3DetailScale },
             { x: 2.0, y: 11.8, scale: s3DetailScale }
@@ -2620,7 +2513,7 @@
 
         } else if (shape === 'sin2') {
           /* ======================================================================
-4. 蠟筆小新濃眉嘟嘴（SIN2）：毛毛蟲雙層粗眉＋圓嘟嘴＋右耳＋耳窩
+             4. 蠟筆小新濃眉嘟嘴（SIN2）：毛毛蟲雙層粗眉＋圓嘟嘴＋右耳＋耳窩
              ====================================================================== */
           var cheekScale = Math.max(0.22, Math.min(0.34, figScale * 0.025));
           var outlineScale = Math.max(0.135, Math.min(0.195, figScale * 0.0148));
@@ -2677,16 +2570,15 @@
           }
           assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
 
+          /* 援軍補上右耳耳窩線條 */
           spawnDetailHelpers(cx, cy, figScale, [
             { x: 12.2, y: 1.5, scale: outlineScale },
-            { x: 11.8, y: 3.9, scale: outlineScale },
-            { x: -7.8, y: -8.1, scale: featureScale },
-            { x: 2.8, y: -8.2, scale: featureScale }
+            { x: 11.8, y: 3.9, scale: outlineScale }
           ]);
 
         } else if (shape === 'sin4') {
           /* ======================================================================
-5. 巧克比鱷魚山先生（Sin4）：鱷魚輪廓＋骨碌碌冒號眼珠＋大眼眶＋交錯鋸齒尖牙
+             5. 巧克比鱷魚山先生（Sin4）：鱷魚輪廓＋骨碌碌冒號眼珠＋大眼眶＋交錯鋸齒尖牙
              ====================================================================== */
           var pupilScale = Math.max(0.21, Math.min(0.32, figScale * 0.024));
           var crocScale = Math.max(0.145, Math.min(0.215, figScale * 0.016));
@@ -2712,6 +2604,7 @@
           }
           assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
 
+          /* 援軍負責刻畫左右大眼眶 + 上下交錯鋸齒牙齒 */
           var eyeL = samplePolyline(buildCirclePts(-2.3, -8.4, 2.7, 3.1, 36), 11, 0);
           var eyeR = samplePolyline(buildCirclePts(3.5, -8.4, 2.7, 3.1, 36), 11, 0);
           var eyeScale = Math.max(0.135, Math.min(0.195, figScale * 0.0148));
@@ -2731,13 +2624,11 @@
             crocDetails.push({ x: tx + 0.2, y: 2.8, scale: toothScale });
             crocDetails.push({ x: tx + 0.4, y: 4.5, scale: toothScale });
           }
-          /* 吻部鼻孔小細節 */
-          crocDetails.push({ x: -12.4, y: -4.2, scale: toothScale });
           spawnDetailHelpers(cx, cy, figScale, crocDetails);
 
         } else {
           /* ======================================================================
-6. 經典大愛心（heart）
+             6. 經典大愛心（heart）
              ====================================================================== */
           var heartDuetGap = Math.max(24, Math.min(48, figScale * 3.4));
           var heartDuetScale = Math.max(0.42, Math.min(0.68, figScale * 0.048));
@@ -2777,17 +2668,10 @@
       function triggerHeartDuetShow() {
         if (!state.gathered) return;
         dismissEggHelpers(true);
-        state.heartShowTimer = EGG_DURATION_SEC;
+        state.heartShowTimer = 6.5;
         state.waveActive = false;
         var chosenShape = pickNextColonEggShape();
         layoutColonEggShape(chosenShape);
-      }
-
-      function cancelEggShowToClock() {
-        if (!state.gathered || state.heartShowTimer <= 0) return;
-        state.heartShowTimer = 0;
-        dismissEggHelpers(false, 'shrink');
-        computeClockTargets();
       }
 
       function computeClockTargets() {
@@ -2968,7 +2852,7 @@
       function setGathered(val, snapImmediate) {
         state.gathered = !!val;
         state.heartShowTimer = 0;
-        dismissEggHelpers(false, 'shrink');
+        dismissEggHelpers(false);
         var btn = document.getElementById('btnToggleGather');
         if (btn) {
           btn.textContent = state.gathered ? '自己玩 / 幾點了（時鐘)' : '自己玩 / 幾點了（玩耍中)';
@@ -3069,12 +2953,6 @@
           return;
         }
 
-        /* 冒號陣型演出中，觸碰畫面即可提前跳回時間顯示 */
-        if (state.heartShowTimer > 0) {
-          cancelEggShowToClock();
-          return;
-        }
-
         var hit = findPigAt(px, py);
         if (hit) {
           if (hit.role === 'colon') {
@@ -3112,11 +2990,6 @@
           if (isTap) {
             setGathered(true);
           }
-          return;
-        }
-
-        if (state.heartShowTimer > 0) {
-          if (isTap) cancelEggShowToClock();
           return;
         }
 
@@ -3405,91 +3278,26 @@
           ctx.restore();
         }
 
-        /* 彩蛋臨時細節援軍演出與退場橋段 */
+        /* 彩蛋臨時細節援軍（小葵螺旋髮捲渦紋、鱷魚眼眶牙齒、左衛門瞇眼等）進場與退場動畫 */
         for (var eh = eggHelpers.length - 1; eh >= 0; eh--) {
           var helper = eggHelpers[eh];
-          var hScale = helper.scale;
-          var hAlpha = 1;
-          var hWiggle = Math.sin(sec * 6 + helper.phase) * 0.08;
-          var hBob = Math.sin(sec * 5 + helper.phase) * 1.4;
-          var hSpinAngle = 0;
-
-          if (!helper.leaving) {
-            if (state.heartShowTimer > 0) {
-              var hRelX = helper.heartBaseX - state.heartCenter.x;
-              var hRelY = helper.heartBaseY - state.heartCenter.y;
-              helper.tx = state.heartCenter.x + hRelX * shapePulse;
-              helper.ty = state.heartCenter.y + hRelY * shapePulse;
-            }
-            helper.x += (helper.tx - helper.x) * Math.min(1, dt * 9.2);
-            helper.y += (helper.ty - helper.y) * Math.min(1, dt * 9.2);
-          } else {
-            helper.exitProgress += dt;
-            var ep = helper.exitProgress;
-
-            if (helper.exitMode === 'shrink') {
-              /* (4) 中途點擊跳回時間：原地縮水變小消失／回鍋 */
-              var shrinkRatio = Math.max(0, 1 - ep / 0.24);
-              hScale = helper.exitBaseScale * shrinkRatio;
-              hAlpha = shrinkRatio;
-              hSpinAngle = ep * 12;
-              if (shrinkRatio <= 0.02) {
-                eggHelpers.splice(eh, 1);
-                continue;
-              }
-            } else if (helper.exitMode === 'exit1') {
-              /* (1) 集體轉圈後向兩側噴射退場：先在 0.45s 內轉 360 度並微微放大，再加速衝出兩側 */
-              var spinDur = 0.45;
-              if (ep < spinDur) {
-                var spinT = ep / spinDur;
-                hSpinAngle = spinT * Math.PI * 2;
-                hScale = helper.exitBaseScale * (1 + 0.25 * Math.sin(spinT * Math.PI));
-                hBob = -Math.sin(spinT * Math.PI) * 8;
-              } else {
-                var jetT = Math.min(1, (ep - spinDur) / 0.48);
-                var easeJet = jetT * jetT;
-                helper.x = helper.exitStartX + (helper.tx - helper.exitStartX) * easeJet;
-                helper.y = helper.exitStartY + (helper.ty - helper.exitStartY) * easeJet;
-                hScale = helper.exitBaseScale * (1.05 - 0.25 * easeJet);
-                hWiggle = Math.sin(sec * 24 + helper.phase) * 0.2;
-              }
-            } else if (helper.exitMode === 'exit2') {
-              /* (2) 螺旋擴散／炸開後分流離場 */
-              var burstDur = 0.36;
-              if (ep < burstDur) {
-                var bT = ep / burstDur;
-                var easeOut = 1 - Math.pow(1 - bT, 2);
-                helper.x = helper.exitStartX + (helper.burstX - helper.exitStartX) * easeOut;
-                helper.y = helper.exitStartY + (helper.burstY - helper.exitStartY) * easeOut;
-                hSpinAngle = bT * Math.PI * 1.4;
-                hScale = helper.exitBaseScale * (1 + 0.2 * Math.sin(bT * Math.PI));
-              } else {
-                var driftT = Math.min(1, (ep - burstDur) / 0.52);
-                helper.x = helper.burstX + (helper.tx - helper.burstX) * (driftT * driftT);
-                helper.y = helper.burstY + (helper.ty - helper.burstY) * driftT + Math.sin(driftT * Math.PI * 2 + helper.phase) * 8;
-                hWiggle = Math.sin(sec * 14 + helper.phase) * 0.14;
-              }
-            } else {
-              /* (3) 排隊波浪跳躍後退場 */
-              var waveDelay = helper.exitOrder * 0.24;
-              var activeT = Math.max(0, ep - waveDelay);
-              if (activeT < 0.30) {
-                hBob = -Math.sin((activeT / 0.30) * Math.PI) * 18;
-                hScale = helper.exitBaseScale * (1 + 0.15 * Math.sin((activeT / 0.30) * Math.PI));
-              } else {
-                var runT = Math.min(1, (activeT - 0.30) / 0.50);
-                helper.x = helper.exitStartX + (helper.tx - helper.exitStartX) * (runT * runT);
-                hBob = -Math.abs(Math.sin(runT * Math.PI * 4)) * 7;
-                hWiggle = Math.sin(sec * 18 + helper.phase) * 0.16;
-              }
-            }
+          if (!helper.leaving && state.heartShowTimer > 0) {
+            var hRelX = helper.heartBaseX - state.heartCenter.x;
+            var hRelY = helper.heartBaseY - state.heartCenter.y;
+            helper.tx = state.heartCenter.x + hRelX * shapePulse;
+            helper.ty = state.heartCenter.y + hRelY * shapePulse;
           }
+          var hSpeed = helper.leaving ? 6.5 : 9.2;
+          helper.x += (helper.tx - helper.x) * Math.min(1, dt * hSpeed);
+          helper.y += (helper.ty - helper.y) * Math.min(1, dt * hSpeed);
+
+          var hBob = Math.sin(sec * 5 + helper.phase) * 1.4;
+          var hWiggle = Math.sin(sec * 6 + helper.phase) * 0.08;
 
           ctx.save();
-          ctx.globalAlpha = hAlpha;
           ctx.translate(helper.x, helper.y + hBob);
-          ctx.rotate(hWiggle + hSpinAngle);
-          ctx.scale(helper.flipX * Math.max(0.01, hScale), Math.max(0.01, hScale));
+          ctx.rotate(hWiggle);
+          ctx.scale(helper.flipX * helper.scale, helper.scale);
           if (helper.sprite._isDarkBg) {
             ctx.fillStyle = 'rgba(20, 18, 22, 0.85)';
             drawRoundRect(ctx, -50, -50, 100, 100, 14);
@@ -3503,7 +3311,7 @@
           ctx.shadowBlur = 0;
           ctx.restore();
 
-          if (helper.leaving && helper.exitMode !== 'shrink' && (helper.x < -90 || helper.x > W + 90 || helper.exitProgress > 1.8)) {
+          if (helper.leaving && (helper.x < -45 || helper.x > W + 45)) {
             eggHelpers.splice(eh, 1);
           }
         }
@@ -4260,7 +4068,7 @@
         for (var ce = 0; ce < colonEggOpts.length; ce++) {
           colonEggOpts[ce].addEventListener('click', function () {
             if (!draftSettings) return;
-            var mode = this.getAttribute('data-mode') || 'random6';
+            var mode = this.getAttribute('data-mode') || 'random5';
             draftSettings.colonEggMode = mode;
             updateModalPreview();
           });
