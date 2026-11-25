@@ -2,32 +2,74 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>手繪小豬報時鐘 · 冒號陣型彩蛋版</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Darumadrop+One&family=Hachi+Maru+Pop&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#FDF6EC" id="metaTheme" />
+  <title>不理不理左衛門時鐘</title>
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="preload" href="clock-pigs/jf-openhuninn-2.0.woff2" as="font" type="font/woff2" crossorigin />
   <style>
-    :root {
-      --bg-cream: #fff9ee;
-      --bg-blush: #ffeef2;
-      --ink: #3d2c2e;
-      --pig-pink: #ff9eb5;
-      --pig-deep: #ff6f94;
-      --pig-ear: #ff82a1;
-      --accent-mint: #79d7be;
-      --accent-gold: #ffd166;
-      --accent-sky: #8ecae6;
-      --card-bg: rgba(255, 255, 255, 0.86);
-      --shadow-soft: 0 14px 34px rgba(133, 76, 89, 0.14);
-      --hand-font: 'Hachi Maru Pop', 'Zen Maru Gothic', cursive, sans-serif;
-      --display-font: 'Darumadrop One', 'Hachi Maru Pop', 'Zen Maru Gothic', cursive, sans-serif;
+    /* 1. 真正的瀨戶字體（SetoFont，含數字 0-9、標點與日文/基本漢字） */
+    @font-face {
+      font-family: "SetoFontReal";
+      src:
+        local("SetoFont"),
+        local("SetoFont-SP"),
+        local("瀬戸フォント"),
+        url("clock-pigs/SetoFont.woff2") format("woff2"),
+        url("clock-pigs/SetoFont.ttf") format("truetype"),
+        url("https://cdn.leafscape.be/setofont/setofont_web.woff2") format("woff2");
+      font-weight: 100 900;
+      font-style: normal;
+      font-display: swap;
     }
 
-    * {
+    /* 2. 內海字體（基於瀨戶字體的繁體中文補字版，補齊「衛、豬」等常用字） */
+    @font-face {
+      font-family: "NaikaiSetoExt";
+      src: url("https://cdn.jsdelivr.net/gh/max32002/naikaifont@1.89/webfont/NaikaiFont-Regular-Lite.woff2") format("woff2");
+      font-weight: 100 900;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    /* 3. 本機粉圓體離線備援 */
+    @font-face {
+      font-family: "LocalRoundFallback";
+      src: url("clock-pigs/jf-openhuninn-2.0.woff2") format("woff2");
+      font-weight: 100 900;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      --bg: #FDF6EC;
+      --ink: #3B2318;
+      --pill-bg: #FFFAF3;
+      --pill-border: #3B2318;
+      --modal-bg: #FDF6EC;
+      --card-bg: #FFFFFF;
+      --accent: #F4B89C;
+      --font-round: "SetoFontReal", "NaikaiSetoExt", "SetoFont", "LocalRoundFallback", "jf open 粉圓 2.0", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    }
+
+    body.night {
+      --bg: #050505;
+      --ink: #F5EDE4;
+      --pill-bg: rgba(28, 28, 32, 0.94);
+      --pill-border: rgba(245, 237, 228, 0.82);
+      --modal-bg: #18181B;
+      --card-bg: #242429;
+      --accent: #D98A6C;
+    }
+
+    *, *::before, *::after {
       box-sizing: border-box;
-      user-select: none;
       -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     html, body {
@@ -36,1020 +78,4390 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      font-family: var(--hand-font);
+      background-color: var(--bg);
       color: var(--ink);
-      background:
-        radial-gradient(circle at 14% 18%, #ffe4ec 0%, transparent 34%),
-        radial-gradient(circle at 86% 20%, #fff0c2 0%, transparent 36%),
-        radial-gradient(circle at 22% 84%, #dff7f0 0%, transparent 38%),
-        radial-gradient(circle at 82% 82%, #e3f2fd 0%, transparent 38%),
-        linear-gradient(155deg, var(--bg-cream) 0%, var(--bg-blush) 100%);
+      font-family: var(--font-round);
+      letter-spacing: 0.04em;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      touch-action: none;
     }
 
-    /* 手繪紙感底紋與輕微浮動裝飾 */
-    .paper-doodles {
+    /* 維持瀨戶手寫字體的自然筆觸並稍微加厚辨識度 */
+    #titleTrigger,
+    .date-pill,
+    .pill-btn,
+    #btnShowBar,
+    .modal-head h2,
+    .section-title,
+    .seg-btn,
+    .chip,
+    .size-btn,
+    #modalPreview {
+      font-family: var(--font-round);
+      -webkit-text-stroke: 0.22px currentColor;
+      paint-order: stroke fill;
+    }
+
+    #stageRoot {
       position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       overflow: hidden;
-    }
-
-    .doodle-item {
-      position: absolute;
-      opacity: 0.28;
-      animation: floatDoodle 7s ease-in-out infinite;
-    }
-
-    @keyframes floatDoodle {
-      0%, 100% { transform: translateY(0px) rotate(-3deg); }
-      50% { transform: translateY(-10px) rotate(4deg); }
-    }
-
-    .app-shell {
-      position: relative;
       z-index: 1;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      padding: clamp(12px, 2.4vh, 26px) clamp(14px, 3vw, 36px);
     }
 
-    /* 頂部標題與狀態列 */
-    .top-bar {
-      width: 100%;
-      max-width: 980px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-      z-index: 20;
-    }
-
-    .title-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 18px;
-      background: var(--card-bg);
-      border: 3px solid var(--ink);
-      border-radius: 999px 990px 995px 988px / 990px 996px 986px 994px;
-      box-shadow: 4px 5px 0 var(--ink);
-      font-weight: 700;
-      font-size: clamp(0.95rem, 1.8vw, 1.2rem);
-    }
-
-    .status-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 16px;
-      background: #fffdf7;
-      border: 2.5px solid var(--ink);
-      border-radius: 999px;
-      box-shadow: 3px 4px 0 var(--ink);
-      font-size: clamp(0.82rem, 1.4vw, 1rem);
-      transition: transform 0.2s ease, background-color 0.2s ease;
-    }
-
-    .status-pill.is-show {
-      background: #fff0f5;
-    }
-
-    .status-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--accent-mint);
-      border: 2px solid var(--ink);
-    }
-
-    .status-pill.is-show .status-dot {
-      background: var(--pig-deep);
-      animation: pulseDot 0.65s infinite alternate;
-    }
-
-    @keyframes pulseDot {
-      from { transform: scale(0.9); }
-      to { transform: scale(1.3); }
-    }
-
-    /* 中央時鐘舞台 */
-    .clock-stage {
-      position: relative;
-      width: 100%;
-      flex: 1;
-      max-width: 1060px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 6px 0;
-    }
-
-    .clock-card {
-      position: relative;
-      width: 100%;
-      max-width: 920px;
-      min-height: clamp(230px, 42vh, 380px);
-      background: rgba(255, 253, 249, 0.84);
-      backdrop-filter: blur(8px);
-      border: 4px solid var(--ink);
-      border-radius: 36px 42px 34px 40px / 40px 34px 42px 36px;
-      box-shadow: 9px 11px 0 var(--ink), var(--shadow-soft);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px 24px 36px;
-      overflow: visible;
-    }
-
-    /* 小豬報時主角（左上方/側邊互動小豬） */
-    .pig-mascot-wrap {
-      position: absolute;
-      top: -34px;
-      right: 26px;
-      width: clamp(74px, 11vw, 108px);
-      height: clamp(74px, 11vw, 108px);
-      cursor: pointer;
-      z-index: 15;
-      transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
-      filter: drop-shadow(3px 4px 0 rgba(61, 44, 46, 0.22));
-    }
-
-    .pig-mascot-wrap:hover {
-      transform: scale(1.08) rotate(-4deg);
-    }
-
-    .pig-mascot-wrap:active {
-      transform: scale(0.95);
-    }
-
-    .pig-mascot-wrap.chime-jump {
-      animation: pigWaveJump 0.75s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    @keyframes pigWaveJump {
-      0% { transform: translateY(0) scale(1, 1); }
-      22% { transform: translateY(6px) scale(1.12, 0.86); }
-      52% { transform: translateY(-26px) scale(0.94, 1.1) rotate(6deg); }
-      78% { transform: translateY(3px) scale(1.05, 0.94) rotate(-3deg); }
-      100% { transform: translateY(0) scale(1, 1) rotate(0deg); }
-    }
-
-    /* 數字時間顯示區 */
-    .time-display {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: clamp(6px, 1.6vw, 18px);
-      font-family: var(--display-font);
-      font-size: clamp(3.4rem, 11.5vw, 8.2rem);
-      line-height: 1;
-      letter-spacing: 0.02em;
-      transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
-      z-index: 6;
-    }
-
-    .time-display.is-hidden {
-      opacity: 0;
-      transform: scale(0.84);
-      pointer-events: none;
-    }
-
-    .time-display.is-returning {
-      animation: timePopIn 0.36s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    @keyframes timePopIn {
-      0% { opacity: 0; transform: scale(0.76) translateY(10px); }
-      100% { opacity: 1; transform: scale(1) translateY(0); }
-    }
-
-    .digit-box {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 0.62em;
-      padding: 0.06em 0.08em;
-      border-radius: 22px;
-      background: #fff;
-      border: 3.5px solid var(--ink);
-      box-shadow: 4px 5px 0 var(--ink);
-      color: var(--ink);
-      text-shadow: 2px 2px 0 rgba(255, 158, 181, 0.45);
-    }
-
-    /* 可點擊的中央冒號 */
-    .colon-btn {
-      position: relative;
-      display: inline-flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: clamp(10px, 2.2vh, 22px);
-      padding: 10px 12px;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      z-index: 12;
-      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    .colon-btn:hover {
-      transform: scale(1.15);
-    }
-
-    .colon-btn:active {
-      transform: scale(0.92);
-    }
-
-    .colon-dot {
-      width: clamp(14px, 2.6vw, 24px);
-      height: clamp(14px, 2.6vw, 24px);
-      border-radius: 50%;
-      background: var(--pig-deep);
-      border: 3px solid var(--ink);
-      box-shadow: 2px 3px 0 var(--ink);
-      transition: opacity 0.25s ease, transform 0.25s ease;
-    }
-
-    .colon-btn.blink-off .colon-dot {
-      opacity: 0.28;
-      transform: scale(0.82);
-    }
-
-    .colon-tip {
-      position: absolute;
-      bottom: -24px;
-      white-space: nowrap;
-      font-family: var(--hand-font);
-      font-size: clamp(0.72rem, 1.2vw, 0.88rem);
-      font-weight: 700;
-      color: var(--pig-deep);
-      background: #fff;
-      border: 2px solid var(--ink);
-      border-radius: 999px;
-      padding: 2px 9px;
-      box-shadow: 2px 2px 0 var(--ink);
-      pointer-events: none;
-    }
-
-    /* 60秒手繪進度條 */
-    .progress-track {
-      position: absolute;
-      left: 24px;
-      right: 24px;
-      bottom: 14px;
-      height: 12px;
-      background: #f5ecee;
-      border: 2.5px solid var(--ink);
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, var(--pig-pink), var(--accent-gold), var(--accent-mint));
-      border-radius: 999px;
-      transition: width 0.25s linear;
-    }
-
-    /* 陣型秀小幫手層（覆蓋整個舞台，支援中途點擊跳回時間） */
-    .formation-layer {
-      position: fixed;
-      inset: 0;
-      z-index: 30;
-      pointer-events: none;
-      overflow: hidden;
-    }
-
-    .formation-layer.is-active {
-      pointer-events: auto;
-      cursor: pointer;
-    }
-
-    .formation-hud {
-      position: fixed;
-      top: 76px;
+    body.force-landscape #stageRoot {
+      width: 100vh;
+      height: 100vw;
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%);
-      z-index: 35;
+      transform: translate(-50%, -50%) rotate(90deg);
+      transform-origin: center center;
+    }
+
+    #clockCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 1;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.16s ease-out;
+    }
+
+    #clockCanvas.ready {
+      opacity: 1;
+    }
+
+    #topBar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 12px;
+      pointer-events: none;
+    }
+
+    .top-bar-inner {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      max-width: 96vw;
+      pointer-events: none;
+    }
+
+    /* 手繪不規則外框：頂部標題框 */
+    #titleTrigger {
+      position: relative;
+      pointer-events: auto;
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      max-width: 95vw;
+      padding: 7px 17px;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 2.5px 2px 2.8px 2.2px;
+      border-radius: 26px 11px 24px 13px / 13px 25px 11px 23px;
+      background: var(--pill-bg);
+      color: var(--ink);
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.24;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transform: rotate(-0.9deg);
+      box-shadow: 3px 4px 0 var(--pill-border);
+      transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    #titleTrigger::before {
+      content: "";
+      position: absolute;
+      inset: -3px -2px -2px -3px;
+      border: 1.4px solid var(--pill-border);
+      border-radius: 13px 25px 12px 24px / 24px 12px 25px 13px;
+      opacity: 0.45;
+      transform: rotate(1.1deg);
+      pointer-events: none;
+    }
+
+    #titleTrigger:hover {
+      transform: rotate(-0.3deg) translateY(-1px);
+      box-shadow: 3.5px 5px 0 var(--pill-border);
+    }
+
+    #titleTrigger:active {
+      transform: rotate(0deg) translate(2px, 2.5px) scale(0.97);
+      box-shadow: 1px 1.5px 0 var(--pill-border);
+    }
+
+    /* 手繪不規則外框：日期／星期小標籤（單獨顯示時自動繼承小豬圖示並放大） */
+    .date-pill {
+      position: relative;
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 5px 13px;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 2.2px 1.8px 2.4px 2px;
+      border-radius: 12px 23px 13px 21px / 21px 12px 22px 13px;
+      background: var(--pill-bg);
+      color: var(--ink);
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.22;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      white-space: nowrap;
+      transform: rotate(1.15deg);
+      box-shadow: 2.5px 3.2px 0 var(--pill-border);
+      transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .date-pill::before {
+      content: "";
+      position: absolute;
+      inset: -2.5px -2px -2px -2.5px;
+      border: 1.2px solid var(--pill-border);
+      border-radius: 22px 11px 20px 12px / 11px 21px 12px 20px;
+      opacity: 0.42;
+      transform: rotate(-1.1deg);
+      pointer-events: none;
+    }
+
+    .date-pill:hover {
+      transform: rotate(0.4deg) translateY(-1px);
+      box-shadow: 3px 4px 0 var(--pill-border);
+    }
+
+    .date-pill:active {
+      transform: rotate(0deg) translate(1.5px, 2px) scale(0.97);
+      box-shadow: 1px 1px 0 var(--pill-border);
+    }
+
+    #titleIcon,
+    #dateIcon {
       display: none;
       align-items: center;
-      gap: 10px;
-      padding: 8px 18px;
-      background: rgba(255, 255, 255, 0.95);
-      border: 3px solid var(--ink);
-      border-radius: 999px;
-      box-shadow: 4px 5px 0 var(--ink);
-      font-size: clamp(0.88rem, 1.6vw, 1.05rem);
-      font-weight: 700;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    #titleIconImg,
+    #dateIconImg {
+      display: none;
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      vertical-align: middle;
+    }
+
+    .ctrl-btn-icon {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .ctrl-btn-img {
+      display: inline-block;
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      vertical-align: middle;
+    }
+
+    .edit-badge {
+      font-size: 0.6em;
+      opacity: 0.65;
+      margin-left: 2px;
+      -webkit-text-stroke: 0;
+    }
+
+    #bottomBar {
+      position: fixed;
+      bottom: 10px;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 8px;
       pointer-events: none;
     }
 
-    .formation-layer.is-active + .formation-hud {
+    .toolbar-row {
+      pointer-events: auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      max-width: 98vw;
+    }
+
+    /* 手繪不規則雙層描邊按鈕 */
+    .pill-btn {
+      position: relative;
       display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 6px 12px;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 2.3px 1.8px 2.5px 2px;
+      border-radius: 21px 9px 19px 11px / 10px 20px 9px 19px;
+      background-color: var(--pill-bg);
+      color: var(--ink);
+      font-size: 14.5px;
+      line-height: 1.24;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 2.5px 3.2px 0 var(--pill-border);
+      white-space: nowrap;
+      transition: transform 0.12s ease, background-color 0.2s ease, box-shadow 0.12s ease;
     }
 
-    .helper-unit {
+    .pill-btn::before {
+      content: "";
       position: absolute;
-      left: 50%;
-      top: 50%;
-      width: clamp(40px, 5.2vw, 62px);
-      height: clamp(40px, 5.2vw, 62px);
-      margin-left: calc(clamp(40px, 5.2vw, 62px) / -2);
-      margin-top: calc(clamp(40px, 5.2vw, 62px) / -2);
-      transform: translate3d(0, 0, 0) scale(0);
-      opacity: 0;
-      filter: drop-shadow(2px 3px 0 rgba(61, 44, 46, 0.25));
-      will-change: transform, opacity;
+      inset: -2.5px -2px -2px -2.5px;
+      border: 1.25px solid var(--pill-border);
+      border-radius: 10px 21px 11px 19px / 19px 10px 20px 11px;
+      opacity: 0.42;
+      transform: rotate(0.95deg);
+      pointer-events: none;
     }
 
-    /* 底部手繪控制列 */
-    .bottom-controls {
+    .toolbar-row .pill-btn:nth-child(1) {
+      border-radius: 22px 9px 20px 11px / 10px 21px 9px 19px;
+      transform: rotate(-0.9deg);
+    }
+
+    .toolbar-row .pill-btn:nth-child(2) {
+      border-radius: 10px 22px 11px 20px / 20px 10px 22px 11px;
+      transform: rotate(0.85deg);
+    }
+
+    .toolbar-row .pill-btn:nth-child(3) {
+      border-radius: 19px 12px 23px 9px / 11px 19px 10px 22px;
+      transform: rotate(-0.65deg);
+    }
+
+    .toolbar-row .pill-btn:nth-child(4) {
+      border-radius: 11px 20px 9px 22px / 21px 11px 19px 10px;
+      transform: rotate(0.95deg);
+    }
+
+    .toolbar-row .pill-btn:nth-child(5) {
+      border-radius: 23px 10px 18px 12px / 9px 22px 11px 18px;
+      transform: rotate(-0.8deg);
+    }
+
+    .toolbar-row .pill-btn:nth-child(6) {
+      border-radius: 9px 21px 12px 20px / 19px 9px 21px 12px;
+      transform: rotate(0.75deg);
+    }
+
+    .pill-btn:hover {
+      transform: rotate(0deg) translateY(-1px);
+      box-shadow: 3px 4.2px 0 var(--pill-border);
+    }
+
+    .pill-btn:active {
+      transform: rotate(0deg) translate(1.8px, 2.2px) scale(0.96);
+      box-shadow: 0.8px 1px 0 var(--pill-border);
+    }
+
+    .pill-btn.primary {
+      background-color: var(--accent);
+      color: #2B1810;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* 手繪不規則外框：「顯示選項」懸浮鈕 */
+    #btnShowBar {
+      position: fixed;
+      right: 12px;
+      bottom: 12px;
+      z-index: 25;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 2.3px 1.8px 2.5px 2px;
+      border-radius: 21px 9px 19px 11px / 10px 20px 9px 19px;
+      background-color: var(--pill-bg);
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.24;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+      opacity: 0.95;
+      cursor: pointer;
+      transform: rotate(-1deg);
+      box-shadow: 2.5px 3.2px 0 var(--pill-border), 0 4px 10px rgba(0, 0, 0, 0.16);
+      transition: opacity 0.2s ease, transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    #btnShowBar::before {
+      content: "";
+      position: absolute;
+      inset: -2.5px -2px -2px -2.5px;
+      border: 1.25px solid var(--pill-border);
+      border-radius: 10px 21px 11px 19px / 19px 10px 20px 11px;
+      opacity: 0.44;
+      transform: rotate(1deg);
+      pointer-events: none;
+    }
+
+    #btnShowBar:active {
+      opacity: 1;
+      transform: rotate(0deg) translate(1.5px, 2px) scale(0.96);
+      box-shadow: 1px 1px 0 var(--pill-border);
+    }
+
+    #titleModal {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(0, 0, 0, 0.54);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+    }
+
+    #titleModal.open {
+      display: flex;
+    }
+
+    .modal-box {
       width: 100%;
-      max-width: 920px;
+      max-width: 450px;
+      max-height: 88vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      background-color: var(--modal-bg);
+      color: var(--ink);
+      font-family: var(--font-round);
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 2.5px 2px 2.8px 2.2px;
+      border-radius: 26px 14px 28px 16px / 15px 26px 14px 25px;
+      padding: 16px;
+      box-shadow: 4px 5px 0 var(--pill-border), 0 14px 36px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .modal-head h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .close-btn {
+      position: relative;
+      width: 33px;
+      height: 33px;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 2px 1.6px 2.2px 1.8px;
+      border-radius: 14px 8px 15px 9px / 9px 15px 8px 14px;
+      background: var(--card-bg);
+      color: var(--ink);
+      font-family: var(--font-round);
+      font-weight: 700;
+      cursor: pointer;
+      transform: rotate(1.4deg);
+      box-shadow: 1.8px 2.2px 0 var(--pill-border);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    .close-btn:active {
+      transform: rotate(0deg) translate(1px, 1.5px);
+      box-shadow: 0.5px 1px 0 var(--pill-border);
+    }
+
+    .section-card {
+      margin-bottom: 13px;
+      padding: 11px 12px;
+      border-radius: 18px 11px 19px 12px / 12px 18px 11px 17px;
+      background: rgba(128, 128, 128, 0.06);
+      border: 1.4px solid rgba(128, 128, 128, 0.28);
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .preview-panel {
+      background: var(--card-bg);
+      border: 1.8px dashed rgba(128, 128, 128, 0.48);
+      border-radius: 20px 11px 21px 12px / 12px 20px 11px 19px;
+      padding: 10px;
+      margin-bottom: 11px;
+      text-align: center;
+    }
+
+    .preview-tag {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      opacity: 0.65;
+      margin-bottom: 4px;
+    }
+
+    #modalPreview {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.25;
+      min-height: 36px;
+    }
+
+    #previewImg {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      object-fit: contain;
+    }
+
+    #previewDatePill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 9px;
+      font-size: 13px;
+      font-weight: 700;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 1.8px 1.4px 2px 1.5px;
+      border-radius: 10px 18px 11px 17px / 17px 10px 18px 11px;
+      background: var(--pill-bg);
+      box-shadow: 1.6px 2px 0 var(--pill-border);
+      margin-left: 4px;
+    }
+
+    #previewDateIcon {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    #previewDateImg {
+      display: none;
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      vertical-align: middle;
+    }
+
+    .preview-btns-bar {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(128, 128, 128, 0.28);
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .preview-mini-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 1.8px 1.4px 2px 1.5px;
+      border-radius: 16px 8px 15px 9px / 9px 15px 8px 16px;
+      background: var(--pill-bg);
+      box-shadow: 1.8px 2.2px 0 var(--pill-border);
+    }
+
+    .preview-mini-img {
+      display: inline-block;
+      width: 19px;
+      height: 19px;
+      object-fit: contain;
+    }
+
+    .field-group {
+      margin-bottom: 11px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(128, 128, 128, 0.16);
+    }
+
+    .field-group:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .field-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .segmented-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+    }
+
+    .seg-btn {
+      position: relative;
+      padding: 8px 10px;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 2.1px 1.7px 2.3px 1.9px;
+      border-radius: 19px 9px 18px 10px / 10px 18px 9px 19px;
+      background: var(--card-bg);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 2px 2.8px 0 var(--pill-border);
+      transition: transform 0.1s ease, background-color 0.2s ease, box-shadow 0.1s ease;
+    }
+
+    .seg-btn:nth-child(1) {
+      transform: rotate(-0.75deg);
+    }
+
+    .seg-btn:nth-child(2) {
+      border-radius: 9px 19px 10px 18px / 18px 10px 19px 9px;
+      transform: rotate(0.75deg);
+    }
+
+    .seg-btn:active {
+      transform: rotate(0deg) translate(1.2px, 1.8px);
+      box-shadow: 0.6px 1px 0 var(--pill-border);
+    }
+
+    .seg-btn.active {
+      background: var(--accent);
+      color: #2B1810;
+    }
+
+    .text-box {
+      width: 100%;
+      padding: 8px 12px;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 2px 1.7px 2.2px 1.8px;
+      border-radius: 16px 9px 17px 10px / 10px 16px 9px 15px;
+      background: var(--card-bg);
+      color: var(--ink);
+      font-family: var(--font-round);
+      font-size: 14px;
+      font-weight: 700;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .chip-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 7px;
+    }
+
+    .chip {
+      position: relative;
+      padding: 5px 11px;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 1.9px 1.5px 2.1px 1.7px;
+      border-radius: 16px 8px 15px 9px / 9px 16px 8px 15px;
+      background: var(--card-bg);
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 1.8px 2.3px 0 var(--pill-border);
+      transition: transform 0.1s ease, background-color 0.2s ease, box-shadow 0.1s ease;
+    }
+
+    .chip:nth-child(even) {
+      border-radius: 8px 16px 9px 15px / 15px 8px 16px 9px;
+    }
+
+    .chip:active {
+      transform: translate(1.2px, 1.5px);
+      box-shadow: 0.5px 1px 0 var(--pill-border);
+    }
+
+    .chip.active {
+      background: var(--accent);
+      color: #2B1810;
+    }
+
+    .size-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .size-btn {
+      padding: 6px 2px;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 1.8px 1.5px 2px 1.6px;
+      border-radius: 14px 8px 13px 9px / 9px 14px 8px 13px;
+      background: var(--card-bg);
+      color: var(--ink);
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 1.4px 2px 0 var(--pill-border);
+      transition: transform 0.1s ease, background-color 0.2s ease, box-shadow 0.1s ease;
+    }
+
+    .size-btn:nth-child(even) {
+      border-radius: 8px 14px 9px 13px / 13px 8px 14px 9px;
+    }
+
+    .size-btn:active {
+      transform: translate(1px, 1.2px);
+      box-shadow: 0.5px 0.5px 0 var(--pill-border);
+    }
+
+    .size-btn.active {
+      background: var(--accent);
+      color: #2B1810;
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .slider-row input[type="range"] {
+      flex: 1;
+      accent-color: #D97757;
+    }
+
+    .sticker-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 5px;
+      margin-bottom: 8px;
+    }
+
+    .sticker-item {
+      aspect-ratio: 1;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 1.8px 1.5px 2px 1.6px;
+      border-radius: 13px 8px 14px 9px / 9px 13px 8px 14px;
+      background: #FFFDF9;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      z-index: 20;
+      cursor: pointer;
+      padding: 2px;
+      touch-action: manipulation;
+      box-shadow: 1.3px 1.8px 0 var(--pill-border);
     }
 
-    .hand-btn {
+    .sticker-item:nth-child(even) {
+      border-radius: 8px 13px 9px 14px / 14px 8px 13px 9px;
+    }
+
+    .sticker-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    .sticker-item.active {
+      border-color: var(--pill-border);
+      background: var(--accent);
+      box-shadow: 1.8px 2.3px 0 var(--pill-border);
+    }
+
+    .icon-pick-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .mini-icon-btn {
+      width: 38px;
+      height: 38px;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 1.8px 1.5px 2px 1.6px;
+      border-radius: 13px 8px 14px 9px / 9px 13px 8px 14px;
+      background: #FFFDF9;
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      padding: 9px 16px;
-      font-family: var(--hand-font);
-      font-size: clamp(0.86rem, 1.45vw, 1.02rem);
-      font-weight: 700;
-      color: var(--ink);
-      background: #fff;
-      border: 3px solid var(--ink);
-      border-radius: 18px 22px 17px 21px / 21px 17px 22px 18px;
-      box-shadow: 3px 4px 0 var(--ink);
+      justify-content: center;
       cursor: pointer;
-      transition: transform 0.16s ease, background-color 0.16s ease;
+      padding: 2px;
+      box-shadow: 1.4px 2px 0 var(--pill-border);
     }
 
-    .hand-btn:hover {
-      transform: translateY(-2px);
-      background: #fff6f8;
+    .mini-icon-btn:nth-child(even) {
+      border-radius: 8px 13px 9px 14px / 14px 8px 13px 9px;
     }
 
-    .hand-btn:active {
-      transform: translateY(1px);
-      box-shadow: 1px 2px 0 var(--ink);
+    .mini-icon-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
     }
 
-    .hand-btn.primary {
-      background: var(--pig-pink);
+    .mini-icon-btn.active {
+      border-color: var(--pill-border);
+      background: var(--accent);
+      box-shadow: 1.8px 2.3px 0 var(--pill-border);
     }
 
-    .hand-btn.primary:hover {
-      background: #ff8aa8;
+    .mini-icon-input {
+      width: 68px;
+      padding: 6px 8px;
+      border-style: solid;
+      border-color: var(--pill-border);
+      border-width: 1.8px 1.5px 2px 1.6px;
+      border-radius: 14px 8px 13px 9px / 9px 14px 8px 13px;
+      background: var(--card-bg);
+      color: var(--ink);
+      font-family: var(--font-round);
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+      user-select: text;
+      -webkit-user-select: text;
     }
 
-    .date-sub {
-      font-size: clamp(0.85rem, 1.4vw, 1rem);
-      opacity: 0.85;
-      padding: 6px 12px;
+    .btn-icon-upload-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 7px;
+      padding: 6px 9px;
+      border-radius: 15px 9px 16px 10px / 10px 15px 9px 16px;
+      background: var(--card-bg);
+      border: 1.5px dashed rgba(128, 128, 128, 0.45);
+      font-size: 12px;
+      font-weight: 700;
     }
 
-    @media (max-width: 600px) {
-      .clock-card {
-        min-height: 210px;
-        border-radius: 26px;
-        padding: 18px 12px 32px;
-      }
-      .pig-mascot-wrap {
-        top: -28px;
-        right: 14px;
-      }
-      .colon-tip {
-        display: none;
-      }
+    .btn-icon-upload-left {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .btn-icon-thumb {
+      display: none;
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+      border-radius: 6px;
+      border: 1px solid rgba(128, 128, 128, 0.3);
+      background: #FFFFFF;
+    }
+
+    .btn-icon-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .custom-source-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .custom-source-thumbs {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .custom-source-thumbs img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+      border-radius: 10px 6px 11px 7px / 7px 10px 6px 11px;
+      background: #FFFDF9;
+      border: 1.4px solid var(--pill-border);
+      padding: 2px;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .modal-actions-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
     }
   </style>
 </head>
 <body>
-  <!-- 手繪背景塗鴉 -->
-  <div class="paper-doodles" aria-hidden="true">
-    <svg class="doodle-item" style="top: 12%; left: 6%; width: 54px;" viewBox="0 0 64 64">
-      <path d="M32 54 C14 40, 8 24, 18 15 C25 9, 31 15, 32 21 C33 15, 39 9, 46 15 C56 24, 50 40, 32 54 Z" fill="none" stroke="#3d2c2e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <svg class="doodle-item" style="top: 18%; right: 9%; width: 52px; animation-delay: -1.8s;" viewBox="0 0 64 64">
-      <path d="M32 8 L38 24 L55 25 L42 36 L46 53 L32 43 L18 53 L22 36 L9 25 L26 24 Z" fill="none" stroke="#3d2c2e" stroke-width="3" stroke-linejoin="round"/>
-    </svg>
-    <svg class="doodle-item" style="bottom: 16%; left: 10%; width: 64px; animation-delay: -3.2s;" viewBox="0 0 80 40">
-      <path d="M6 22 Q 20 8, 34 22 T 62 22 T 76 22" fill="none" stroke="#3d2c2e" stroke-width="3" stroke-linecap="round"/>
-    </svg>
-    <svg class="doodle-item" style="bottom: 20%; right: 7%; width: 50px; animation-delay: -4.5s;" viewBox="0 0 64 64">
-      <circle cx="32" cy="32" r="18" fill="none" stroke="#3d2c2e" stroke-width="3" stroke-dasharray="8 6"/>
-    </svg>
+  <div id="stageRoot">
+    <canvas id="clockCanvas"></canvas>
   </div>
 
-  <div class="app-shell">
-    <!-- 頂部列 -->
-    <header class="top-bar">
-      <div class="title-badge">
-        <span>🐷</span>
-        <span>手繪小豬報時鐘</span>
+  <header id="topBar">
+    <div class="top-bar-inner">
+      <button id="titleTrigger" type="button" title="不理不理左衛門時鐘">
+        <span id="titleText">不理不理左衛門時鐘</span>
+        <span id="titleIcon"></span>
+        <img id="titleIconImg" alt="標題小圖示" />
+        <span class="edit-badge">✎</span>
+      </button>
+      <div id="dateBadge" class="date-pill" role="button" tabindex="0" title="點擊設定日期標籤">
+        <span id="dateIcon"></span>
+        <img id="dateIconImg" alt="日期小圖示" />
+        <span id="dateText">11/23 週一</span>
+        <span id="dateEditBadge" class="edit-badge hidden">✎</span>
       </div>
-      <div id="statusPill" class="status-pill">
-        <span class="status-dot"></span>
-        <span id="statusText">正常報時中 · 點擊中央「:」看 5 秒陣型秀</span>
+    </div>
+  </header>
+
+  <footer id="bottomBar">
+    <div class="toolbar-row">
+      <button id="btnToggleGather" type="button" class="pill-btn">自己玩 / 幾點了（時鐘)</button>
+      <button id="btnGuestShow" type="button" class="pill-btn">特別來賓表演</button>
+      <button id="btnWakeLock" type="button" class="pill-btn">螢幕常亮</button>
+      <button id="btnToggleNight" type="button" class="pill-btn">夜間模式</button>
+      <button id="btnOpenSettings" type="button" class="pill-btn">進來看看</button>
+      <button id="btnHideBar" type="button" class="pill-btn">
+        <span id="hideBtnIcon" class="ctrl-btn-icon"></span>
+        <img id="hideBtnImg" class="ctrl-btn-img" alt="都躲起來圖示" />
+        <span>都躲起來</span>
+      </button>
+    </div>
+    <input id="fileRoamerInput" type="file" accept="image/*" multiple class="hidden" />
+    <input id="fileGuestInput" type="file" accept="image/*" multiple class="hidden" />
+  </footer>
+
+  <button id="btnShowBar" type="button" class="hidden" title="顯示選項">
+    <span id="showBtnIcon" class="ctrl-btn-icon"></span>
+    <img id="showBtnImg" class="ctrl-btn-img" alt="顯示選項圖示" />
+    <span>顯示選項</span>
+  </button>
+
+  <div id="titleModal" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h2>進來看看</h2>
+        <button id="btnCloseModal" type="button" class="close-btn">✕</button>
       </div>
-    </header>
 
-    <!-- 中央時鐘舞台 -->
-    <main class="clock-stage">
-      <section class="clock-card" aria-label="數位時鐘">
-        <!-- 報時小豬角色 -->
-        <div id="pigMascot" class="pig-mascot-wrap" title="點我試試報時波浪跳！">
-          <svg viewBox="0 0 120 120" width="100%" height="100%">
-            <!-- 左耳與右耳 -->
-            <path d="M26 42 L18 14 L46 28 Z" fill="#ff82a1" stroke="#3d2c2e" stroke-width="4" stroke-linejoin="round"/>
-            <path d="M94 42 L102 14 L74 28 Z" fill="#ff82a1" stroke="#3d2c2e" stroke-width="4" stroke-linejoin="round"/>
-            <!-- 頭部 -->
-            <ellipse cx="60" cy="64" rx="42" ry="38" fill="#ff9eb5" stroke="#3d2c2e" stroke-width="4"/>
-            <!-- 腮紅 -->
-            <ellipse cx="33" cy="70" rx="8" ry="5" fill="#ff6f94" opacity="0.55"/>
-            <ellipse cx="87" cy="70" rx="8" ry="5" fill="#ff6f94" opacity="0.55"/>
-            <!-- 眼睛 -->
-            <circle cx="44" cy="56" r="5.5" fill="#3d2c2e"/>
-            <circle cx="42.3" cy="54.2" r="1.8" fill="#fff"/>
-            <circle cx="76" cy="56" r="5.5" fill="#3d2c2e"/>
-            <circle cx="74.3" cy="54.2" r="1.8" fill="#fff"/>
-            <!-- 豬鼻子 -->
-            <ellipse cx="60" cy="69" rx="14" ry="10.5" fill="#ff7d9e" stroke="#3d2c2e" stroke-width="3.5"/>
-            <circle cx="55.5" cy="69" r="2.7" fill="#3d2c2e"/>
-            <circle cx="64.5" cy="69" r="2.7" fill="#3d2c2e"/>
-            <!-- 微笑嘴巴 -->
-            <path d="M51 82 Q 60 89, 69 82" fill="none" stroke="#3d2c2e" stroke-width="3.5" stroke-linecap="round"/>
-          </svg>
+      <!-- 1. 畫面轉向（自動／強制橫向） -->
+      <div class="section-card">
+        <div class="section-title">
+          <span>1. 畫面轉向（自動／強制橫向）</span>
+        </div>
+        <div class="segmented-row">
+          <button type="button" id="btnOrientAuto" class="seg-btn active">自動轉向</button>
+          <button type="button" id="btnOrientForceLandscape" class="seg-btn">強制橫向</button>
+        </div>
+      </div>
+
+      <!-- 2. 時鐘數字大小 -->
+      <div class="section-card">
+        <div class="section-title">
+          <span>2. 時鐘數字大小</span>
+        </div>
+        <div class="segmented-row">
+          <button type="button" id="btnSizeLarge" class="seg-btn">大</button>
+          <button type="button" id="btnSizeExtraLarge" class="seg-btn active">特大</button>
+        </div>
+      </div>
+
+      <!-- 3. 頂部標題與按鈕圖示設定 -->
+      <div class="section-card">
+        <div class="section-title">
+          <span>3. 頂部標題與按鈕圖示設定</span>
         </div>
 
-        <!-- 時間數字 -->
-        <div id="timeDisplay" class="time-display">
-          <span id="h1" class="digit-box">0</span>
-          <span id="h2" class="digit-box">0</span>
-          <button id="colonBtn" class="colon-btn" type="button" aria-label="觸發 5 秒冒號陣型秀">
-            <span class="colon-dot"></span>
-            <span class="colon-dot"></span>
-            <span class="colon-tip">點我 5s 陣型秀</span>
-          </button>
-          <span id="m1" class="digit-box">0</span>
-          <span id="m2" class="digit-box">0</span>
+        <div class="preview-panel">
+          <span class="preview-tag">頂部標題與按鈕即時預覽</span>
+          <div id="modalPreview">
+            <span id="previewText">不理不理左衛門時鐘</span>
+            <span id="previewIcon"></span>
+            <img id="previewImg" alt="預覽圖示" />
+            <span id="previewDatePill">
+              <span id="previewDateIcon"></span>
+              <img id="previewDateImg" alt="" />
+              <span id="previewDateText">11/23 週一</span>
+              <span id="previewDateEdit" class="edit-badge hidden">✎</span>
+            </span>
+          </div>
+          <div class="preview-btns-bar">
+            <span class="preview-mini-pill">
+              <span id="prevHideEmoji"></span>
+              <img id="prevHideImg" class="preview-mini-img" alt="" />
+              <span>都躲起來</span>
+            </span>
+            <span class="preview-mini-pill">
+              <span id="prevShowEmoji"></span>
+              <img id="prevShowImg" class="preview-mini-img" alt="" />
+              <span>顯示選項</span>
+            </span>
+          </div>
         </div>
 
-        <!-- 秒數進度條 -->
-        <div class="progress-track" title="本分鐘秒數進度">
-          <div id="progressFill" class="progress-fill"></div>
+        <div class="field-group">
+          <div class="field-label-row">
+            <span>頂部標題顯示狀態</span>
+          </div>
+          <div class="segmented-row">
+            <button type="button" id="btnTitleVisibleOn" class="seg-btn active">顯示標題</button>
+            <button type="button" id="btnTitleVisibleOff" class="seg-btn">隱藏標題</button>
+          </div>
         </div>
-      </section>
-    </main>
 
-    <!-- 底部控制列 -->
-    <footer class="bottom-controls">
-      <button id="btnHeart" class="hand-btn primary" type="button">💖 愛心陣型（5s）</button>
-      <button id="btnDuet" class="hand-btn" type="button">🐷🐰 雙人陣型（5s）</button>
-      <button id="btnShiro" class="hand-btn" type="button">🐶 小白陣型（5s）</button>
-      <button id="btnChime" class="hand-btn" type="button">🔔 報時跳一下</button>
-      <span id="dateSub" class="date-sub"></span>
-    </footer>
-  </div>
+        <div class="field-group">
+          <div class="field-label-row">
+            <span>日期／星期小標籤</span>
+          </div>
+          <div class="segmented-row">
+            <button type="button" id="btnDateVisibleOn" class="seg-btn active">顯示日期</button>
+            <button type="button" id="btnDateVisibleOff" class="seg-btn">隱藏日期</button>
+          </div>
+        </div>
 
-  <!-- 陣型秀小幫手畫布（點擊任意處可提前跳回時間顯示） -->
-  <div id="formationLayer" class="formation-layer" aria-hidden="true"></div>
-  <div id="formationHud" class="formation-hud">
-    <span id="formationLabel">陣型秀進行中（5秒）</span>
-    <span>·</span>
-    <span>點擊畫面立即跳回時間</span>
+        <div class="field-group">
+          <div class="field-label-row">
+            <label for="inputTitle">標題文字內容</label>
+            <button id="btnClearTitle" type="button" class="chip">清空文字</button>
+          </div>
+          <input id="inputTitle" type="text" maxlength="24" class="text-box" placeholder="輸入標題文字" />
+          <div class="chip-wrap">
+            <button type="button" class="chip preset-title" data-val="不理不理左衛門時鐘">不理不理左衛門時鐘</button>
+            <button type="button" class="chip preset-title" data-val="肥嘟嘟左衛門時鐘">肥嘟嘟左衛門時鐘</button>
+            <button type="button" class="chip preset-title" data-val="午休時間">午休時間</button>
+            <button type="button" class="chip preset-title" data-val="起床囉！">起床囉！</button>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label-row">
+            <label for="inputFontSize">標題字型大小</label>
+            <span id="fontSizeBadge" class="chip">26px</span>
+          </div>
+          <div class="size-row">
+            <button type="button" class="size-btn" data-size="18">小 18px</button>
+            <button type="button" class="size-btn" data-size="22">適中 22px</button>
+            <button type="button" class="size-btn" data-size="26">標準 26px</button>
+            <button type="button" class="size-btn" data-size="32">大 32px</button>
+            <button type="button" class="size-btn" data-size="40">特大 40px</button>
+          </div>
+          <div class="slider-row">
+            <span style="font-size:12px;font-weight:700;opacity:0.65;">A</span>
+            <input id="inputFontSize" type="range" min="16" max="44" step="1" value="26" />
+            <span style="font-size:18px;font-weight:700;">A</span>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label-row">
+            <span>標題／日期小圖示</span>
+            <button id="btnNoIcon" type="button" class="chip">無圖示</button>
+          </div>
+          <div class="sticker-grid" id="titleStickerGrid"></div>
+          <input id="inputCustomIcon" type="text" maxlength="8" class="text-box" placeholder="輸入文字 / Emoji..." />
+          <div class="btn-icon-upload-bar">
+            <div class="btn-icon-upload-left">
+              <img id="titleIconThumb" class="btn-icon-thumb" alt="標題小圖示縮圖" />
+              <span id="titleIconImgStatus">自訂圖片</span>
+            </div>
+            <div class="btn-icon-actions">
+              <button id="btnTriggerIconUpload" type="button" class="chip">上傳圖片</button>
+              <button id="btnClearTitleIconImg" type="button" class="chip hidden">改回原圖</button>
+              <input id="fileIconInput" type="file" accept="image/*" class="hidden" />
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label-row">
+            <span>「都躲起來」按鈕圖示</span>
+          </div>
+          <div class="icon-pick-row" id="hideIconGroup"></div>
+          <div class="btn-icon-upload-bar">
+            <div class="btn-icon-upload-left">
+              <img id="hideBtnThumb" class="btn-icon-thumb" alt="都躲起來圖示預覽" />
+              <span id="hideBtnImgStatus">自訂圖片</span>
+            </div>
+            <div class="btn-icon-actions">
+              <button id="btnUploadHideIcon" type="button" class="chip">上傳圖片</button>
+              <button id="btnClearHideIconImg" type="button" class="chip hidden">改回原圖</button>
+              <input id="fileHideIconInput" type="file" accept="image/*" class="hidden" />
+            </div>
+          </div>
+
+          <div class="field-label-row" style="margin-top:10px;">
+            <span>「顯示選項」按鈕圖示</span>
+          </div>
+          <div class="icon-pick-row" id="showIconGroup"></div>
+          <div class="btn-icon-upload-bar">
+            <div class="btn-icon-upload-left">
+              <img id="showBtnThumb" class="btn-icon-thumb" alt="顯示圖示預覽" />
+              <span id="showBtnImgStatus">自訂圖片</span>
+            </div>
+            <div class="btn-icon-actions">
+              <button id="btnUploadShowIcon" type="button" class="chip">上傳圖片</button>
+              <button id="btnClearShowIconImg" type="button" class="chip hidden">改回原圖</button>
+              <input id="fileShowIconInput" type="file" accept="image/*" class="hidden" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. 自訂誰來玩耍 -->
+      <div class="section-card">
+        <div class="section-title">
+          <span>4. 自訂誰來玩耍</span>
+        </div>
+        <div class="custom-source-row">
+          <span id="roamerSourceStatus" style="font-size:12.5px;font-weight:700;">預設（142 隻）</span>
+          <div style="display:flex;gap:6px;">
+            <button type="button" id="btnPickRoamerImgs" class="chip">選擇圖片</button>
+            <button type="button" id="btnResetRoamerImgs" class="chip hidden">恢復預設</button>
+          </div>
+        </div>
+        <div id="roamerThumbs" class="custom-source-thumbs"></div>
+      </div>
+
+      <!-- 5. 邀請特別來賓 -->
+      <div class="section-card">
+        <div class="section-title">
+          <span>5. 邀請特別來賓</span>
+        </div>
+        <div class="custom-source-row">
+          <span id="guestSourceStatus" style="font-size:12.5px;font-weight:700;">預設特別來賓</span>
+          <div style="display:flex;gap:6px;">
+            <button type="button" id="btnPickGuestImgs" class="chip">選擇圖片</button>
+            <button type="button" id="btnResetGuestImgs" class="chip hidden">恢復預設</button>
+          </div>
+        </div>
+        <div id="guestThumbs" class="custom-source-thumbs"></div>
+      </div>
+
+      <!-- 6. 冒號點擊彩蛋圖案 -->
+      <div class="section-card">
+        <div class="section-title">
+          <span>6. 冒號點擊彩蛋圖案</span>
+        </div>
+        <div class="chip-wrap" id="colonEggChoiceGroup" style="margin-top:0;">
+          <button type="button" class="chip colon-egg-opt active" data-mode="random5">5 款隨機輪流</button>
+          <button type="button" class="chip colon-egg-opt" data-mode="himawari">小葵捲髮側臉</button>
+          <button type="button" class="chip colon-egg-opt" data-mode="sin1">小新側臉</button>
+          <button type="button" class="chip colon-egg-opt" data-mode="s3">肥嘟嘟左衛門</button>
+          <button type="button" class="chip colon-egg-opt" data-mode="sin2">小新濃眉嘟嘴</button>
+          <button type="button" class="chip colon-egg-opt" data-mode="sin4">巧克比鱷魚山</button>
+          <button type="button" class="chip colon-egg-opt" data-mode="heart">經典大愛心</button>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="btnResetDefaults" type="button" class="chip">恢復預設值</button>
+        <div class="modal-actions-right">
+          <button id="btnCancelModal" type="button" class="pill-btn">取消</button>
+          <button id="btnApplyModal" type="button" class="pill-btn primary">確認套用</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
-    (() => {
-      // ===== 常數與狀態 =====
-      const SHOW_DURATION_MS = 5000;       // 需求 3：陣型變換總時長改為 5 秒
-      const PATTERN_STEP_MS = 1250;        // 5 秒內切換陣型節奏
-      const HELPER_COUNT = 28;             // 需求 2：擴充小幫手數量至 28 位，提升圖案精細度
+    (function () {
+      'use strict';
 
-      const h1El = document.getElementById('h1');
-      const h2El = document.getElementById('h2');
-      const m1El = document.getElementById('m1');
-      const m2El = document.getElementById('m2');
-      const colonBtn = document.getElementById('colonBtn');
-      const timeDisplay = document.getElementById('timeDisplay');
-      const progressFill = document.getElementById('progressFill');
-      const statusPill = document.getElementById('statusPill');
-      const statusText = document.getElementById('statusText');
-      const dateSub = document.getElementById('dateSub');
-      const pigMascot = document.getElementById('pigMascot');
-      const formationLayer = document.getElementById('formationLayer');
-      const formationLabel = document.getElementById('formationLabel');
+      var memStore = {};
+      function safeGet(key, fallback) {
+        try {
+          var v = window.localStorage.getItem(key);
+          if (v !== null) return v;
+        } catch (e) {}
+        return Object.prototype.hasOwnProperty.call(memStore, key) ? memStore[key] : fallback;
+      }
 
-      let isShowActive = false;
-      let isExiting = false;
-      let showEndTimer = null;
-      let patternTimer = null;
-      let stepTimer = null;
-      let exitFinishTimer = null;
-      let lastMinute = -1;
-      let currentMode = 'auto'; // 'auto' | 'heart' | 'duet' | 'shiro'
+      function safeSet(key, val) {
+        memStore[key] = val;
+        try {
+          window.localStorage.setItem(key, val);
+        } catch (e) {}
+      }
 
-      // ===== 小幫手 SVG 模板（精緻手繪風格） =====
-      const HELPER_SVGS = [
-        // 粉紅小豬小幫手
-        `<svg viewBox="0 0 64 64" width="100%" height="100%">
-          <path d="M15 24 L10 9 L25 16 Z" fill="#ff82a1" stroke="#3d2c2e" stroke-width="3" stroke-linejoin="round"/>
-          <path d="M49 24 L54 9 L39 16 Z" fill="#ff82a1" stroke="#3d2c2e" stroke-width="3" stroke-linejoin="round"/>
-          <ellipse cx="32" cy="35" rx="22" ry="19" fill="#ff9eb5" stroke="#3d2c2e" stroke-width="3"/>
-          <circle cx="24" cy="31" r="2.8" fill="#3d2c2e"/>
-          <circle cx="40" cy="31" r="2.8" fill="#3d2c2e"/>
-          <ellipse cx="32" cy="38" rx="7.5" ry="5.5" fill="#ff6f94" stroke="#3d2c2e" stroke-width="2.5"/>
-          <circle cx="29.8" cy="38" r="1.4" fill="#3d2c2e"/>
-          <circle cx="34.2" cy="38" r="1.4" fill="#3d2c2e"/>
-        </svg>`,
-        // 奶油星星/愛心小精靈
-        `<svg viewBox="0 0 64 64" width="100%" height="100%">
-          <path d="M32 52 C14 39, 9 23, 19 15 C25 10, 31 15, 32 21 C33 15, 39 10, 45 15 C55 23, 50 39, 32 52 Z" fill="#ffd166" stroke="#3d2c2e" stroke-width="3" stroke-linejoin="round"/>
-          <circle cx="26" cy="28" r="2.3" fill="#3d2c2e"/>
-          <circle cx="38" cy="28" r="2.3" fill="#3d2c2e"/>
-          <path d="M29 34 Q 32 37, 35 34" fill="none" stroke="#3d2c2e" stroke-width="2.5" stroke-linecap="round"/>
-        </svg>`,
-        // 小白風格小汪汪小幫手
-        `<svg viewBox="0 0 64 64" width="100%" height="100%">
-          <path d="M16 24 L11 10 L25 18 Z" fill="#ffffff" stroke="#3d2c2e" stroke-width="3" stroke-linejoin="round"/>
-          <path d="M48 24 L53 10 L39 18 Z" fill="#ffffff" stroke="#3d2c2e" stroke-width="3" stroke-linejoin="round"/>
-          <ellipse cx="32" cy="36" rx="22" ry="18.5" fill="#ffffff" stroke="#3d2c2e" stroke-width="3"/>
-          <circle cx="23.5" cy="33" r="4.2" fill="#3d2c2e"/>
-          <circle cx="40.5" cy="33" r="4.2" fill="#3d2c2e"/>
-          <circle cx="22.5" cy="31.8" r="1.3" fill="#fff"/>
-          <circle cx="39.5" cy="31.8" r="1.3" fill="#fff"/>
-          <ellipse cx="32" cy="39" rx="3.6" ry="2.6" fill="#3d2c2e"/>
-          <path d="M27 43 Q 32 47, 37 43" fill="none" stroke="#3d2c2e" stroke-width="2.5" stroke-linecap="round"/>
-        </svg>`
+      function drawRoundRect(c, x, y, w, h, r) {
+        var radius = Math.min(r, w / 2, h / 2);
+        c.beginPath();
+        c.moveTo(x + radius, y);
+        c.arcTo(x + w, y, x + w, y + h, radius);
+        c.arcTo(x + w, y + h, x, y + h, radius);
+        c.arcTo(x, y + h, x, y, radius);
+        c.arcTo(x, y, x + w, y, radius);
+        c.closePath();
+      }
+
+      function drawHandDrawnCircle(c, cx, cy, r, nightMode) {
+        c.save();
+        c.strokeStyle = nightMode ? 'rgba(245, 237, 228, 0.9)' : '#3B2318';
+        c.lineCap = 'round';
+
+        c.lineWidth = 2.1;
+        c.beginPath();
+        for (var i = 0; i <= 24; i++) {
+          var a = (i / 24) * Math.PI * 2;
+          var wobble = 1 + 0.055 * Math.sin(a * 3 + 0.7) + 0.035 * Math.cos(a * 2 - 0.4);
+          var rx = cx + Math.cos(a) * r * wobble;
+          var ry = cy + Math.sin(a) * r * (2 - wobble * 0.96);
+          if (i === 0) c.moveTo(rx, ry);
+          else c.lineTo(rx, ry);
+        }
+        c.closePath();
+        c.stroke();
+
+        c.lineWidth = 1.05;
+        c.globalAlpha *= 0.48;
+        c.beginPath();
+        for (var j = 0; j <= 24; j++) {
+          var a2 = (j / 24) * Math.PI * 2;
+          var w2 = 1 + 0.05 * Math.cos(a2 * 3 - 0.5);
+          var rx2 = cx + 1.1 + Math.cos(a2) * (r * 1.06) * w2;
+          var ry2 = cy - 0.9 + Math.sin(a2) * (r * 1.04);
+          if (j === 0) c.moveTo(rx2, ry2);
+          else c.lineTo(rx2, ry2);
+        }
+        c.closePath();
+        c.stroke();
+        c.restore();
+      }
+
+      function drawMiniHeart(c, cx, cy, size, color) {
+        c.save();
+        c.translate(cx, cy);
+        c.fillStyle = color;
+        c.strokeStyle = '#3B2318';
+        c.lineWidth = 1.8;
+        c.beginPath();
+        var s = size / 16;
+        c.moveTo(0, 5 * s);
+        c.bezierCurveTo(-12 * s, -6 * s, -22 * s, 6 * s, 0, 20 * s);
+        c.bezierCurveTo(22 * s, 6 * s, 12 * s, -6 * s, 0, 5 * s);
+        c.closePath();
+        c.fill();
+        c.stroke();
+        c.restore();
+      }
+
+      var PIG_FILE_PATHS = [
+        'icons/PIG (1).jpg', 'icons/PIG (2).jpg', 'icons/PIG (3).jpg', 'icons/PIG (4).jpg',
+        'icons/PIG (5).jpg', 'icons/PIG (6).jpg', 'icons/PIG (7).jpg', 'icons/PIG (8).jpg',
+        'icons/PIG (9).jpg', 'icons/PIG (10).jpg', 'icons/PIG (11).jpg', 'icons/PIG (12).jpg',
+        'icons/PIG (13).jpg', 'icons/PIG (14).jpg', 'icons/PIG (15).jpg', 'icons/PIG (16).jpg'
       ];
 
-      // 建立小幫手 DOM 節點池
-      const helpers = [];
-      for (let i = 0; i < HELPER_COUNT; i++) {
-        const el = document.createElement('div');
-        el.className = 'helper-unit';
-        el.innerHTML = HELPER_SVGS[i % HELPER_SVGS.length];
-        formationLayer.appendChild(el);
-        helpers.push({
-          el,
-          x: 0,
-          y: 0,
-          scale: 0,
-          rot: 0,
-          opacity: 0
+      var HIDE_PRESET_INDICES = [6, 3, 8, 11, 14, 15];
+      var SHOW_PRESET_INDICES = [4, 10, 9, 0, 5, 12];
+
+      var CLOCK_PIGS_DIR = 'clock-pigs/';
+      var EASTER_EGGS_DIR = 'easter-eggs/';
+
+      var CLOCK_PIG_FILES = [
+        '12209766.png',
+        '12209767.png',
+        '12209781.png',
+        '5727675.png',
+        '5727691.png',
+        '5727689.png',
+        '3856937.png',
+        '2040294.png'
+      ];
+
+      var WEIRDO_EGG_FILES = [
+        '12209765.png',
+        '12209774.png',
+        '12209771.png',
+        '12209761.png',
+        '12209770.png',
+        '12209772.png',
+        '12209775.png',
+        '12209777.png',
+        '2040285.png'
+      ];
+
+      var HOUR_EGG_FILES = [
+        '12209767.png',
+        '12209781.png',
+        '2040285.png',
+        '3856930.png',
+        '3856933.png',
+        '3856929.jpg'
+      ];
+
+      var CLICK_EGG_FILES = [
+        '12209762.png',
+        '12209763.png',
+        '12209779.png',
+        '12209764.png',
+        '2040307.png'
+      ];
+
+      function removeBackgroundAndTrim(img, outSize, callback) {
+        try {
+          var rawW = Math.max(img.naturalWidth || img.width || 1, 1);
+          var rawH = Math.max(img.naturalHeight || img.height || 1, 1);
+          var tmp = document.createElement('canvas');
+          tmp.width = rawW;
+          tmp.height = rawH;
+          var tc = tmp.getContext('2d');
+          tc.drawImage(img, 0, 0, rawW, rawH);
+
+          var isDarkBg = false;
+          var cropX = 0, cropY = 0, cropW = rawW, cropH = rawH;
+
+          try {
+            var imgData = tc.getImageData(0, 0, rawW, rawH);
+            var d = imgData.data;
+
+            var corners = [
+              [0, 0],
+              [rawW - 1, 0],
+              [0, rawH - 1],
+              [rawW - 1, rawH - 1]
+            ];
+            var bgR = 0, bgG = 0, bgB = 0, validCorners = 0;
+            var darkCount = 0;
+            for (var cIdx = 0; cIdx < corners.length; cIdx++) {
+              var cx = corners[cIdx][0], cy = corners[cIdx][1];
+              var ci = (cy * rawW + cx) * 4;
+              var cr = d[ci], cg = d[ci + 1], cb = d[ci + 2], ca = d[ci + 3];
+              if (ca > 20) {
+                if (cr + cg + cb < 90) darkCount++;
+                bgR += cr;
+                bgG += cg;
+                bgB += cb;
+                validCorners++;
+              }
+            }
+
+            if (darkCount >= 2) {
+              isDarkBg = true;
+            } else {
+              bgR = validCorners ? bgR / validCorners : 240;
+              bgG = validCorners ? bgG / validCorners : 242;
+              bgB = validCorners ? bgB / validCorners : 246;
+
+              var minX = rawW, minY = rawH, maxX = -1, maxY = -1;
+
+              for (var y = 0; y < rawH; y++) {
+                for (var x = 0; x < rawW; x++) {
+                  var idx = (y * rawW + x) * 4;
+                  var r = d[idx], g = d[idx + 1], b = d[idx + 2], a = d[idx + 3];
+                  if (a === 0) continue;
+
+                  var distBg = Math.sqrt(
+                    (r - bgR) * (r - bgR) +
+                    (g - bgG) * (g - bgG) +
+                    (b - bgB) * (b - bgB)
+                  );
+                  var isNearWhite = (r > 234 && g > 234 && b > 234);
+
+                  if (distBg < 26 || isNearWhite) {
+                    d[idx + 3] = 0;
+                  } else {
+                    if (distBg < 44) {
+                      var ratio = (distBg - 26) / 18;
+                      d[idx + 3] = Math.round(a * Math.max(0.1, Math.min(0.85, ratio)));
+                    }
+                    if (d[idx + 3] > 20) {
+                      if (x < minX) minX = x;
+                      if (x > maxX) maxX = x;
+                      if (y < minY) minY = y;
+                      if (y > maxY) maxY = y;
+                    }
+                  }
+                }
+              }
+              tc.putImageData(imgData, 0, 0);
+
+              if (maxX >= minX && maxY >= minY) {
+                cropX = minX;
+                cropY = minY;
+                cropW = maxX - minX + 1;
+                cropH = maxY - minY + 1;
+              }
+            }
+          } catch (pixErr) {}
+
+          var off = document.createElement('canvas');
+          off.width = outSize;
+          off.height = outSize;
+          var c = off.getContext('2d');
+          var pad = Math.max(3, Math.round(outSize * 0.04));
+          var scale = Math.min((outSize - pad * 2) / cropW, (outSize - pad * 2) / cropH);
+          var dw = cropW * scale;
+          var dh = cropH * scale;
+          c.drawImage(tmp, cropX, cropY, cropW, cropH, (outSize - dw) / 2, (outSize - dh) / 2, dw, dh);
+          off._isDarkBg = isDarkBg;
+
+          callback(off);
+        } catch (err) {
+          callback(null);
+        }
+      }
+
+      var originalCutoutDataURLs = new Array(16);
+      var originalCutoutCanvases = new Array(16);
+      var pickerImgEls = { title: [], hide: [], show: [] };
+
+      function refreshAllPresetImagesInDOM() {
+        for (var i = 0; i < 16; i++) {
+          var url = originalCutoutDataURLs[i] || encodeURI(PIG_FILE_PATHS[i]);
+          if (pickerImgEls.title[i]) pickerImgEls.title[i].src = url;
+        }
+        for (var h = 0; h < HIDE_PRESET_INDICES.length; h++) {
+          var hIdx = HIDE_PRESET_INDICES[h];
+          if (pickerImgEls.hide[h]) {
+            pickerImgEls.hide[h].src = originalCutoutDataURLs[hIdx] || encodeURI(PIG_FILE_PATHS[hIdx]);
+          }
+        }
+        for (var s = 0; s < SHOW_PRESET_INDICES.length; s++) {
+          var sIdx = SHOW_PRESET_INDICES[s];
+          if (pickerImgEls.show[s]) {
+            pickerImgEls.show[s].src = originalCutoutDataURLs[sIdx] || encodeURI(PIG_FILE_PATHS[sIdx]);
+          }
+        }
+
+        if (currentSettings) {
+          if (currentSettings.iconType === 'preset') {
+            currentSettings.iconImage = originalCutoutDataURLs[currentSettings.presetIndex] || encodeURI(PIG_FILE_PATHS[currentSettings.presetIndex]);
+          }
+          if (currentSettings.hideBtnIconType === 'preset') {
+            currentSettings.hideBtnImageData = originalCutoutDataURLs[currentSettings.hideBtnPresetIndex] || encodeURI(PIG_FILE_PATHS[currentSettings.hideBtnPresetIndex]);
+          }
+          if (currentSettings.showBtnIconType === 'preset') {
+            currentSettings.showBtnImageData = originalCutoutDataURLs[currentSettings.showBtnPresetIndex] || encodeURI(PIG_FILE_PATHS[currentSettings.showBtnPresetIndex]);
+          }
+          applySettingsToScreen();
+        }
+
+        if (draftSettings) {
+          if (draftSettings.iconType === 'preset') {
+            draftSettings.iconImage = originalCutoutDataURLs[draftSettings.presetIndex] || encodeURI(PIG_FILE_PATHS[draftSettings.presetIndex]);
+          }
+          if (draftSettings.hideBtnIconType === 'preset') {
+            draftSettings.hideBtnImageData = originalCutoutDataURLs[draftSettings.hideBtnPresetIndex] || encodeURI(PIG_FILE_PATHS[draftSettings.hideBtnPresetIndex]);
+          }
+          if (draftSettings.showBtnIconType === 'preset') {
+            draftSettings.showBtnImageData = originalCutoutDataURLs[draftSettings.showBtnPresetIndex] || encodeURI(PIG_FILE_PATHS[draftSettings.showBtnPresetIndex]);
+          }
+          updateModalPreview();
+        }
+      }
+
+      function loadOriginalPigIcons() {
+        var remaining = PIG_FILE_PATHS.length;
+        for (var i = 0; i < PIG_FILE_PATHS.length; i++) {
+          (function (idx) {
+            var img = new Image();
+            img.onload = function () {
+              removeBackgroundAndTrim(img, 96, function (cutCanvas) {
+                if (cutCanvas) {
+                  originalCutoutCanvases[idx] = cutCanvas;
+                  try {
+                    originalCutoutDataURLs[idx] = cutCanvas.toDataURL('image/png');
+                  } catch (e) {
+                    originalCutoutDataURLs[idx] = encodeURI(PIG_FILE_PATHS[idx]);
+                  }
+                } else {
+                  originalCutoutDataURLs[idx] = encodeURI(PIG_FILE_PATHS[idx]);
+                }
+                remaining--;
+                if (remaining <= 0) refreshAllPresetImagesInDOM();
+              });
+            };
+            img.onerror = function () {
+              originalCutoutDataURLs[idx] = encodeURI(PIG_FILE_PATHS[idx]);
+              remaining--;
+              if (remaining <= 0) refreshAllPresetImagesInDOM();
+            };
+            img.src = encodeURI(PIG_FILE_PATHS[idx]);
+          })(i);
+        }
+      }
+
+      var STORAGE_KEY = 'buriburi_pig_clock_settings_v12';
+      var TOTAL_PIGS = 142;
+      var DEFAULT_POSE_COUNT = 12;
+
+      var VALID_EGG_MODES = ['random5', 'himawari', 'sin1', 's3', 'sin2', 'sin4', 'heart'];
+      var RANDOM5_POOL = ['himawari', 'sin1', 's3', 'sin2', 'sin4'];
+
+      var W = 360;
+      var H = 640;
+      var DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+      function formatTodayBadge() {
+        var d = new Date();
+        var weekNames = ['日', '一', '二', '三', '四', '五', '六'];
+        return (d.getMonth() + 1) + '/' + d.getDate() + ' 週' + weekNames[d.getDay()];
+      }
+
+      function getDefaultSettings() {
+        return {
+          forceLandscape: false,
+          extraLarge: true,
+          visible: true,
+          showDateBadge: true,
+          colonEggMode: 'random5',
+          text: '不理不理左衛門時鐘',
+          fontSize: 26,
+          iconType: 'preset',
+          presetIndex: 0,
+          iconEmoji: '',
+          iconImage: originalCutoutDataURLs[0] || encodeURI(PIG_FILE_PATHS[0]),
+          hideBtnIconType: 'preset',
+          hideBtnPresetIndex: 6,
+          hideBtnIcon: '',
+          hideBtnImageData: originalCutoutDataURLs[6] || encodeURI(PIG_FILE_PATHS[6]),
+          showBtnIconType: 'preset',
+          showBtnPresetIndex: 4,
+          showBtnIcon: '',
+          showBtnImageData: originalCutoutDataURLs[4] || encodeURI(PIG_FILE_PATHS[4])
+        };
+      }
+
+      function cloneSettings(src) {
+        var def = getDefaultSettings();
+        var titleType = src.iconType;
+        if (titleType !== 'preset' && titleType !== 'image' && titleType !== 'emoji' && titleType !== 'none') {
+          titleType = 'preset';
+        }
+        var titleIdx = typeof src.presetIndex === 'number' ? Math.max(0, Math.min(15, src.presetIndex)) : 0;
+        var titleImg = titleType === 'preset'
+          ? (originalCutoutDataURLs[titleIdx] || encodeURI(PIG_FILE_PATHS[titleIdx]))
+          : (src.iconImage || '');
+
+        var hideType = src.hideBtnIconType;
+        if (hideType !== 'preset' && hideType !== 'image' && hideType !== 'emoji') hideType = 'preset';
+        var hideIdx = typeof src.hideBtnPresetIndex === 'number' ? Math.max(0, Math.min(15, src.hideBtnPresetIndex)) : 6;
+        var hideImg = hideType === 'preset'
+          ? (originalCutoutDataURLs[hideIdx] || encodeURI(PIG_FILE_PATHS[hideIdx]))
+          : (src.hideBtnImageData || '');
+
+        var showType = src.showBtnIconType;
+        if (showType !== 'preset' && showType !== 'image' && showType !== 'emoji') showType = 'preset';
+        var showIdx = typeof src.showBtnPresetIndex === 'number' ? Math.max(0, Math.min(15, src.showBtnPresetIndex)) : 4;
+        var showImg = showType === 'preset'
+          ? (originalCutoutDataURLs[showIdx] || encodeURI(PIG_FILE_PATHS[showIdx]))
+          : (src.showBtnImageData || '');
+
+        var eggMode = src.colonEggMode === 'bo' ? 'himawari' : src.colonEggMode;
+        if (VALID_EGG_MODES.indexOf(eggMode) === -1) eggMode = 'random5';
+
+        return {
+          forceLandscape: typeof src.forceLandscape === 'boolean' ? src.forceLandscape : false,
+          extraLarge: typeof src.extraLarge === 'boolean' ? src.extraLarge : true,
+          visible: typeof src.visible === 'boolean' ? src.visible : true,
+          showDateBadge: typeof src.showDateBadge === 'boolean' ? src.showDateBadge : true,
+          colonEggMode: eggMode,
+          text: typeof src.text === 'string' ? src.text : def.text,
+          fontSize: typeof src.fontSize === 'number' ? Math.min(44, Math.max(16, src.fontSize)) : 26,
+          iconType: titleType,
+          presetIndex: titleIdx,
+          iconEmoji: typeof src.iconEmoji === 'string' ? src.iconEmoji : '',
+          iconImage: titleImg,
+          hideBtnIconType: hideType,
+          hideBtnPresetIndex: hideIdx,
+          hideBtnIcon: typeof src.hideBtnIcon === 'string' ? src.hideBtnIcon : '',
+          hideBtnImageData: hideImg,
+          showBtnIconType: showType,
+          showBtnPresetIndex: showIdx,
+          showBtnIcon: typeof src.showBtnIcon === 'string' ? src.showBtnIcon : '',
+          showBtnImageData: showImg
+        };
+      }
+
+      var currentSettings = null;
+      var draftSettings = null;
+
+      var state = {
+        gathered: true,
+        nightMode: false,
+        wakeLock: null,
+        barHidden: false,
+        lastMinute: -1,
+        lastHourTriggered: -1,
+        lastChimeKey: '',
+        waveActive: false,
+        waveStartTime: 0,
+        waveCycles: 1,
+        waveContinuousEnd: 0,
+        heartShowTimer: 0,
+        activeEggShape: 'himawari',
+        eggDeck: [],
+        lastDrawnEggShape: '',
+        heartCenter: { x: 180, y: 320 },
+        heartScale: 8,
+        clockBox: { left: 20, right: 300, top: 120, bottom: 420 },
+        safeTopBottom: 64,
+        stageRevealed: false
+      };
+
+      var canvas = document.getElementById('clockCanvas');
+      var ctx = canvas.getContext('2d');
+      var fallbackSprites = [];
+      var repoClockSprites = [];
+      var customRoamerSprites = [];
+      var customRoamerUrls = [];
+      var usingCustomRoamer = false;
+
+      var weirdoSprites = [];
+      var hourSprites = [];
+      var clickSprites = [];
+      var customGuestSprites = [];
+      var customGuestUrls = [];
+      var usingCustomGuest = false;
+
+      var pigs = [];
+      var eggHelpers = [];
+      var paradeVisitors = [];
+
+      var draggingPig = null;
+      var pointerDownPos = { x: 0, y: 0 };
+      var pointerMoved = false;
+
+      function getCurrentRoamerPool() {
+        if (usingCustomRoamer && customRoamerSprites.length > 0) return customRoamerSprites;
+        if (repoClockSprites.length > 0) return repoClockSprites;
+        return fallbackSprites;
+      }
+
+      function getWeirdoPool() {
+        if (usingCustomGuest && customGuestSprites.length > 0) return customGuestSprites;
+        return weirdoSprites;
+      }
+
+      function getHourPool() {
+        if (usingCustomGuest && customGuestSprites.length > 0) return customGuestSprites;
+        if (hourSprites.length > 0) return hourSprites;
+        if (weirdoSprites.length > 0) return weirdoSprites;
+        return getCurrentRoamerPool();
+      }
+
+      function getClickEggPool() {
+        if (usingCustomGuest && customGuestSprites.length > 0) return customGuestSprites;
+        if (clickSprites.length > 0) return clickSprites;
+        return weirdoSprites;
+      }
+
+      /* 彙整系統現有圖庫供彩蛋圖案臨時借調細節援軍 */
+      function getSystemHelperSpritePool() {
+        var list = [];
+        var sources = [repoClockSprites, clickSprites, weirdoSprites, hourSprites];
+        for (var s = 0; s < sources.length; s++) {
+          var arr = sources[s];
+          if (!arr) continue;
+          for (var i = 0; i < arr.length; i++) {
+            if (arr[i] && list.indexOf(arr[i]) === -1) {
+              list.push(arr[i]);
+            }
+          }
+        }
+        for (var p = 0; p < originalCutoutCanvases.length; p++) {
+          if (originalCutoutCanvases[p] && list.indexOf(originalCutoutCanvases[p]) === -1) {
+            list.push(originalCutoutCanvases[p]);
+          }
+        }
+        if (list.length === 0) return fallbackSprites;
+        return list;
+      }
+
+      function createHandDrawnPigSprite(poseIdx) {
+        var off = document.createElement('canvas');
+        off.width = 96;
+        off.height = 96;
+        var c = off.getContext('2d');
+
+        var skin = '#F6C198';
+        var darkInk = '#3B2318';
+        var snoutPink = '#F17A7E';
+        var cheekPink = '#F78A8C';
+
+        c.save();
+        c.lineCap = 'round';
+        c.lineJoin = 'round';
+        c.strokeStyle = darkInk;
+        c.lineWidth = 3.2;
+
+        c.beginPath();
+        c.moveTo(22, 58);
+        c.bezierCurveTo(10, 52, 12, 40, 22, 45);
+        c.stroke();
+
+        c.fillStyle = skin;
+        drawRoundRect(c, 31, 64, 11, 13, 5);
+        c.fill();
+        c.stroke();
+
+        drawRoundRect(c, 54, 64, 11, 13, 5);
+        c.fill();
+        c.stroke();
+
+        c.fillStyle = skin;
+        c.beginPath();
+        c.ellipse(48, 53, 27, 21, 0, 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+
+        c.fillStyle = skin;
+        c.beginPath();
+        c.ellipse(28, 35, 7, 11, 0.45, 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+
+        c.beginPath();
+        c.ellipse(68, 35, 7, 11, -0.45, 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+
+        var mode = poseIdx % 12;
+        if (mode === 3 || mode === 7) {
+          c.beginPath();
+          c.arc(38, 46, 4.5, Math.PI * 1.1, Math.PI * 1.9);
+          c.stroke();
+          c.beginPath();
+          c.arc(58, 46, 4.5, Math.PI * 1.1, Math.PI * 1.9);
+          c.stroke();
+        } else if (mode === 5 || mode === 10) {
+          c.beginPath();
+          c.arc(38, 46, 4.5, 0, Math.PI * 2);
+          c.fillStyle = darkInk;
+          c.fill();
+          c.beginPath();
+          c.moveTo(54, 46);
+          c.lineTo(62, 46);
+          c.stroke();
+        } else {
+          c.fillStyle = darkInk;
+          c.beginPath();
+          c.arc(38, 46, 4.2, 0, Math.PI * 2);
+          c.arc(58, 46, 4.2, 0, Math.PI * 2);
+          c.fill();
+        }
+
+        c.fillStyle = cheekPink;
+        c.beginPath();
+        c.ellipse(29, 53, 5.2, 3.2, 0, 0, Math.PI * 2);
+        c.ellipse(67, 53, 5.2, 3.2, 0, 0, Math.PI * 2);
+        c.fill();
+
+        c.fillStyle = snoutPink;
+        c.beginPath();
+        c.ellipse(48, 53, 10.5, 7.5, 0, 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+
+        c.fillStyle = darkInk;
+        c.beginPath();
+        c.arc(44.5, 53, 2, 0, Math.PI * 2);
+        c.arc(51.5, 53, 2, 0, Math.PI * 2);
+        c.fill();
+
+        if (mode === 1 || mode === 6 || mode === 11) {
+          c.fillStyle = '#D95360';
+          c.beginPath();
+          c.arc(48, 62, 4.5, 0, Math.PI);
+          c.fill();
+          c.stroke();
+        } else {
+          c.beginPath();
+          c.moveTo(43, 62);
+          c.quadraticCurveTo(48, 66, 53, 62);
+          c.stroke();
+        }
+
+        if (mode === 2 || mode === 8) {
+          c.fillStyle = '#E85D75';
+          c.beginPath();
+          c.arc(74, 24, 4, 0, Math.PI * 2);
+          c.arc(80, 24, 4, 0, Math.PI * 2);
+          c.lineTo(77, 32);
+          c.closePath();
+          c.fill();
+        }
+
+        c.restore();
+        return off;
+      }
+
+      function buildFallbackSprites() {
+        fallbackSprites = [];
+        for (var i = 0; i < DEFAULT_POSE_COUNT; i++) {
+          fallbackSprites.push(createHandDrawnPigSprite(i));
+        }
+      }
+
+      function loadFolderSprites(folder, filenames, outSize, onDone) {
+        var results = [];
+        var remaining = filenames.length;
+        if (remaining === 0) {
+          onDone([]);
+          return;
+        }
+        for (var i = 0; i < filenames.length; i++) {
+          (function (name) {
+            var img = new Image();
+            img.onload = function () {
+              removeBackgroundAndTrim(img, outSize, function (spr) {
+                if (spr) results.push(spr);
+                remaining--;
+                if (remaining <= 0) onDone(results);
+              });
+            };
+            img.onerror = function () {
+              remaining--;
+              if (remaining <= 0) onDone(results);
+            };
+            img.src = encodeURI(folder + name);
+          })(filenames[i]);
+        }
+      }
+
+      function snapClockPigsToTargets() {
+        if (!state.gathered) return;
+        computeClockTargets();
+        for (var i = 0; i < pigs.length; i++) {
+          pigs[i].x = pigs[i].tx;
+          pigs[i].y = pigs[i].ty;
+          pigs[i].currentScale = pigs[i].scale;
+        }
+      }
+
+      function revealClockStage() {
+        if (state.stageRevealed) return;
+        state.stageRevealed = true;
+        resize();
+        snapClockPigsToTargets();
+        if (canvas) {
+          canvas.classList.add('ready');
+        }
+      }
+
+      function loadClockAndEasterAssets() {
+        setTimeout(revealClockStage, 1600);
+
+        loadFolderSprites(CLOCK_PIGS_DIR, CLOCK_PIG_FILES, 96, function (loaded) {
+          if (loaded.length > 0) {
+            repoClockSprites = loaded;
+            for (var i = 0; i < pigs.length; i++) {
+              pigs[i].pose = i % repoClockSprites.length;
+            }
+          }
+          revealClockStage();
+        });
+
+        loadFolderSprites(EASTER_EGGS_DIR, WEIRDO_EGG_FILES, 96, function (loaded) {
+          weirdoSprites = loaded;
+          if (!state.gathered) applyWeirdoMix(true);
+        });
+
+        loadFolderSprites(EASTER_EGGS_DIR, HOUR_EGG_FILES, 220, function (loaded) {
+          hourSprites = loaded;
+        });
+
+        loadFolderSprites(EASTER_EGGS_DIR, CLICK_EGG_FILES, 96, function (loaded) {
+          clickSprites = loaded;
         });
       }
 
-      // ===== 陣型座標產生器（28 點高精細輪廓） =====
-      function getHeartPoints(count, radiusX, radiusY, offsetX = 0, offsetY = 0) {
-        const pts = [];
-        for (let i = 0; i < count; i++) {
-          const t = (Math.PI * 2 * i) / count;
-          const x = 16 * Math.pow(Math.sin(t), 3);
-          const y = -(
-            13 * Math.cos(t) -
-            5 * Math.cos(2 * t) -
-            2 * Math.cos(3 * t) -
-            Math.cos(4 * t)
-          );
-          pts.push({
-            x: offsetX + (x / 16) * radiusX,
-            y: offsetY + (y / 14) * radiusY
+      /* 瀨戶字體（SetoFont）手寫圓潤風格數字路徑（每個點第 3 欄為 1 時保留手寫轉折尖角） */
+      var SETO_DIGIT_POLYLINES = {
+        '0': [
+          [0.48, 0.05], [0.70, 0.08], [0.84, 0.24], [0.86, 0.50],
+          [0.82, 0.78], [0.64, 0.94], [0.38, 0.95], [0.20, 0.80],
+          [0.14, 0.52], [0.18, 0.24], [0.34, 0.07], [0.48, 0.05]
+        ],
+        '1': [
+          [0.30, 0.21], [0.54, 0.06, 1], [0.53, 0.50], [0.53, 0.94, 1],
+          [0.28, 0.94], [0.80, 0.94]
+        ],
+        '2': [
+          [0.20, 0.25], [0.34, 0.08], [0.58, 0.06], [0.78, 0.14],
+          [0.84, 0.30], [0.74, 0.48], [0.48, 0.70], [0.18, 0.93, 1],
+          [0.52, 0.94], [0.85, 0.93]
+        ],
+        '3': [
+          [0.22, 0.14], [0.48, 0.06], [0.74, 0.12], [0.80, 0.28],
+          [0.68, 0.42], [0.46, 0.47, 1], [0.72, 0.54], [0.84, 0.72],
+          [0.72, 0.90], [0.44, 0.95], [0.20, 0.87]
+        ],
+        '4': [
+          [0.66, 0.94], [0.66, 0.50], [0.66, 0.06, 1], [0.40, 0.36],
+          [0.15, 0.65, 1], [0.52, 0.64], [0.87, 0.64]
+        ],
+        '5': [
+          [0.80, 0.07], [0.50, 0.06], [0.24, 0.07, 1], [0.21, 0.27],
+          [0.20, 0.45, 1], [0.46, 0.42], [0.74, 0.50], [0.83, 0.70],
+          [0.70, 0.90], [0.42, 0.95], [0.18, 0.86]
+        ],
+        '6': [
+          [0.72, 0.10], [0.46, 0.06], [0.24, 0.22], [0.16, 0.50],
+          [0.18, 0.78], [0.38, 0.94], [0.68, 0.93], [0.83, 0.74],
+          [0.74, 0.54], [0.48, 0.49], [0.20, 0.56]
+        ],
+        '7': [
+          [0.17, 0.20], [0.17, 0.07, 1], [0.52, 0.06], [0.85, 0.07, 1],
+          [0.66, 0.36], [0.48, 0.66], [0.36, 0.94]
+        ],
+        '8': [
+          [0.50, 0.47], [0.28, 0.39], [0.22, 0.22], [0.36, 0.07],
+          [0.64, 0.07], [0.78, 0.22], [0.72, 0.39], [0.50, 0.47],
+          [0.78, 0.57], [0.84, 0.77], [0.68, 0.94], [0.32, 0.94],
+          [0.16, 0.77], [0.22, 0.57], [0.50, 0.47]
+        ],
+        '9': [
+          [0.81, 0.42], [0.60, 0.52], [0.32, 0.50], [0.17, 0.33],
+          [0.26, 0.11], [0.54, 0.06], [0.78, 0.17], [0.82, 0.44],
+          [0.74, 0.70], [0.56, 0.89], [0.28, 0.94]
+        ]
+      };
+
+      /* Chaikin 手寫弧線平滑化（保留標記為尖角的轉折點） */
+      function smoothSetoPolyline(pts, iterations) {
+        var cur = pts.slice();
+        for (var it = 0; it < iterations; it++) {
+          if (cur.length < 3) break;
+          var next = [cur[0]];
+          for (var i = 0; i < cur.length - 1; i++) {
+            var p0 = cur[i];
+            var p1 = cur[i + 1];
+            if (p0[2] === 1 || p1[2] === 1) {
+              next.push(p1);
+            } else {
+              next.push([p0[0] * 0.75 + p1[0] * 0.25, p0[1] * 0.75 + p1[1] * 0.25, 0]);
+              next.push([p0[0] * 0.25 + p1[0] * 0.75, p0[1] * 0.25 + p1[1] * 0.75, 0]);
+            }
+          }
+          next.push(cur[cur.length - 1]);
+          cur = next;
+        }
+        return cur;
+      }
+
+      function samplePolyline(pts, count, smoothIter) {
+        var workPts = smoothIter ? smoothSetoPolyline(pts, smoothIter) : pts;
+        var segLengths = [];
+        var totalLen = 0;
+        for (var i = 0; i < workPts.length - 1; i++) {
+          var dx = workPts[i + 1][0] - workPts[i][0];
+          var dy = workPts[i + 1][1] - workPts[i][1];
+          var len = Math.sqrt(dx * dx + dy * dy);
+          segLengths.push(len);
+          totalLen += len;
+        }
+        var out = [];
+        if (totalLen <= 0 || count <= 1) {
+          out.push({ x: workPts[0][0], y: workPts[0][1] });
+          return out;
+        }
+        for (var k = 0; k < count; k++) {
+          var targetDist = (k / (count - 1)) * totalLen;
+          var acc = 0;
+          var placed = false;
+          for (var s = 0; s < segLengths.length; s++) {
+            var sl = segLengths[s];
+            if (acc + sl >= targetDist || s === segLengths.length - 1) {
+              var t = sl > 0 ? Math.min(1, Math.max(0, (targetDist - acc) / sl)) : 0;
+              out.push({
+                x: workPts[s][0] + (workPts[s + 1][0] - workPts[s][0]) * t,
+                y: workPts[s][1] + (workPts[s + 1][1] - workPts[s][1]) * t
+              });
+              placed = true;
+              break;
+            }
+            acc += sl;
+          }
+          if (!placed) {
+            var last = workPts[workPts.length - 1];
+            out.push({ x: last[0], y: last[1] });
+          }
+        }
+        return out;
+      }
+
+      function initPigs() {
+        pigs = [];
+        for (var i = 0; i < TOTAL_PIGS; i++) {
+          pigs.push({
+            id: i,
+            x: Math.random() * (W - 60) + 30,
+            y: Math.random() * (H - 140) + 80,
+            vx: (Math.random() - 0.5) * 70,
+            vy: (Math.random() - 0.5) * 70,
+            pose: i % DEFAULT_POSE_COUNT,
+            poseTimer: 1.5 + Math.random() * 3.5,
+            wigglePhase: Math.random() * Math.PI * 2,
+            wiggleFreq: 3.6 + Math.random() * 2.4,
+            flipX: Math.random() > 0.5 ? 1 : -1,
+            role: 'roamer',
+            colonIndex: -1,
+            slotIndex: -1,
+            heartBaseX: 0,
+            heartBaseY: 0,
+            tx: 0,
+            ty: 0,
+            scale: 0.42,
+            currentScale: 0.44,
+            baseAlpha: 1,
+            isWeirdo: false,
+            overrideSprite: null,
+            eggTimer: 0,
+            eggAction: 0,
+            clickFlip: 1
           });
+        }
+      }
+
+      function triggerGuestParade() {
+        var pool = getHourPool();
+        if (!pool || pool.length === 0) return;
+
+        var count = Math.min(5, Math.max(3, pool.length));
+        for (var i = 0; i < count; i++) {
+          var fromLeft = i % 2 === 0;
+          var spr = pool[i % pool.length];
+          var sz = Math.max(140, Math.min(230, Math.min(W, H) * 0.36));
+          var yBase = H * (0.26 + (i / count) * 0.44);
+          paradeVisitors.push({
+            sprite: spr,
+            x: fromLeft ? -sz - i * 175 : W + sz + i * 175,
+            y: yBase,
+            baseY: yBase,
+            size: sz,
+            vx: fromLeft ? 125 : -125,
+            phase: Math.random() * Math.PI * 2,
+            facing: fromLeft ? 1 : -1,
+            pauseTimer: 0,
+            hasPausedAtMid: false
+          });
+        }
+      }
+
+      function getSafeBounds() {
+        var topBarEl = document.getElementById('topBar');
+        var bottomBarEl = document.getElementById('bottomBar');
+        var hasTopContent = currentSettings && (currentSettings.visible || currentSettings.showDateBadge);
+        var topBottom = 14;
+        if (hasTopContent && topBarEl) {
+          topBottom = 64;
+          var tr = topBarEl.getBoundingClientRect();
+          if (tr && tr.bottom > 20) topBottom = Math.min(tr.bottom, H * 0.25);
+        }
+        state.safeTopBottom = topBottom;
+
+        var bottomTop = H - 14;
+        if (!state.barHidden && bottomBarEl) {
+          var br = bottomBarEl.getBoundingClientRect();
+          if (br && br.top > 120) bottomTop = Math.max(br.top, H * 0.72);
+        }
+        return {
+          topBottom: topBottom,
+          bottomTop: bottomTop
+        };
+      }
+
+      /* ============================================================================
+         5 款精細手繪彩蛋圖案標準化座標（中心 (0,0)，半徑約 15，標記 1 為銳利折角不磨平）
+         ============================================================================ */
+
+      /* 1. 小葵捲髮側臉（HIMAWARI）：
+            額前三道立體螺旋捲毛（帶深凹 V 型波谷），配合額頭內側螺旋捲線與右側圓耳朵 */
+      var HIMAWARI_OUTLINE = [
+        /* 左臉頰到額角 */
+        [-11.2, -3.2],
+        /* 第 1 捲（左側前額最突出捲毛） */
+        [-14.2, -4.4], [-15.2, -7.8], [-12.6, -11.0], [-8.8, -10.6], [-7.6, -6.8, 1],
+        /* 第 2 捲（頭頂中央大螺旋捲毛） */
+        [-6.6, -10.6], [-2.8, -12.0], [0.6, -9.8], [1.4, -6.2, 1],
+        /* 第 3 捲（右側額角捲毛） */
+        [2.6, -9.4], [6.4, -9.8], [9.4, -7.2],
+        /* 後腦勺圓弧到右耳 */
+        [11.4, -3.6], [11.6, 0.2, 1],
+        /* 右側小圓耳朵 */
+        [14.2, 0.2], [15.6, 3.0], [14.4, 6.2], [11.6, 6.8, 1],
+        /* 圓潤下巴與左側嘟嘟臉頰 */
+        [8.4, 8.6], [1.2, 9.6], [-6.8, 9.4], [-12.4, 7.2],
+        [-14.6, 3.6], [-13.6, -0.2], [-11.2, -3.2]
+      ];
+
+      /* 2. 蠟筆小新側臉（SIN1）：經典馬鈴薯頭型＋鼓鼓左臉頰＋右側大耳朵 */
+      var SIN1_OUTLINE = [
+        [-1.8, -12.0], [3.2, -11.8], [7.6, -9.4], [9.6, -5.2], [9.8, -1.0, 1],
+        /* 右側外凸大耳朵 */
+        [12.6, -1.8], [15.2, 0.2], [15.6, 3.8], [13.8, 6.8], [11.0, 7.6],
+        [9.4, 6.8, 1],
+        /* 平順下巴到左側鼓鼓臉頰 */
+        [6.8, 8.2], [0.6, 9.2], [-7.2, 9.6], [-13.2, 8.6],
+        [-15.6, 5.4], [-15.4, 1.0], [-12.6, -2.0], [-10.8, -3.0],
+        [-9.6, -7.6], [-6.0, -11.0], [-1.8, -12.0]
+      ];
+
+      /* 3. 肥嘟嘟左衛門豬頭（S3）：左右招風豬耳＋圓臉＋中間大豬鼻 */
+      var S3_HEAD_OUTLINE = [
+        [-4.2, -8.4], [0.0, -7.4], [4.2, -8.4],
+        /* 右耳 */
+        [7.8, -12.0, 1], [11.2, -10.6], [11.6, -5.8], [10.6, -2.8, 1],
+        /* 右臉頰與雙下巴 */
+        [14.0, -0.4], [14.8, 3.8], [12.4, 7.4], [8.2, 8.6, 1],
+        [4.8, 10.8], [0.0, 10.2], [-4.8, 10.8], [-8.2, 8.6, 1],
+        /* 左臉頰與左耳 */
+        [-12.4, 7.4], [-14.8, 3.8], [-14.0, -0.4], [-10.6, -2.8, 1],
+        [-11.6, -5.8], [-11.2, -10.6], [-7.8, -12.0, 1], [-4.2, -8.4]
+      ];
+
+      var S3_SNOUT_OUTLINE = [
+        [0.0, 2.0], [4.6, 0.8], [8.6, 2.4], [9.4, 6.2],
+        [6.8, 9.6], [2.6, 9.4], [0.0, 8.6], [-2.6, 9.4],
+        [-6.8, 9.6], [-9.4, 6.2], [-8.6, 2.4], [-4.6, 0.8], [0.0, 2.0]
+      ];
+
+      /* 4. 蠟筆小新濃眉嘟嘴（SIN2）：馬鈴薯頭＋粗黑毛毛蟲濃眉＋嘟嘴＋右耳 */
+      var SIN2_HEAD_OUTLINE = [
+        [-2.8, -12.8], [2.8, -12.4], [7.4, -9.4], [9.4, -4.6], [9.6, -1.6, 1],
+        /* 右耳 */
+        [12.4, -2.4], [15.2, -0.2], [15.6, 3.8], [13.6, 6.8], [10.8, 7.6],
+        [9.0, 6.4, 1],
+        /* 下巴與鼓臉頰 */
+        [5.2, 8.8], [-2.0, 9.8], [-9.2, 9.4], [-14.2, 6.8],
+        [-15.4, 2.4], [-13.6, -1.6], [-11.2, -2.6], [-10.6, -7.4], [-7.4, -11.4],
+        [-2.8, -12.8]
+      ];
+
+      /* 濃眉加厚成雙層弧線，遠看像超粗毛毛蟲眉毛 */
+      var SIN2_BROW_LEFT = [
+        [-11.4, -5.8], [-9.4, -8.8], [-6.2, -9.0], [-4.0, -6.4],
+        [-4.6, -5.4], [-6.6, -7.4], [-9.2, -7.2], [-10.8, -5.0]
+      ];
+
+      var SIN2_BROW_RIGHT = [
+        [-1.2, -6.4], [1.4, -9.2], [4.8, -9.2], [7.2, -6.2],
+        [6.4, -5.2], [4.4, -7.6], [1.6, -7.6], [-0.4, -5.4]
+      ];
+
+      /* 5. 巧克比鱷魚山先生（Sin4）：長吻鼻孔＋張開大嘴＋鋸齒牙＋大眼 */
+      var SIN4_BODY_OUTLINE = [
+        [4.8, -5.2], [9.8, -4.8], [13.4, -2.0], [14.6, 2.4], [13.8, 7.0],
+        [10.2, 9.8], [2.0, 10.0], [-7.2, 9.6], [-9.6, 7.6], [-7.6, 5.4],
+        [2.6, 5.4], [7.0, 3.8], [7.0, 1.4], [2.6, 0.2], [-10.4, 0.2],
+        /* 鱷魚吻部前端與鼻孔小隆起 */
+        [-14.4, -1.4], [-15.0, -4.6], [-12.6, -6.6], [-10.6, -5.6],
+        [-8.4, -6.4], [-5.2, -5.4]
+      ];
+
+      function buildCirclePts(cx, cy, rx, ry, steps) {
+        var pts = [];
+        for (var i = 0; i <= steps; i++) {
+          var a = (i / steps) * Math.PI * 2;
+          pts.push([cx + Math.cos(a) * rx, cy + Math.sin(a) * ry]);
         }
         return pts;
       }
 
-      function getDuetPoints(count, spreadX, radiusY) {
-        // 左右雙心＋中央甜蜜連線，呈現雙人陣型
-        const half = Math.floor(count / 2);
-        const leftPts = getHeartPoints(half, spreadX * 0.62, radiusY * 0.78, -spreadX * 0.56, -8);
-        const rightPts = getHeartPoints(count - half, spreadX * 0.62, radiusY * 0.78, spreadX * 0.56, 8);
-        return [...leftPts, ...rightPts];
+      function pickNextColonEggShape() {
+        var mode = (currentSettings && currentSettings.colonEggMode) ? currentSettings.colonEggMode : 'random5';
+        if (mode !== 'random5') {
+          state.activeEggShape = mode;
+          state.lastDrawnEggShape = mode;
+          return mode;
+        }
+        if (!state.eggDeck || state.eggDeck.length === 0) {
+          var deck = RANDOM5_POOL.slice();
+          for (var i = deck.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = deck[i];
+            deck[i] = deck[j];
+            deck[j] = tmp;
+          }
+          if (deck.length > 1 && deck[0] === state.lastDrawnEggShape) {
+            var swap = deck[0];
+            deck[0] = deck[deck.length - 1];
+            deck[deck.length - 1] = swap;
+          }
+          state.eggDeck = deck;
+        }
+        var nextShape = state.eggDeck.shift();
+        state.activeEggShape = nextShape;
+        state.lastDrawnEggShape = nextShape;
+        return nextShape;
       }
 
-      // 需求 1：小白冒號點擊彩蛋陣型（蓬鬆圓臉 + 左右立耳 + 黑眼圈/耳朵細節 + 微笑弧線）
-      function getShiroPoints(count, rx, ry) {
-        const pts = [];
-        // 分配點位：14 點勾勒小白蓬鬆圓臉與微笑，7 點左耳，7 點右耳
-        const earCount = 7;
-        const faceCount = Math.max(8, count - earCount * 2);
-
-        // 左耳（左上立耳）
-        for (let i = 0; i < earCount; i++) {
-          const ratio = i / Math.max(1, earCount - 1);
-          pts.push({
-            x: -rx * (0.48 + ratio * 0.24),
-            y: -ry * (0.78 + Math.sin(ratio * Math.PI) * 0.42)
-          });
-        }
-
-        // 右耳（右上立耳）
-        for (let i = 0; i < earCount; i++) {
-          const ratio = i / Math.max(1, earCount - 1);
-          pts.push({
-            x: rx * (0.48 + ratio * 0.24),
-            y: -ry * (0.78 + Math.sin(ratio * Math.PI) * 0.42)
-          });
-        }
-
-        // 小白圓潤臉龐與下方微笑輪廓
-        for (let i = 0; i < faceCount; i++) {
-          const t = (Math.PI * 2 * i) / faceCount;
-          // 稍微加入小白臉頰的軟萌鼓感
-          const puff = 1 + 0.08 * Math.sin(t * 2);
-          pts.push({
-            x: Math.cos(t) * rx * puff,
-            y: Math.sin(t) * ry * puff + ry * 0.12
-          });
-        }
-
-        return pts.slice(0, count);
-      }
-
-      function buildFormationCoordinates(type) {
-        const vw = window.innerWidth;
-        const vh = window.innerHeight;
-        const base = Math.min(vw, vh);
-        const rx = Math.max(120, Math.min(250, base * 0.34));
-        const ry = Math.max(110, Math.min(220, base * 0.30));
-
-        if (type === 'heart') {
-          return getHeartPoints(HELPER_COUNT, rx * 1.15, ry * 1.12, 0, -10);
-        }
-        if (type === 'duet') {
-          return getDuetPoints(HELPER_COUNT, rx * 1.15, ry * 1.05);
-        }
-        // 'shiro' 小白陣型
-        return getShiroPoints(HELPER_COUNT, rx * 1.05, ry * 0.96);
-      }
-
-      function applyHelperTransform(h, x, y, scale, rot, opacity, transition = 'transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease') {
-        h.x = x;
-        h.y = y;
-        h.scale = scale;
-        h.rot = rot;
-        h.opacity = opacity;
-        h.el.style.transition = transition;
-        h.el.style.opacity = String(opacity);
-        h.el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${scale.toFixed(3)}) rotate(${rot.toFixed(1)}deg)`;
-      }
-
-      function renderPattern(type, labelText) {
-        formationLabel.textContent = labelText;
-        const coords = buildFormationCoordinates(type);
-        helpers.forEach((h, idx) => {
-          const target = coords[idx] || { x: 0, y: 0 };
-          const tilt = (idx % 2 === 0 ? 1 : -1) * 7;
-          applyHelperTransform(h, target.x, target.y, 1, tilt, 1);
+      function assignOrderedPointsToPigs(rimPigs, slotList, cx, cy) {
+        if (rimPigs.length === 0 || slotList.length === 0) return;
+        var sortedPigs = rimPigs.slice().sort(function (a, b) {
+          return Math.atan2(a.y - cy, a.x - cx) - Math.atan2(b.y - cy, b.x - cx);
         });
-      }
-
-      // ===== 清除計時器輔助函式 =====
-      function clearShowTimers() {
-        if (showEndTimer) { clearTimeout(showEndTimer); showEndTimer = null; }
-        if (patternTimer) { clearInterval(patternTimer); patternTimer = null; }
-        if (stepTimer) { clearTimeout(stepTimer); stepTimer = null; }
-        if (exitFinishTimer) { clearTimeout(exitFinishTimer); exitFinishTimer = null; }
-      }
-
-      // ===== 需求 4：退場橋段實作 =====
-      function runExitSequence(isManualInterrupt, onComplete) {
-        isExiting = true;
-        formationLayer.classList.remove('is-active');
-        clearShowTimers();
-
-        const vw = window.innerWidth;
-        const edgeX = vw * 0.68 + 120;
-
-        if (isManualInterrupt) {
-          // (4) 使用者中途點擊跳回時間：原地縮水變小消失／回鍋，讓退場更快、不干擾時間數字快速成形
-          statusText.textContent = '已提前跳回時間 · 小幫手快速回鍋中';
-          helpers.forEach((h, idx) => {
-            const delay = idx * 8;
-            setTimeout(() => {
-              applyHelperTransform(
-                h,
-                h.x * 0.35,
-                h.y * 0.35,
-                0.05,
-                h.rot + 25,
-                0,
-                'transform 0.22s cubic-bezier(0.55, 0.06, 0.68, 0.53), opacity 0.18s ease-out'
-              );
-            }, delay);
+        var indexedSlots = [];
+        for (var i = 0; i < slotList.length; i++) {
+          indexedSlots.push({
+            x: slotList[i].x,
+            y: slotList[i].y,
+            scale: slotList[i].scale,
+            ang: Math.atan2(slotList[i].y - cy, slotList[i].x - cx)
           });
+        }
+        indexedSlots.sort(function (a, b) { return a.ang - b.ang; });
 
-          exitFinishTimer = setTimeout(() => {
-            isExiting = false;
-            if (onComplete) onComplete();
-          }, 260);
+        var count = Math.min(sortedPigs.length, indexedSlots.length);
+        for (var k = 0; k < count; k++) {
+          sortedPigs[k].tx = indexedSlots[k].x;
+          sortedPigs[k].ty = indexedSlots[k].y;
+          sortedPigs[k].heartBaseX = indexedSlots[k].x;
+          sortedPigs[k].heartBaseY = indexedSlots[k].y;
+          sortedPigs[k].scale = indexedSlots[k].scale;
+          sortedPigs[k].baseAlpha = 1;
+        }
+      }
+
+      function dismissEggHelpers(immediate) {
+        if (immediate) {
+          eggHelpers = [];
+          return;
+        }
+        for (var i = 0; i < eggHelpers.length; i++) {
+          var h = eggHelpers[i];
+          if (!h.leaving) {
+            h.leaving = true;
+            var goRight = h.x >= W * 0.5;
+            h.tx = goRight ? (W + 70) : -70;
+            h.ty = h.y + (Math.random() - 0.5) * 40;
+            h.flipX = goRight ? 1 : -1;
+          }
+        }
+      }
+
+      /* 召喚少量精巧援軍來刻畫五官／髮捲／牙齒細節，彩蛋結束自動跑步離場 */
+      function spawnDetailHelpers(cx, cy, figScale, helperSlots) {
+        eggHelpers = [];
+        var helperPool = getSystemHelperSpritePool();
+        if (!helperPool || helperPool.length === 0 || !helperSlots || helperSlots.length === 0) return;
+
+        for (var k = 0; k < helperSlots.length; k++) {
+          var slot = helperSlots[k];
+          var sx = cx + slot.x * figScale;
+          var sy = cy + slot.y * figScale;
+          var fromLeft = sx < cx;
+          eggHelpers.push({
+            sprite: helperPool[k % helperPool.length],
+            x: fromLeft ? (-36 - (k % 6) * 16) : (W + 36 + (k % 6) * 16),
+            y: sy + (Math.random() - 0.5) * 26,
+            tx: sx,
+            ty: sy,
+            heartBaseX: sx,
+            heartBaseY: sy,
+            scale: slot.scale,
+            flipX: fromLeft ? 1 : -1,
+            phase: Math.random() * Math.PI * 2,
+            leaving: false
+          });
+        }
+      }
+
+      function layoutColonEggShape(shape) {
+        var bounds = getSafeBounds();
+        var cx = W * 0.5;
+        var cy = (bounds.topBottom + bounds.bottomTop) * 0.5 + 4;
+        var availW = W - 40;
+        var availH = Math.max(160, bounds.bottomTop - bounds.topBottom - 24);
+
+        var figScale = Math.min(availW / 33, availH / 29);
+        state.heartCenter = { x: cx, y: cy };
+        state.heartScale = figScale;
+
+        var colonPigs = [];
+        var rimPigs = [];
+        for (var i = 0; i < pigs.length; i++) {
+          pigs[i].eggTimer = 0;
+          if (!pigs[i].isWeirdo) pigs[i].overrideSprite = null;
+          if (pigs[i].role === 'colon') {
+            colonPigs.push(pigs[i]);
+          } else {
+            rimPigs.push(pigs[i]);
+          }
+        }
+        colonPigs.sort(function (a, b) { return a.colonIndex - b.colonIndex; });
+
+        var slots = [];
+
+        if (shape === 'himawari') {
+          /* ======================================================================
+             1. 小葵捲髮側臉（HIMAWARI）：
+             額前 3 圈立體螺旋捲毛（外圈深凹波浪 + 內側螺旋髮捲線條）＋圓臉＋右耳
+             ====================================================================== */
+          var himaDuetGap = Math.max(18, Math.min(36, figScale * 2.3));
+          var himaDuetScale = Math.max(0.32, Math.min(0.48, figScale * 0.036));
+          /* 縮小輪廓小豬尺寸，讓三圈捲毛的波谷線條清晰分明不糊在一起 */
+          var himaRimScale = Math.max(0.135, Math.min(0.20, figScale * 0.015));
+
+          for (var cb = 0; cb < colonPigs.length; cb++) {
+            var sideB = cb === 0 ? -1 : 1;
+            colonPigs[cb].tx = cx + sideB * himaDuetGap - figScale * 1.4;
+            colonPigs[cb].ty = cy + figScale * 2.2;
+            colonPigs[cb].heartBaseX = colonPigs[cb].tx;
+            colonPigs[cb].heartBaseY = colonPigs[cb].ty;
+            colonPigs[cb].scale = himaDuetScale;
+            colonPigs[cb].baseAlpha = 1;
+            colonPigs[cb].flipX = sideB === -1 ? 1 : -1;
+          }
+
+          /* 140 隻主體全部用來精細勾勒小葵的三圈捲毛＋臉型＋耳朵（smoothIter=1 保留捲毛凹谷） */
+          var himaPts = samplePolyline(HIMAWARI_OUTLINE, rimPigs.length + 1, 1);
+          for (var bi = 0; bi < rimPigs.length; bi++) {
+            slots.push({
+              x: cx + himaPts[bi].x * figScale,
+              y: cy + himaPts[bi].y * figScale,
+              scale: himaRimScale
+            });
+          }
+          assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
+
+          /* 援軍在額頭內側補上三圈螺旋捲毛的內捲渦紋 + 右耳耳窩，讓捲捲髮超立體 */
+          var curlHelperScale = Math.max(0.125, Math.min(0.185, figScale * 0.0138));
+          var curlDetails = [
+            /* 左第 1 捲內渦 */
+            { x: -11.4, y: -7.6, scale: curlHelperScale },
+            { x: -10.2, y: -6.4, scale: curlHelperScale },
+            { x: -9.2, y: -7.6, scale: curlHelperScale },
+            /* 中第 2 捲內渦 */
+            { x: -4.2, y: -8.6, scale: curlHelperScale },
+            { x: -2.8, y: -7.2, scale: curlHelperScale },
+            { x: -1.6, y: -8.4, scale: curlHelperScale },
+            /* 右第 3 捲內渦 */
+            { x: 4.4, y: -6.8, scale: curlHelperScale },
+            { x: 5.8, y: -5.6, scale: curlHelperScale },
+            /* 右耳耳窩 */
+            { x: 12.6, y: 2.6, scale: curlHelperScale },
+            { x: 12.4, y: 4.6, scale: curlHelperScale }
+          ];
+          spawnDetailHelpers(cx, cy, figScale, curlDetails);
+
+        } else if (shape === 'sin1') {
+          /* ======================================================================
+             2. 蠟筆小新側臉（SIN1）：馬鈴薯頭型＋鼓臉頰＋右大耳＋耳窩＋小眉眼
+             ====================================================================== */
+          var duetGap = Math.max(18, Math.min(36, figScale * 2.4));
+          var duetScale = Math.max(0.33, Math.min(0.50, figScale * 0.038));
+          var rimScale = Math.max(0.145, Math.min(0.215, figScale * 0.016));
+
+          for (var c1 = 0; c1 < colonPigs.length; c1++) {
+            var side1 = c1 === 0 ? -1 : 1;
+            colonPigs[c1].tx = cx + side1 * duetGap - figScale * 1.8;
+            colonPigs[c1].ty = cy + figScale * 0.8;
+            colonPigs[c1].heartBaseX = colonPigs[c1].tx;
+            colonPigs[c1].heartBaseY = colonPigs[c1].ty;
+            colonPigs[c1].scale = duetScale;
+            colonPigs[c1].baseAlpha = 1;
+            colonPigs[c1].flipX = side1 === -1 ? 1 : -1;
+          }
+
+          var sin1Pts = samplePolyline(SIN1_OUTLINE, rimPigs.length + 1, 1);
+          for (var s1 = 0; s1 < rimPigs.length; s1++) {
+            slots.push({
+              x: cx + sin1Pts[s1].x * figScale,
+              y: cy + sin1Pts[s1].y * figScale,
+              scale: rimScale
+            });
+          }
+          assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
+
+          /* 援軍補上右耳耳窩線條＋額頭小濃眉 */
+          var sin1DetailScale = Math.max(0.13, Math.min(0.19, figScale * 0.0145));
+          spawnDetailHelpers(cx, cy, figScale, [
+            { x: 12.4, y: 1.6, scale: sin1DetailScale },
+            { x: 12.0, y: 4.0, scale: sin1DetailScale },
+            { x: -7.5, y: -5.8, scale: sin1DetailScale },
+            { x: -5.2, y: -6.4, scale: sin1DetailScale },
+            { x: -1.5, y: -6.2, scale: sin1DetailScale },
+            { x: 1.0, y: -5.6, scale: sin1DetailScale }
+          ]);
+
+        } else if (shape === 's3') {
+          /* ======================================================================
+             3. 肥嘟嘟左衛門豬頭（S3）：雙耳頭型＋豬鼻外框＋鼻孔冒號豬＋瞇瞇眼＋小嘴
+             ====================================================================== */
+          var nostrilScale = Math.max(0.22, Math.min(0.34, figScale * 0.025));
+          var headScale = Math.max(0.145, Math.min(0.215, figScale * 0.016));
+          var snoutScale = Math.max(0.135, Math.min(0.20, figScale * 0.015));
+
+          for (var c2 = 0; c2 < colonPigs.length; c2++) {
+            var side2 = c2 === 0 ? -1 : 1;
+            colonPigs[c2].tx = cx + side2 * figScale * 3.8;
+            colonPigs[c2].ty = cy + figScale * 5.6;
+            colonPigs[c2].heartBaseX = colonPigs[c2].tx;
+            colonPigs[c2].heartBaseY = colonPigs[c2].ty;
+            colonPigs[c2].scale = nostrilScale;
+            colonPigs[c2].baseAlpha = 1;
+            colonPigs[c2].flipX = side2 === -1 ? 1 : -1;
+          }
+
+          var snoutCount = 36;
+          var headCount = rimPigs.length - snoutCount;
+          var headPts = samplePolyline(S3_HEAD_OUTLINE, headCount + 1, 1);
+          var snoutPts = samplePolyline(S3_SNOUT_OUTLINE, snoutCount + 1, 2);
+
+          for (var h1 = 0; h1 < headCount; h1++) {
+            slots.push({
+              x: cx + headPts[h1].x * figScale,
+              y: cy + headPts[h1].y * figScale,
+              scale: headScale
+            });
+          }
+          for (var sn = 0; sn < snoutCount; sn++) {
+            slots.push({
+              x: cx + snoutPts[sn].x * figScale,
+              y: cy + snoutPts[sn].y * figScale,
+              scale: snoutScale
+            });
+          }
+          assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
+
+          /* 援軍補上肥嘟嘟左衛門經典的「半月不屑眼」與「八字小嘴」 */
+          var s3DetailScale = Math.max(0.135, Math.min(0.195, figScale * 0.0148));
+          spawnDetailHelpers(cx, cy, figScale, [
+            { x: -6.6, y: -2.4, scale: s3DetailScale },
+            { x: -4.4, y: -2.4, scale: s3DetailScale },
+            { x: 4.4, y: -2.4, scale: s3DetailScale },
+            { x: 6.6, y: -2.4, scale: s3DetailScale },
+            { x: -2.0, y: 11.8, scale: s3DetailScale },
+            { x: 0.0, y: 11.2, scale: s3DetailScale },
+            { x: 2.0, y: 11.8, scale: s3DetailScale }
+          ]);
+
+        } else if (shape === 'sin2') {
+          /* ======================================================================
+             4. 蠟筆小新濃眉嘟嘴（SIN2）：毛毛蟲雙層粗眉＋圓嘟嘴＋右耳＋耳窩
+             ====================================================================== */
+          var cheekScale = Math.max(0.22, Math.min(0.34, figScale * 0.025));
+          var outlineScale = Math.max(0.135, Math.min(0.195, figScale * 0.0148));
+          var featureScale = Math.max(0.155, Math.min(0.225, figScale * 0.017));
+
+          for (var c3 = 0; c3 < colonPigs.length; c3++) {
+            var side3 = c3 === 0 ? -1 : 1;
+            colonPigs[c3].tx = cx + (side3 === -1 ? -6.8 : 2.0) * figScale;
+            colonPigs[c3].ty = cy + figScale * 0.2;
+            colonPigs[c3].heartBaseX = colonPigs[c3].tx;
+            colonPigs[c3].heartBaseY = colonPigs[c3].ty;
+            colonPigs[c3].scale = cheekScale;
+            colonPigs[c3].baseAlpha = 1;
+            colonPigs[c3].flipX = side3 === -1 ? 1 : -1;
+          }
+
+          var browLCount = 16;
+          var browRCount = 16;
+          var mouthCount = 14;
+          var headSin2Count = rimPigs.length - browLCount - browRCount - mouthCount;
+
+          var hSin2Pts = samplePolyline(SIN2_HEAD_OUTLINE, headSin2Count + 1, 1);
+          var bLPts = samplePolyline(SIN2_BROW_LEFT, browLCount, 1);
+          var bRPts = samplePolyline(SIN2_BROW_RIGHT, browRCount, 1);
+          var mouthPts = samplePolyline(buildCirclePts(-5.8, 7.2, 2.3, 2.3, 48), mouthCount + 1, 0);
+
+          for (var hs = 0; hs < headSin2Count; hs++) {
+            slots.push({
+              x: cx + hSin2Pts[hs].x * figScale,
+              y: cy + hSin2Pts[hs].y * figScale,
+              scale: outlineScale
+            });
+          }
+          for (var bl = 0; bl < browLCount; bl++) {
+            slots.push({
+              x: cx + bLPts[bl].x * figScale,
+              y: cy + bLPts[bl].y * figScale,
+              scale: featureScale
+            });
+          }
+          for (var br = 0; br < browRCount; br++) {
+            slots.push({
+              x: cx + bRPts[br].x * figScale,
+              y: cy + bRPts[br].y * figScale,
+              scale: featureScale
+            });
+          }
+          for (var mo = 0; mo < mouthCount; mo++) {
+            slots.push({
+              x: cx + mouthPts[mo].x * figScale,
+              y: cy + mouthPts[mo].y * figScale,
+              scale: featureScale
+            });
+          }
+          assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
+
+          /* 援軍補上右耳耳窩線條 */
+          spawnDetailHelpers(cx, cy, figScale, [
+            { x: 12.2, y: 1.5, scale: outlineScale },
+            { x: 11.8, y: 3.9, scale: outlineScale }
+          ]);
+
+        } else if (shape === 'sin4') {
+          /* ======================================================================
+             5. 巧克比鱷魚山先生（Sin4）：鱷魚輪廓＋骨碌碌冒號眼珠＋大眼眶＋交錯鋸齒尖牙
+             ====================================================================== */
+          var pupilScale = Math.max(0.21, Math.min(0.32, figScale * 0.024));
+          var crocScale = Math.max(0.145, Math.min(0.215, figScale * 0.016));
+
+          for (var c4 = 0; c4 < colonPigs.length; c4++) {
+            var eyeX = c4 === 0 ? -2.3 : 3.5;
+            colonPigs[c4].tx = cx + eyeX * figScale;
+            colonPigs[c4].ty = cy - 8.4 * figScale;
+            colonPigs[c4].heartBaseX = colonPigs[c4].tx;
+            colonPigs[c4].heartBaseY = colonPigs[c4].ty;
+            colonPigs[c4].scale = pupilScale;
+            colonPigs[c4].baseAlpha = 1;
+            colonPigs[c4].flipX = -1;
+          }
+
+          var crocPts = samplePolyline(SIN4_BODY_OUTLINE, rimPigs.length, 1);
+          for (var cr = 0; cr < rimPigs.length; cr++) {
+            slots.push({
+              x: cx + crocPts[cr].x * figScale,
+              y: cy + crocPts[cr].y * figScale,
+              scale: crocScale
+            });
+          }
+          assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
+
+          /* 援軍負責刻畫左右大眼眶 + 上下交錯鋸齒牙齒 */
+          var eyeL = samplePolyline(buildCirclePts(-2.3, -8.4, 2.7, 3.1, 36), 11, 0);
+          var eyeR = samplePolyline(buildCirclePts(3.5, -8.4, 2.7, 3.1, 36), 11, 0);
+          var eyeScale = Math.max(0.135, Math.min(0.195, figScale * 0.0148));
+          var toothScale = Math.max(0.13, Math.min(0.19, figScale * 0.0142));
+          var crocDetails = [];
+
+          for (var e1 = 0; e1 < eyeL.length - 1; e1++) {
+            crocDetails.push({ x: eyeL[e1].x, y: eyeL[e1].y, scale: eyeScale });
+          }
+          for (var e2 = 0; e2 < eyeR.length - 1; e2++) {
+            crocDetails.push({ x: eyeR[e2].x, y: eyeR[e2].y, scale: eyeScale });
+          }
+          var toothX = [-7.8, -4.0, -0.2, 3.6];
+          for (var t = 0; t < toothX.length; t++) {
+            var tx = toothX[t];
+            crocDetails.push({ x: tx, y: 1.0, scale: toothScale });
+            crocDetails.push({ x: tx + 0.2, y: 2.8, scale: toothScale });
+            crocDetails.push({ x: tx + 0.4, y: 4.5, scale: toothScale });
+          }
+          spawnDetailHelpers(cx, cy, figScale, crocDetails);
+
+        } else {
+          /* ======================================================================
+             6. 經典大愛心（heart）
+             ====================================================================== */
+          var heartDuetGap = Math.max(24, Math.min(48, figScale * 3.4));
+          var heartDuetScale = Math.max(0.42, Math.min(0.68, figScale * 0.048));
+          var heartRimScale = Math.max(0.20, Math.min(0.32, figScale * 0.024));
+
+          for (var c5 = 0; c5 < colonPigs.length; c5++) {
+            var side5 = c5 === 0 ? -1 : 1;
+            colonPigs[c5].tx = cx + side5 * heartDuetGap;
+            colonPigs[c5].ty = cy + figScale * 1.4;
+            colonPigs[c5].heartBaseX = colonPigs[c5].tx;
+            colonPigs[c5].heartBaseY = colonPigs[c5].ty;
+            colonPigs[c5].scale = heartDuetScale;
+            colonPigs[c5].baseAlpha = 1;
+            colonPigs[c5].flipX = side5 === -1 ? 1 : -1;
+          }
+
+          var rawPts = [];
+          var STEPS = 720;
+          for (var s = 0; s <= STEPS; s++) {
+            var t = (s / STEPS) * Math.PI * 2;
+            var hx = 16 * Math.pow(Math.sin(t), 3);
+            var hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+            rawPts.push([hx, hy]);
+          }
+          var heartSamples = samplePolyline(rawPts, rimPigs.length + 1, 0);
+          for (var k = 0; k < rimPigs.length; k++) {
+            slots.push({
+              x: cx + heartSamples[k].x * figScale,
+              y: cy + heartSamples[k].y * figScale,
+              scale: heartRimScale
+            });
+          }
+          assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
+        }
+      }
+
+      function triggerHeartDuetShow() {
+        if (!state.gathered) return;
+        dismissEggHelpers(true);
+        state.heartShowTimer = 6.5;
+        state.waveActive = false;
+        var chosenShape = pickNextColonEggShape();
+        layoutColonEggShape(chosenShape);
+      }
+
+      function computeClockTargets() {
+        if (state.heartShowTimer > 0) return;
+
+        var now = new Date();
+        var curMin = now.getMinutes();
+        var curHour = now.getHours();
+        if (curMin === 0 && now.getSeconds() === 0 && curHour !== state.lastHourTriggered) {
+          state.lastHourTriggered = curHour;
+          triggerGuestParade();
+        }
+        state.lastMinute = curMin;
+
+        var hh = String(curHour).padStart(2, '0');
+        var mm = String(curMin).padStart(2, '0');
+        var digits = [hh[0], hh[1], mm[0], mm[1]];
+
+        var isExtraLarge = currentSettings ? currentSettings.extraLarge : true;
+        var isLandscape = W > H;
+
+        var bounds = getSafeBounds();
+        var topBottom = bounds.topBottom;
+        var bottomTop = bounds.bottomTop;
+
+        var safeTop = topBottom + 6;
+        var safeBottom = Math.max(safeTop + 170, bottomTop - 6);
+        var safeH = safeBottom - safeTop;
+
+        var outerRowMargin = 38;
+        var rowToClockGap = Math.max(32, Math.min(44, safeH * 0.075));
+
+        var digitZoneTop = safeTop + outerRowMargin + rowToClockGap * 0.55;
+        var digitZoneBot = safeBottom - outerRowMargin - rowToClockGap * 0.55;
+        var digitZoneH = Math.max(96, digitZoneBot - digitZoneTop);
+
+        var clockW = W * (isExtraLarge ? (isLandscape ? 0.84 : 0.91) : (isLandscape ? 0.72 : 0.79));
+        var colonW = clockW * 0.095;
+        var digitGap = clockW * 0.045;
+        var digitW = (clockW - colonW - digitGap * 2) / 4;
+        var ratioCap = isLandscape ? 1.38 : 1.92;
+        var digitH = Math.min(digitZoneH * (isExtraLarge ? 0.94 : 0.78), digitW * ratioCap);
+
+        var startX = (W - clockW) / 2;
+        var centerY = (digitZoneTop + digitZoneBot) / 2;
+        var topY = centerY - digitH / 2;
+        var bottomY = topY + digitH;
+
+        var topRowY = Math.max(safeTop + outerRowMargin, topY - rowToClockGap);
+        var botRowY = Math.min(safeBottom - outerRowMargin, bottomY + rowToClockGap);
+
+        state.clockBox = {
+          left: startX - 18,
+          right: startX + clockW + 18,
+          top: topY - 18,
+          bottom: bottomY + 18
+        };
+
+        var xOffsets = [
+          startX,
+          startX + digitW + digitGap,
+          startX + digitW * 2 + digitGap + colonW,
+          startX + digitW * 3 + digitGap * 2 + colonW
+        ];
+
+        var targets = [];
+        var ptsPerDigit = 20;
+
+        for (var d = 0; d < 4; d++) {
+          var poly = SETO_DIGIT_POLYLINES[digits[d]] || SETO_DIGIT_POLYLINES['0'];
+          var samples = samplePolyline(poly, ptsPerDigit, 2);
+          for (var s = 0; s < samples.length; s++) {
+            targets.push({
+              x: xOffsets[d] + samples[s].x * digitW,
+              y: topY + samples[s].y * digitH,
+              role: 'digit',
+              colonIndex: -1
+            });
+          }
+        }
+
+        var colonX = startX + digitW * 2 + digitGap + colonW * 0.5;
+        targets.push({ x: colonX, y: topY + digitH * 0.34, role: 'colon', colonIndex: 0 });
+        targets.push({ x: colonX, y: topY + digitH * 0.68, role: 'colon', colonIndex: 1 });
+
+        for (var i = 0; i < pigs.length; i++) {
+          pigs[i].role = 'roamer';
+          pigs[i].colonIndex = -1;
+          pigs[i].slotIndex = -1;
+          pigs[i].baseAlpha = 1;
+        }
+
+        var used = new Array(pigs.length);
+        var pigScale = Math.max(0.21, Math.min(0.32, (digitW / 96) * 0.45));
+
+        for (var t = 0; t < targets.length; t++) {
+          var bestIdx = -1;
+          var bestDist = Infinity;
+          for (var p = 0; p < pigs.length; p++) {
+            if (used[p]) continue;
+            var dx = pigs[p].x - targets[t].x;
+            var dy = pigs[p].y - targets[t].y;
+            var dist = dx * dx + dy * dy;
+            if (dist < bestDist) {
+              bestDist = dist;
+              bestIdx = p;
+            }
+          }
+          if (bestIdx !== -1) {
+            used[bestIdx] = true;
+            pigs[bestIdx].role = targets[t].role;
+            pigs[bestIdx].colonIndex = targets[t].colonIndex;
+            pigs[bestIdx].tx = targets[t].x;
+            pigs[bestIdx].ty = targets[t].y;
+            pigs[bestIdx].scale = pigScale;
+            pigs[bestIdx].baseAlpha = 1;
+          }
+        }
+
+        var roamers = [];
+        for (var r = 0; r < pigs.length; r++) {
+          if (pigs[r].role === 'roamer') {
+            roamers.push(pigs[r]);
+          }
+        }
+
+        roamers.sort(function (a, b) { return a.y - b.y; });
+        var halfCount = Math.floor(roamers.length / 2);
+        var topRoamers = roamers.slice(0, halfCount);
+        var botRoamers = roamers.slice(halfCount);
+
+        var isAM = curHour < 12;
+        var topRowScale = pigScale * (isAM ? 0.90 : 0.64);
+        var botRowScale = pigScale * (isAM ? 0.64 : 0.90);
+        var topRowAlpha = isAM ? 1.0 : 0.58;
+        var botRowAlpha = isAM ? 0.58 : 1.0;
+
+        var rowLeft = Math.max(20, startX - 6);
+        var rowRight = Math.min(W - 20, startX + clockW + 6);
+        var rowSpan = Math.max(40, rowRight - rowLeft);
+
+        function alignPigRow(list, rowY, rScale, rAlpha, baseSlot) {
+          if (list.length === 0) return;
+          list.sort(function (a, b) { return a.x - b.x; });
+          for (var k = 0; k < list.length; k++) {
+            list[k].slotIndex = baseSlot + k;
+            list[k].tx = list.length === 1 ? (W * 0.5) : (rowLeft + (k / (list.length - 1)) * rowSpan);
+            list[k].ty = rowY;
+            list[k].scale = rScale;
+            list[k].baseAlpha = rAlpha;
+            list[k].vx = 0;
+            list[k].vy = 0;
+          }
+        }
+
+        alignPigRow(topRoamers, topRowY, topRowScale, topRowAlpha, 0);
+        alignPigRow(botRoamers, botRowY, botRowScale, botRowAlpha, halfCount);
+      }
+
+      function applyWeirdoMix(enable) {
+        var wPool = getWeirdoPool();
+        for (var i = 0; i < pigs.length; i++) {
+          pigs[i].isWeirdo = false;
+          if (pigs[i].eggTimer <= 0) pigs[i].overrideSprite = null;
+          if (enable && wPool.length > 0 && i % 6 === 0) {
+            pigs[i].isWeirdo = true;
+            pigs[i].overrideSprite = wPool[(i / 6) % wPool.length];
+            pigs[i].scale = 0.56;
+            pigs[i].baseAlpha = 1;
+            var ang = Math.random() * Math.PI * 2;
+            var spd = 55 + Math.random() * 45;
+            pigs[i].vx = Math.cos(ang) * spd;
+            pigs[i].vy = Math.sin(ang) * spd;
+          }
+        }
+      }
+
+      function setGathered(val, snapImmediate) {
+        state.gathered = !!val;
+        state.heartShowTimer = 0;
+        dismissEggHelpers(false);
+        var btn = document.getElementById('btnToggleGather');
+        if (btn) {
+          btn.textContent = state.gathered ? '自己玩 / 幾點了（時鐘)' : '自己玩 / 幾點了（玩耍中)';
+        }
+        if (state.gathered) {
+          applyWeirdoMix(false);
+          computeClockTargets();
+          if (snapImmediate) {
+            snapClockPigsToTargets();
+          }
+        } else {
+          state.waveActive = false;
+          applyWeirdoMix(true);
+          for (var i = 0; i < pigs.length; i++) {
+            pigs[i].role = 'roamer';
+            pigs[i].slotIndex = -1;
+            pigs[i].baseAlpha = 1;
+            if (!pigs[i].isWeirdo) pigs[i].scale = 0.44;
+            var angle = Math.random() * Math.PI * 2;
+            var spd = 45 + Math.random() * 55;
+            pigs[i].vx = Math.cos(angle) * spd;
+            pigs[i].vy = Math.sin(angle) * spd;
+          }
+        }
+      }
+
+      function triggerPigEgg(pig, cycleNext) {
+        var nextAction = cycleNext ? ((pig.eggAction + 1) % 4) : Math.floor(Math.random() * 4);
+        pig.eggAction = nextAction;
+        pig.eggTimer = 3.6;
+        pig.clickFlip *= -1;
+        pig.overrideSprite = null;
+
+        if (nextAction === 0) {
+          pig.vy = -150;
+        } else if (nextAction === 2) {
+          var pool = getClickEggPool();
+          if (pool.length > 0) {
+            pig.overrideSprite = pool[Math.floor(Math.random() * pool.length)];
+          }
+        } else if (nextAction === 3) {
+          pig.wiggleFreq = 16;
+        }
+      }
+
+      function findPigAt(px, py) {
+        for (var c = 0; c < pigs.length; c++) {
+          if (pigs[c].role === 'colon') {
+            var cRadius = Math.max(30, 96 * pigs[c].scale * 0.95);
+            if (Math.hypot(px - pigs[c].x, py - pigs[c].y) <= cRadius) {
+              return pigs[c];
+            }
+          }
+        }
+        for (var i = pigs.length - 1; i >= 0; i--) {
+          var p = pigs[i];
+          var hitRadius = Math.max(24, 96 * p.scale * 0.65);
+          if (Math.hypot(px - p.x, py - p.y) <= hitRadius) {
+            return p;
+          }
+        }
+        return null;
+      }
+
+      function toStageCoords(clientX, clientY) {
+        var vw = window.innerWidth || document.documentElement.clientWidth || 320;
+        var vh = window.innerHeight || document.documentElement.clientHeight || 480;
+        if (currentSettings && currentSettings.forceLandscape) {
+          return {
+            x: clientY,
+            y: vw - clientX
+          };
+        }
+        return {
+          x: clientX,
+          y: clientY
+        };
+      }
+
+      function handlePointerDown(clientX, clientY) {
+        var pt = toStageCoords(clientX, clientY);
+        var px = pt.x;
+        var py = pt.y;
+        pointerDownPos = { x: px, y: py };
+        pointerMoved = false;
+
+        for (var vIdx = paradeVisitors.length - 1; vIdx >= 0; vIdx--) {
+          var vis = paradeVisitors[vIdx];
+          if (Math.hypot(px - vis.x, py - vis.y) <= vis.size * 0.85) {
+            vis.vx = -vis.vx;
+            vis.facing *= -1;
+            vis.pauseTimer = 1.2;
+            return;
+          }
+        }
+
+        if (!state.gathered) {
           return;
         }
 
-        // 正常 5 秒結束時：從 (1) (2) (3) 三種退場橋段中隨機挑一種
-        const exitChoice = Math.floor(Math.random() * 3);
-
-        if (exitChoice === 0) {
-          // (1) 集體轉圈後向兩側噴射退場：先原地 0.45s 內轉 360 度並微微放大，再往左或往右加速衝出畫面邊緣
-          statusText.textContent = '退場橋段：集體轉圈後咻——向兩側噴射！';
-          helpers.forEach((h, idx) => {
-            const dir = h.x >= 0 ? 1 : -1;
-            const stagger = (idx % 6) * 25;
-            setTimeout(() => {
-              // 階段 A：原地加速旋轉 360 度並微微放大
-              applyHelperTransform(
-                h,
-                h.x,
-                h.y,
-                1.22,
-                h.rot + 360,
-                1,
-                'transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease'
-              );
-            }, stagger);
-
-            setTimeout(() => {
-              // 階段 B：依所在位置往左或往右加速噴射出畫面
-              const dy = (idx % 2 === 0 ? -1 : 1) * 28;
-              applyHelperTransform(
-                h,
-                dir * edgeX,
-                h.y + dy,
-                0.92,
-                h.rot + 360 + dir * 35,
-                0,
-                'transform 0.44s cubic-bezier(0.4, 0, 1, 0.6), opacity 0.35s ease-in'
-              );
-            }, 420 + stagger);
-          });
-
-          exitFinishTimer = setTimeout(() => {
-            isExiting = false;
-            if (onComplete) onComplete();
-          }, 980);
-
-        } else if (exitChoice === 1) {
-          // (2) 螺旋擴散／炸開後分流離場：先以彩蛋中心為圓心向外擴散一小圈，再各自轉向左側或右側滑出螢幕
-          statusText.textContent = '退場橋段：螺旋擴散綻放後分流離場！';
-          helpers.forEach((h, idx) => {
-            const angle = Math.atan2(h.y, h.x) + 0.55;
-            const expandR = 72 + (idx % 4) * 18;
-            const burstX = h.x + Math.cos(angle) * expandR;
-            const burstY = h.y + Math.sin(angle) * expandR;
-            const dir = burstX >= 0 ? 1 : -1;
-
-            setTimeout(() => {
-              applyHelperTransform(
-                h,
-                burstX,
-                burstY,
-                1.16,
-                h.rot + 95,
-                1,
-                'transform 0.34s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease'
-              );
-            }, idx * 12);
-
-            setTimeout(() => {
-              applyHelperTransform(
-                h,
-                dir * edgeX,
-                burstY + (dir > 0 ? 36 : -36),
-                0.85,
-                h.rot + 210 + dir * 30,
-                0,
-                'transform 0.48s cubic-bezier(0.32, 0, 0.67, 1), opacity 0.4s ease-in'
-              );
-            }, 340 + idx * 12);
-          });
-
-          exitFinishTimer = setTimeout(() => {
-            isExiting = false;
-            if (onComplete) onComplete();
-          }, 1150);
-
-        } else {
-          // (3) 排隊波浪跳躍後退場：依左右順序輪流跳一下（類似報時波浪），再往左右兩側小跑步離開
-          statusText.textContent = '退場橋段：排隊波浪跳躍打招呼，再往兩側小跑步離開！';
-          const sortedIndices = helpers
-            .map((h, idx) => ({ idx, x: h.x }))
-            .sort((a, b) => a.x - b.x)
-            .map((item) => item.idx);
-
-          sortedIndices.forEach((idx, order) => {
-            const h = helpers[idx];
-            const dir = h.x >= 0 ? 1 : -1;
-            const hopDelay = order * 24;
-
-            // 跳一下
-            setTimeout(() => {
-              applyHelperTransform(
-                h,
-                h.x,
-                h.y - 34,
-                1.12,
-                dir * 12,
-                1,
-                'transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease'
-              );
-            }, hopDelay);
-
-            // 落地並往左右兩側小跑步離開
-            setTimeout(() => {
-              applyHelperTransform(
-                h,
-                dir * edgeX,
-                h.y + ((order % 2 === 0) ? -10 : 12),
-                0.9,
-                dir * 18,
-                0,
-                'transform 0.46s ease-in, opacity 0.38s ease-in'
-              );
-            }, hopDelay + 230);
-          });
-
-          exitFinishTimer = setTimeout(() => {
-            isExiting = false;
-            if (onComplete) onComplete();
-          }, 1360);
+        var hit = findPigAt(px, py);
+        if (hit) {
+          if (hit.role === 'colon') {
+            triggerHeartDuetShow();
+            return;
+          }
+          if (state.heartShowTimer <= 0) {
+            draggingPig = hit;
+            hit.eggTimer = Math.max(hit.eggTimer, 3.6);
+          }
         }
       }
 
-      // ===== 啟動 5 秒陣型秀（triggerHeartDuetShow） =====
-      function triggerHeartDuetShow(forcedMode = 'auto') {
-        if (isExiting) return;
-
-        clearShowTimers();
-        isShowActive = true;
-        currentMode = forcedMode;
-
-        // 隱藏時間數字，啟動陣型層
-        timeDisplay.classList.remove('is-returning');
-        timeDisplay.classList.add('is-hidden');
-        formationLayer.classList.add('is-active');
-        formationLayer.setAttribute('aria-hidden', 'false');
-        statusPill.classList.add('is-show');
-
-        // 定義 5 秒內的陣型序列
-        const sequence =
-          forcedMode === 'shiro'
-            ? [
-                { type: 'shiro', label: '🐶 小白蓬鬆萌臉陣型（5s）' },
-                { type: 'heart', label: '💖 小白＆愛心暖呼呼陣型（5s）' },
-                { type: 'shiro', label: '🐶 小白立耳打招呼陣型（5s）' },
-                { type: 'duet', label: '🐷🐶 小豬＆小白雙人陣型（5s）' }
-              ]
-            : forcedMode === 'heart'
-            ? [
-                { type: 'heart', label: '💖 手繪愛心陣型秀（5s）' },
-                { type: 'shiro', label: '🐶 小白驚喜客串陣型（5s）' },
-                { type: 'heart', label: '💖 閃亮愛心放大陣型（5s）' },
-                { type: 'duet', label: '🐷🐰 雙人甜蜜陣型（5s）' }
-              ]
-            : forcedMode === 'duet'
-            ? [
-                { type: 'duet', label: '🐷🐰 雙人陣型秀（5s）' },
-                { type: 'shiro', label: '🐶 小白加入雙人派對（5s）' },
-                { type: 'heart', label: '💖 雙人愛心連線（5s）' },
-                { type: 'duet', label: '🐷🐰 雙人歡樂陣型（5s）' }
-              ]
-            : [
-                { type: 'heart', label: '💖 冒號陣型秀 · 愛心登場（5s）' },
-                { type: 'duet', label: '🐷🐰 冒號陣型秀 · 雙人登場（5s）' },
-                { type: 'shiro', label: '🐶 冒號陣型秀 · 小白登場（5s）' },
-                { type: 'heart', label: '💖 冒號陣型秀 · 愛心收尾（5s）' }
-              ];
-
-        let stepIdx = 0;
-        const runStep = () => {
-          if (!isShowActive || isExiting) return;
-          const item = sequence[stepIdx % sequence.length];
-          statusText.textContent = item.label;
-          renderPattern(item.type, item.label);
-          stepIdx++;
-        };
-
-        runStep();
-        patternTimer = setInterval(runStep, PATTERN_STEP_MS);
-
-        // 總時長嚴格設定為 5000ms（5 秒）
-        showEndTimer = setTimeout(() => {
-          finishShow(false);
-        }, SHOW_DURATION_MS);
+      function handlePointerMove(clientX, clientY) {
+        if (!draggingPig || !state.gathered || state.heartShowTimer > 0) return;
+        var pt = toStageCoords(clientX, clientY);
+        var px = pt.x;
+        var py = pt.y;
+        if (Math.hypot(px - pointerDownPos.x, py - pointerDownPos.y) > 6) {
+          pointerMoved = true;
+        }
+        if (pointerMoved) {
+          draggingPig.x = Math.min(Math.max(px, 24), W - 24);
+          draggingPig.y = Math.min(Math.max(py, 56), H - 36);
+          draggingPig.vx = 0;
+          draggingPig.vy = 0;
+        }
       }
 
-      // 結束陣型秀並跳回時間顯示
-      function finishShow(isManualInterrupt) {
-        if (!isShowActive || isExiting) return;
-        isShowActive = false;
+      function handlePointerUp(clientX, clientY) {
+        var pt = toStageCoords(clientX, clientY);
+        var isTap = Math.hypot(pt.x - pointerDownPos.x, pt.y - pointerDownPos.y) <= 10;
 
-        runExitSequence(isManualInterrupt, () => {
-          formationLayer.setAttribute('aria-hidden', 'true');
-          statusPill.classList.remove('is-show');
-          statusText.textContent = '正常報時中 · 點擊中央「:」看 5 秒陣型秀';
+        if (!state.gathered) {
+          if (isTap) {
+            setGathered(true);
+          }
+          return;
+        }
 
-          // 讓時間數字快速成形並跳回
-          timeDisplay.classList.remove('is-hidden');
-          timeDisplay.classList.remove('is-returning');
-          void timeDisplay.offsetWidth;
-          timeDisplay.classList.add('is-returning');
+        if (draggingPig) {
+          var targetPig = draggingPig;
+          draggingPig = null;
+          if (!pointerMoved) {
+            triggerPigEgg(targetPig, targetPig.eggTimer > 0.2);
+          }
+          return;
+        }
+
+        if (isTap) {
+          var hit = findPigAt(pt.x, pt.y);
+          if (hit) {
+            if (hit.role === 'colon') {
+              triggerHeartDuetShow();
+            } else if (state.heartShowTimer <= 0) {
+              triggerPigEgg(hit, hit.eggTimer > 0.2);
+            }
+          } else if (state.heartShowTimer <= 0) {
+            setGathered(false);
+          }
+        }
+      }
+
+      function updateDateBadgeText() {
+        var label = formatTodayBadge();
+        var dateTextEl = document.getElementById('dateText');
+        var prevDateTextEl = document.getElementById('previewDateText');
+        if (dateTextEl && dateTextEl.textContent !== label) dateTextEl.textContent = label;
+        if (prevDateTextEl && prevDateTextEl.textContent !== label) prevDateTextEl.textContent = label;
+      }
+
+      var lastTime = 0;
+      function animate(now) {
+        requestAnimationFrame(animate);
+        if (!lastTime) lastTime = now;
+        var dt = Math.min((now - lastTime) / 1000, 0.05);
+        lastTime = now;
+        var sec = now / 1000;
+
+        var wallNow = new Date();
+        var curHour = wallNow.getHours();
+        var curMin = wallNow.getMinutes();
+        var curSec = wallNow.getSeconds();
+        var secFrac = curSec + wallNow.getMilliseconds() / 1000;
+
+        if (state.heartShowTimer > 0) {
+          state.heartShowTimer -= dt;
+          if (state.heartShowTimer <= 0) {
+            state.heartShowTimer = 0;
+            dismissEggHelpers(false);
+            if (state.gathered) computeClockTargets();
+          }
+        }
+
+        if (state.gathered && state.heartShowTimer <= 0 && curMin !== state.lastMinute) {
+          updateDateBadgeText();
+          computeClockTargets();
+        }
+
+        var chimeKey = curHour + ':' + curMin;
+        if (state.gathered && state.heartShowTimer <= 0 && curSec === 0 && state.lastChimeKey !== chimeKey) {
+          state.lastChimeKey = chimeKey;
+          if (curMin === 0) {
+            state.waveActive = true;
+            state.waveStartTime = now;
+            state.waveCycles = 99;
+            state.waveContinuousEnd = now + 6500;
+          } else {
+            var cycles = curMin <= 15 ? 1 : (curMin <= 30 ? 2 : (curMin <= 45 ? 3 : 4));
+            state.waveActive = true;
+            state.waveStartTime = now;
+            state.waveCycles = cycles;
+            state.waveContinuousEnd = 0;
+          }
+        }
+
+        var waveElapsed = 0;
+        var PASS_DUR = 1.62;
+        if (state.waveActive) {
+          waveElapsed = (now - state.waveStartTime) / 1000;
+          if (state.waveContinuousEnd > 0) {
+            if (now > state.waveContinuousEnd) state.waveActive = false;
+          } else if (waveElapsed > state.waveCycles * PASS_DUR + 0.35) {
+            state.waveActive = false;
+          }
+        }
+
+        var colonBeat = 0.5 + 0.5 * Math.cos(secFrac * Math.PI * 2);
+        var colonPulseScale = 0.88 + 0.30 * colonBeat;
+        var colonPulseAlpha = 0.35 + 0.65 * colonBeat;
+
+        var shapePulse = 1 + 0.042 * Math.sin(sec * 5.8);
+
+        ctx.fillStyle = state.nightMode ? '#050505' : '#FDF6EC';
+        ctx.fillRect(0, 0, W, H);
+
+        if (!state.nightMode) {
+          ctx.fillStyle = 'rgba(59, 35, 24, 0.05)';
+          for (var gx = 16; gx < W; gx += 28) {
+            for (var gy = 16; gy < H; gy += 28) {
+              ctx.fillRect(gx, gy, 1.5, 1.5);
+            }
+          }
+        }
+
+        var box = state.clockBox;
+        var hasTopContent = currentSettings && (currentSettings.visible || currentSettings.showDateBadge);
+        var minTopY = hasTopContent ? Math.max(58, state.safeTopBottom + 12) : 26;
+        var pool = getCurrentRoamerPool();
+        var activeSecPig = null;
+
+        for (var i = 0; i < pigs.length; i++) {
+          var p = pigs[i];
+          p.wigglePhase += dt * p.wiggleFreq;
+
+          var isFocusedEgg = p.eggTimer > 0 && state.heartShowTimer <= 0;
+          if (isFocusedEgg) {
+            p.eggTimer -= dt;
+            if (p.eggTimer <= 0) {
+              p.eggTimer = 0;
+              p.wiggleFreq = 3.6 + (i % 5) * 0.45;
+              if (!p.isWeirdo) p.overrideSprite = null;
+            }
+          }
+
+          if (state.gathered && state.heartShowTimer > 0) {
+            if (p.role === 'colon') {
+              var sideDir = p.colonIndex === 0 ? -1 : 1;
+              if (state.activeEggShape === 'sin4') {
+                p.tx = p.heartBaseX + Math.sin(sec * 4.5) * 3.5;
+                p.ty = p.heartBaseY + Math.cos(sec * 4.5) * 1.8;
+                p.flipX = -1;
+              } else {
+                var duetSway = Math.sin(sec * 5.2) * 5;
+                p.tx = p.heartBaseX + duetSway;
+                p.ty = p.heartBaseY - Math.abs(Math.sin(sec * 7.5 + p.colonIndex * 1.4)) * 7;
+                p.flipX = sideDir === -1 ? 1 : -1;
+              }
+            } else {
+              var relX = p.heartBaseX - state.heartCenter.x;
+              var relY = p.heartBaseY - state.heartCenter.y;
+              p.tx = state.heartCenter.x + relX * shapePulse;
+              p.ty = state.heartCenter.y + relY * shapePulse;
+            }
+          }
+
+          if (p === draggingPig) {
+            // 拖曳中
+          } else if (isFocusedEgg && p.eggAction === 1) {
+            p.y += Math.sin(sec * 8 + p.id) * 0.4;
+          } else if (state.gathered && !isFocusedEgg) {
+            var dx = p.tx - p.x;
+            var dy = p.ty - p.y;
+            if (Math.abs(dx) > 0.35 || Math.abs(dy) > 0.35) {
+              p.x += dx * Math.min(1, dt * 8.2);
+              p.y += dy * Math.min(1, dt * 8.2);
+              if (state.heartShowTimer <= 0 && Math.abs(dx) > 1.5) {
+                p.flipX = dx >= 0 ? 1 : -1;
+              }
+            } else {
+              p.x = p.tx;
+              p.y = p.ty;
+            }
+          } else {
+            p.poseTimer -= dt;
+            if (p.poseTimer <= 0) {
+              if (!p.isWeirdo && !isFocusedEgg) {
+                p.pose = Math.floor(Math.random() * pool.length);
+              }
+              p.poseTimer = 2 + Math.random() * 4;
+              var ang = Math.random() * Math.PI * 2;
+              var speed = p.isWeirdo ? (55 + Math.random() * 45) : (35 + Math.random() * 55);
+              p.vx = Math.cos(ang) * speed;
+              p.vy = Math.sin(ang) * speed;
+            }
+
+            p.x += p.vx * dt;
+            p.y += p.vy * dt;
+            if (Math.abs(p.vx) > 2) p.flipX = p.vx >= 0 ? 1 : -1;
+
+            var margin = 24;
+            if (p.x < margin) { p.x = margin; p.vx = Math.abs(p.vx); }
+            if (p.x > W - margin) { p.x = W - margin; p.vx = -Math.abs(p.vx); }
+            if (p.y < minTopY) { p.y = minTopY; p.vy = Math.abs(p.vy); }
+            if (p.y > H - 36) { p.y = H - 36; p.vy = -Math.abs(p.vy); }
+
+            if (state.gathered && !isFocusedEgg && p.x > box.left && p.x < box.right && p.y > box.top && p.y < box.bottom) {
+              var dLeft = p.x - box.left;
+              var dRight = box.right - p.x;
+              var dTop = p.y - box.top;
+              var dBot = box.bottom - p.y;
+              var minD = Math.min(dLeft, dRight, dTop, dBot);
+              if (minD === dLeft) { p.x = box.left; p.vx = -Math.abs(p.vx); }
+              else if (minD === dRight) { p.x = box.right; p.vx = Math.abs(p.vx); }
+              else if (minD === dTop) { p.y = box.top; p.vy = -Math.abs(p.vy); }
+              else { p.y = box.bottom; p.vy = Math.abs(p.vy); }
+            }
+          }
+
+          var sprite = p.overrideSprite || pool[p.pose % pool.length] || fallbackSprites[0];
+          if (!sprite) continue;
+
+          var isActiveSec = state.gathered && state.heartShowTimer <= 0 && p.role === 'roamer' && p.slotIndex === curSec;
+          if (isActiveSec) activeSecPig = p;
+
+          var targetScale = p.scale;
+          if (isActiveSec) {
+            targetScale = Math.max(p.scale * 1.48, 0.34);
+          }
+
+          p.currentScale += (targetScale - p.currentScale) * Math.min(1, dt * 10);
+          var drawScale = p.currentScale * (isFocusedEgg ? 1.45 : 1);
+          var drawAlpha = (state.gathered && state.heartShowTimer <= 0) ? (isActiveSec ? 1 : p.baseAlpha) : 1;
+
+          if (state.gathered && state.heartShowTimer <= 0 && p.role === 'colon') {
+            drawScale *= colonPulseScale;
+            drawAlpha = colonPulseAlpha;
+          }
+
+          var waveJump = 0;
+          if (state.waveActive && state.gathered && state.heartShowTimer <= 0 && p.role === 'roamer' && p.slotIndex >= 0) {
+            var maxC = state.waveContinuousEnd > 0 ? Math.ceil((waveElapsed + 2) / PASS_DUR) : state.waveCycles;
+            for (var wc = 0; wc < maxC; wc++) {
+              var localT = waveElapsed - wc * PASS_DUR - p.slotIndex * 0.022;
+              if (localT >= 0 && localT <= 0.32) {
+                waveJump = -Math.sin((localT / 0.32) * Math.PI) * 19;
+                break;
+              }
+            }
+          }
+
+          var secPopOffset = 0;
+          if (isActiveSec) {
+            var secBounce = Math.sin(Math.min(1, (secFrac % 1) * 3.5) * Math.PI) * 4;
+            secPopOffset = (p.slotIndex < 30 ? -1 : 1) * (5 + secBounce);
+          }
+
+          var jumpOffset = waveJump + secPopOffset;
+          if (isFocusedEgg && p.eggAction === 0) {
+            jumpOffset -= Math.abs(Math.sin(sec * 9 + p.id)) * 18;
+          }
+
+          var bobY = Math.sin(p.wigglePhase * 0.7) * (isFocusedEgg ? 4 : 1.7) + jumpOffset;
+          var wiggleAngle = Math.sin(p.wigglePhase) * (isFocusedEgg ? 0.25 : 0.08);
+          if (state.gathered && state.heartShowTimer > 0 && p.role === 'colon') {
+            var sideTilt = p.colonIndex === 0 ? 1 : -1;
+            wiggleAngle = Math.sin(sec * 7.5) * 0.22 * sideTilt;
+          }
+
+          ctx.save();
+          ctx.globalAlpha = drawAlpha;
+
+          if (state.gathered && state.heartShowTimer <= 0 && p.role === 'colon') {
+            var ringRadius = Math.max(13, 96 * drawScale * 0.62);
+            if (state.nightMode) {
+              ctx.shadowColor = 'rgba(255, 240, 210, 0.85)';
+              ctx.shadowBlur = 10;
+            }
+            drawHandDrawnCircle(ctx, p.x, p.y + bobY, ringRadius, state.nightMode);
+            ctx.shadowBlur = 0;
+          }
+
+          ctx.translate(p.x, p.y + bobY);
+          ctx.rotate(wiggleAngle);
+          ctx.scale(p.flipX * p.clickFlip * drawScale, drawScale);
+
+          if (sprite._isDarkBg) {
+            ctx.fillStyle = 'rgba(20, 18, 22, 0.85)';
+            drawRoundRect(ctx, -50, -50, 100, 100, 14);
+            ctx.fill();
+          }
+
+          if (isActiveSec) {
+            ctx.shadowColor = state.nightMode ? 'rgba(255, 224, 150, 0.95)' : 'rgba(244, 155, 110, 0.88)';
+            ctx.shadowBlur = 13;
+          } else if (state.nightMode) {
+            ctx.shadowColor = 'rgba(255, 245, 225, 0.62)';
+            ctx.shadowBlur = 9;
+          }
+
+          ctx.drawImage(sprite, -48, -48, 96, 96);
+          ctx.shadowBlur = 0;
+          ctx.restore();
+        }
+
+        /* 彩蛋臨時細節援軍（小葵螺旋髮捲渦紋、鱷魚眼眶牙齒、左衛門瞇眼等）進場與退場動畫 */
+        for (var eh = eggHelpers.length - 1; eh >= 0; eh--) {
+          var helper = eggHelpers[eh];
+          if (!helper.leaving && state.heartShowTimer > 0) {
+            var hRelX = helper.heartBaseX - state.heartCenter.x;
+            var hRelY = helper.heartBaseY - state.heartCenter.y;
+            helper.tx = state.heartCenter.x + hRelX * shapePulse;
+            helper.ty = state.heartCenter.y + hRelY * shapePulse;
+          }
+          var hSpeed = helper.leaving ? 6.5 : 9.2;
+          helper.x += (helper.tx - helper.x) * Math.min(1, dt * hSpeed);
+          helper.y += (helper.ty - helper.y) * Math.min(1, dt * hSpeed);
+
+          var hBob = Math.sin(sec * 5 + helper.phase) * 1.4;
+          var hWiggle = Math.sin(sec * 6 + helper.phase) * 0.08;
+
+          ctx.save();
+          ctx.translate(helper.x, helper.y + hBob);
+          ctx.rotate(hWiggle);
+          ctx.scale(helper.flipX * helper.scale, helper.scale);
+          if (helper.sprite._isDarkBg) {
+            ctx.fillStyle = 'rgba(20, 18, 22, 0.85)';
+            drawRoundRect(ctx, -50, -50, 100, 100, 14);
+            ctx.fill();
+          }
+          if (state.nightMode) {
+            ctx.shadowColor = 'rgba(255, 245, 225, 0.62)';
+            ctx.shadowBlur = 8;
+          }
+          ctx.drawImage(helper.sprite, -48, -48, 96, 96);
+          ctx.shadowBlur = 0;
+          ctx.restore();
+
+          if (helper.leaving && (helper.x < -45 || helper.x > W + 45)) {
+            eggHelpers.splice(eh, 1);
+          }
+        }
+
+        if (state.gathered && state.heartShowTimer > 0 && state.activeEggShape === 'heart') {
+          var pulseMiniHeart = 10 + Math.sin(sec * 9) * 2.2;
+          drawMiniHeart(
+            ctx,
+            state.heartCenter.x + Math.sin(sec * 5.2) * 5,
+            state.heartCenter.y - state.heartScale * 1.6 + Math.cos(sec * 7.5) * 3,
+            pulseMiniHeart,
+            '#F26B83'
+          );
+        }
+
+        if (activeSecPig && state.gathered && state.heartShowTimer <= 0) {
+          var isTopHalf = activeSecPig.slotIndex < 30;
+          var pigHalfH = 48 * activeSecPig.currentScale;
+          var labelOffset = pigHalfH + 12;
+          var bx = Math.min(Math.max(activeSecPig.x, 22), W - 22);
+          var by = isTopHalf ? (activeSecPig.y - labelOffset - 2) : (activeSecPig.y + labelOffset + 2);
+          var secLabel = String(curSec).padStart(2, '0');
+
+          ctx.save();
+          ctx.font = '700 13px "SetoFontReal", "NaikaiSetoExt", "SetoFont", "LocalRoundFallback", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+
+          var pillW = 26;
+          var pillH = 18;
+          ctx.fillStyle = state.nightMode ? 'rgba(34, 30, 28, 0.94)' : '#FFF9F0';
+          ctx.strokeStyle = state.nightMode ? '#F5EDE4' : '#3B2318';
+          ctx.lineWidth = 1.6;
+          drawRoundRect(ctx, bx - pillW / 2, by - pillH / 2, pillW, pillH, 7);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = state.nightMode ? '#FFD89C' : '#3B2318';
+          ctx.fillText(secLabel, bx, by + 0.5);
+          ctx.restore();
+        }
+
+        for (var v = paradeVisitors.length - 1; v >= 0; v--) {
+          var vis = paradeVisitors[v];
+          if (vis.pauseTimer > 0) {
+            vis.pauseTimer -= dt;
+          } else {
+            vis.x += vis.vx * dt;
+            var midX = W * 0.5;
+            if (!vis.hasPausedAtMid && ((vis.vx > 0 && vis.x >= midX - 20 && vis.x <= midX + 20) || (vis.vx < 0 && vis.x <= midX + 20 && vis.x >= midX - 20))) {
+              vis.hasPausedAtMid = true;
+              vis.pauseTimer = 1.1;
+            }
+          }
+
+          vis.y = vis.baseY + Math.sin(sec * 4.2 + vis.phase) * 14;
+          var vAng = Math.sin(sec * 6.5 + vis.phase) * 0.16;
+          var vScale = vis.size / 96;
+
+          ctx.save();
+          ctx.translate(vis.x, vis.y);
+          ctx.rotate(vAng);
+          ctx.scale(vis.facing * vScale, vScale);
+          if (vis.sprite._isDarkBg) {
+            ctx.fillStyle = 'rgba(20, 18, 22, 0.85)';
+            drawRoundRect(ctx, -50, -50, 100, 100, 14);
+            ctx.fill();
+          }
+          ctx.drawImage(vis.sprite, -48, -48, 96, 96);
+          ctx.restore();
+
+          if (vis.x < -vis.size * 2.5 || vis.x > W + vis.size * 2.5) {
+            paradeVisitors.splice(v, 1);
+          }
+        }
+      }
+
+      function populatePresetPickers() {
+        pickerImgEls.title = [];
+        pickerImgEls.hide = [];
+        pickerImgEls.show = [];
+
+        var titleGrid = document.getElementById('titleStickerGrid');
+        if (titleGrid) {
+          titleGrid.innerHTML = '';
+          for (var i = 0; i < PIG_FILE_PATHS.length; i++) {
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'sticker-item';
+            btn.setAttribute('data-preset-idx', String(i));
+            btn.title = 'PIG (' + (i + 1) + ').jpg';
+            var img = document.createElement('img');
+            img.src = originalCutoutDataURLs[i] || encodeURI(PIG_FILE_PATHS[i]);
+            img.alt = btn.title;
+            btn.appendChild(img);
+            titleGrid.appendChild(btn);
+            pickerImgEls.title[i] = img;
+          }
+        }
+
+        var hideGroup = document.getElementById('hideIconGroup');
+        if (hideGroup) {
+          hideGroup.innerHTML = '';
+          for (var h = 0; h < HIDE_PRESET_INDICES.length; h++) {
+            var hIdx = HIDE_PRESET_INDICES[h];
+            var hBtn = document.createElement('button');
+            hBtn.type = 'button';
+            hBtn.className = 'mini-icon-btn hide-icon-opt';
+            hBtn.setAttribute('data-preset-idx', String(hIdx));
+            hBtn.title = 'PIG (' + (hIdx + 1) + ').jpg';
+            var hImg = document.createElement('img');
+            hImg.src = originalCutoutDataURLs[hIdx] || encodeURI(PIG_FILE_PATHS[hIdx]);
+            hImg.alt = hBtn.title;
+            hBtn.appendChild(hImg);
+            hideGroup.appendChild(hBtn);
+            pickerImgEls.hide[h] = hImg;
+          }
+          var hInp = document.createElement('input');
+          hInp.id = 'inputHideBtnIcon';
+          hInp.type = 'text';
+          hInp.maxLength = 4;
+          hInp.className = 'mini-icon-input';
+          hInp.placeholder = '文字';
+          hideGroup.appendChild(hInp);
+        }
+
+        var showGroup = document.getElementById('showIconGroup');
+        if (showGroup) {
+          showGroup.innerHTML = '';
+          for (var s = 0; s < SHOW_PRESET_INDICES.length; s++) {
+            var sIdx = SHOW_PRESET_INDICES[s];
+            var sBtn = document.createElement('button');
+            sBtn.type = 'button';
+            sBtn.className = 'mini-icon-btn show-icon-opt';
+            sBtn.setAttribute('data-preset-idx', String(sIdx));
+            sBtn.title = 'PIG (' + (sIdx + 1) + ').jpg';
+            var sImg = document.createElement('img');
+            sImg.src = originalCutoutDataURLs[sIdx] || encodeURI(PIG_FILE_PATHS[sIdx]);
+            sImg.alt = sBtn.title;
+            sBtn.appendChild(sImg);
+            showGroup.appendChild(sBtn);
+            pickerImgEls.show[s] = sImg;
+          }
+          var sInp = document.createElement('input');
+          sInp.id = 'inputShowBtnIcon';
+          sInp.type = 'text';
+          sInp.maxLength = 4;
+          sInp.className = 'mini-icon-input';
+          sInp.placeholder = '文字';
+          showGroup.appendChild(sInp);
+        }
+      }
+
+      function loadSettings() {
+        currentSettings = getDefaultSettings();
+        var raw = safeGet(STORAGE_KEY, '');
+        if (!raw) return;
+        try {
+          var parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') {
+            currentSettings = cloneSettings(parsed);
+          }
+        } catch (e) {}
+      }
+
+      function saveSettings() {
+        try {
+          safeSet(STORAGE_KEY, JSON.stringify(currentSettings));
+        } catch (e) {}
+      }
+
+      function syncButtonIconDisplay(iconEl, imgEl, iconType, iconText, imgData) {
+        if (!iconEl || !imgEl) return;
+        if ((iconType === 'preset' || iconType === 'image') && imgData) {
+          iconEl.style.display = 'none';
+          imgEl.src = imgData;
+          imgEl.style.display = 'inline-block';
+        } else {
+          imgEl.style.display = 'none';
+          iconEl.textContent = iconText || '🐷';
+          iconEl.style.display = 'inline-flex';
+        }
+      }
+
+      function applyOrientationClass(forceLand) {
+        document.body.classList.toggle('force-landscape', !!forceLand);
+        if (forceLand && screen && screen.orientation && typeof screen.orientation.lock === 'function') {
+          try { screen.orientation.lock('landscape').catch(function () {}); } catch (e) {}
+        } else if (!forceLand && screen && screen.orientation && typeof screen.orientation.unlock === 'function') {
+          try { screen.orientation.unlock(); } catch (e) {}
+        }
+      }
+
+      function applySettingsToScreen() {
+        var s = currentSettings;
+        applyOrientationClass(s.forceLandscape);
+        updateDateBadgeText();
+
+        var topBarEl = document.getElementById('topBar');
+        var trigger = document.getElementById('titleTrigger');
+        var dateBadgeEl = document.getElementById('dateBadge');
+        var dateIconEl = document.getElementById('dateIcon');
+        var dateImgEl = document.getElementById('dateIconImg');
+        var dateEditEl = document.getElementById('dateEditBadge');
+        var textEl = document.getElementById('titleText');
+        var iconEl = document.getElementById('titleIcon');
+        var imgEl = document.getElementById('titleIconImg');
+        var hideIconEl = document.getElementById('hideBtnIcon');
+        var hideImgEl = document.getElementById('hideBtnImg');
+        var showIconEl = document.getElementById('showBtnIcon');
+        var showImgEl = document.getElementById('showBtnImg');
+
+        var showAnyTop = s.visible || s.showDateBadge;
+        if (topBarEl) {
+          topBarEl.classList.toggle('hidden', !showAnyTop);
+        }
+
+        if (trigger) {
+          trigger.classList.toggle('hidden', !s.visible);
+          trigger.style.fontSize = s.fontSize + 'px';
+        }
+
+        if (textEl) {
+          textEl.textContent = s.text;
+          textEl.style.display = s.text ? 'inline' : 'none';
+        }
+
+        if (iconEl && imgEl) {
+          if (s.iconType === 'none') {
+            iconEl.style.display = 'none';
+            imgEl.style.display = 'none';
+          } else if ((s.iconType === 'preset' || s.iconType === 'image') && s.iconImage) {
+            iconEl.style.display = 'none';
+            imgEl.src = s.iconImage;
+            imgEl.style.display = 'inline-block';
+            var dim = Math.round(s.fontSize * 1.24);
+            imgEl.style.width = dim + 'px';
+            imgEl.style.height = dim + 'px';
+          } else {
+            imgEl.style.display = 'none';
+            iconEl.textContent = s.iconEmoji || '🐷';
+            iconEl.style.display = 'inline-flex';
+          }
+        }
+
+        if (dateBadgeEl) {
+          dateBadgeEl.classList.toggle('hidden', !s.showDateBadge);
+          var isSoloDate = !s.visible && s.showDateBadge;
+          if (isSoloDate) {
+            var soloDateSize = Math.max(20, Math.round(s.fontSize * 0.85));
+            dateBadgeEl.style.fontSize = soloDateSize + 'px';
+            dateBadgeEl.style.padding = '7px 16px';
+            if (dateEditEl) dateEditEl.classList.remove('hidden');
+
+            if (dateIconEl && dateImgEl) {
+              if (s.iconType === 'none') {
+                dateIconEl.style.display = 'none';
+                dateImgEl.style.display = 'none';
+              } else if ((s.iconType === 'preset' || s.iconType === 'image') && s.iconImage) {
+                dateIconEl.style.display = 'none';
+                dateImgEl.src = s.iconImage;
+                dateImgEl.style.display = 'inline-block';
+                var dDim = Math.round(soloDateSize * 1.24);
+                dateImgEl.style.width = dDim + 'px';
+                dateImgEl.style.height = dDim + 'px';
+              } else {
+                dateImgEl.style.display = 'none';
+                dateIconEl.textContent = s.iconEmoji || '🐷';
+                dateIconEl.style.display = 'inline-flex';
+              }
+            }
+          } else {
+            dateBadgeEl.style.fontSize = Math.max(13, Math.round(s.fontSize * 0.64)) + 'px';
+            dateBadgeEl.style.padding = '5px 13px';
+            if (dateEditEl) dateEditEl.classList.add('hidden');
+            if (dateIconEl) dateIconEl.style.display = 'none';
+            if (dateImgEl) dateImgEl.style.display = 'none';
+          }
+        }
+
+        syncButtonIconDisplay(hideIconEl, hideImgEl, s.hideBtnIconType, s.hideBtnIcon, s.hideBtnImageData);
+        syncButtonIconDisplay(showIconEl, showImgEl, s.showBtnIconType, s.showBtnIcon, s.showBtnImageData);
+
+        resize();
+      }
+
+      function syncModalUploadBar(thumbEl, statusEl, clearBtnEl, isUploadedImg, imgData, defaultMsg) {
+        if (thumbEl) {
+          if (isUploadedImg && imgData) {
+            thumbEl.src = imgData;
+            thumbEl.style.display = 'inline-block';
+          } else {
+            thumbEl.style.display = 'none';
+          }
+        }
+        if (statusEl) {
+          statusEl.textContent = isUploadedImg && imgData ? '已套用圖片' : defaultMsg;
+        }
+        if (clearBtnEl) {
+          clearBtnEl.classList.toggle('hidden', !(isUploadedImg && imgData));
+        }
+      }
+
+      function refreshCustomSourceUI() {
+        var rStatus = document.getElementById('roamerSourceStatus');
+        var rReset = document.getElementById('btnResetRoamerImgs');
+        var rThumbs = document.getElementById('roamerThumbs');
+        if (rStatus) {
+          rStatus.textContent = usingCustomRoamer ? ('自訂中（' + customRoamerSprites.length + ' 張）') : '預設（142 隻）';
+        }
+        if (rReset) rReset.classList.toggle('hidden', !usingCustomRoamer);
+        if (rThumbs) {
+          rThumbs.innerHTML = '';
+          for (var i = 0; i < customRoamerUrls.length; i++) {
+            var im = document.createElement('img');
+            im.src = customRoamerUrls[i];
+            im.alt = '';
+            rThumbs.appendChild(im);
+          }
+        }
+
+        var gStatus = document.getElementById('guestSourceStatus');
+        var gReset = document.getElementById('btnResetGuestImgs');
+        var gThumbs = document.getElementById('guestThumbs');
+        if (gStatus) {
+          gStatus.textContent = usingCustomGuest ? ('自訂中（' + customGuestSprites.length + ' 張）') : '預設特別來賓';
+        }
+        if (gReset) gReset.classList.toggle('hidden', !usingCustomGuest);
+        if (gThumbs) {
+          gThumbs.innerHTML = '';
+          for (var j = 0; j < customGuestUrls.length; j++) {
+            var gim = document.createElement('img');
+            gim.src = customGuestUrls[j];
+            gim.alt = '';
+            gThumbs.appendChild(gim);
+          }
+        }
+      }
+
+      function updateModalPreview() {
+        var d = draftSettings;
+        if (!d) return;
+
+        updateDateBadgeText();
+
+        var btnOriAuto = document.getElementById('btnOrientAuto');
+        var btnOriForce = document.getElementById('btnOrientForceLandscape');
+        if (btnOriAuto) btnOriAuto.classList.toggle('active', !d.forceLandscape);
+        if (btnOriForce) btnOriForce.classList.toggle('active', !!d.forceLandscape);
+
+        var btnSzL = document.getElementById('btnSizeLarge');
+        var btnSzXL = document.getElementById('btnSizeExtraLarge');
+        if (btnSzL) btnSzL.classList.toggle('active', !d.extraLarge);
+        if (btnSzXL) btnSzXL.classList.toggle('active', !!d.extraLarge);
+
+        var eggOpts = document.querySelectorAll('.colon-egg-opt');
+        for (var eo = 0; eo < eggOpts.length; eo++) {
+          var em = eggOpts[eo].getAttribute('data-mode');
+          eggOpts[eo].classList.toggle('active', em === d.colonEggMode);
+        }
+
+        var prevBox = document.getElementById('modalPreview');
+        var prevText = document.getElementById('previewText');
+        var prevIcon = document.getElementById('previewIcon');
+        var prevImg = document.getElementById('previewImg');
+        var prevDate = document.getElementById('previewDatePill');
+        var prevDateIcon = document.getElementById('previewDateIcon');
+        var prevDateImg = document.getElementById('previewDateImg');
+        var prevDateEdit = document.getElementById('previewDateEdit');
+        var badge = document.getElementById('fontSizeBadge');
+        var slider = document.getElementById('inputFontSize');
+        var btnVisOn = document.getElementById('btnTitleVisibleOn');
+        var btnVisOff = document.getElementById('btnTitleVisibleOff');
+        var btnDateOn = document.getElementById('btnDateVisibleOn');
+        var btnDateOff = document.getElementById('btnDateVisibleOff');
+
+        if (btnVisOn) btnVisOn.classList.toggle('active', d.visible);
+        if (btnVisOff) btnVisOff.classList.toggle('active', !d.visible);
+        if (btnDateOn) btnDateOn.classList.toggle('active', d.showDateBadge);
+        if (btnDateOff) btnDateOff.classList.toggle('active', !d.showDateBadge);
+
+        if (badge) badge.textContent = d.fontSize + 'px';
+        if (slider) slider.value = String(d.fontSize);
+
+        var showAnyTop = d.visible || d.showDateBadge;
+        var isSoloDate = !d.visible && d.showDateBadge;
+
+        if (prevBox) {
+          prevBox.style.fontSize = d.fontSize + 'px';
+          prevBox.style.opacity = showAnyTop ? '1' : '0.45';
+        }
+
+        if (d.visible) {
+          if (prevText) {
+            prevText.style.display = 'inline';
+            prevText.textContent = d.text || '';
+            prevText.style.opacity = d.text ? '1' : '0.55';
+          }
+          if (prevIcon && prevImg) {
+            if (d.iconType === 'none') {
+              prevIcon.style.display = 'none';
+              prevImg.style.display = 'none';
+            } else if ((d.iconType === 'preset' || d.iconType === 'image') && d.iconImage) {
+              prevIcon.style.display = 'none';
+              prevImg.src = d.iconImage;
+              prevImg.style.display = 'inline-block';
+              var dim = Math.round(d.fontSize * 1.24);
+              prevImg.style.width = dim + 'px';
+              prevImg.style.height = dim + 'px';
+            } else {
+              prevImg.style.display = 'none';
+              prevIcon.textContent = d.iconEmoji || '🐷';
+              prevIcon.style.display = 'inline-flex';
+            }
+          }
+        } else if (isSoloDate) {
+          if (prevText) prevText.style.display = 'none';
+          if (prevIcon) prevIcon.style.display = 'none';
+          if (prevImg) prevImg.style.display = 'none';
+        } else {
+          if (prevText) {
+            prevText.style.display = 'inline';
+            prevText.textContent = '標題與日期皆已隱藏';
+            prevText.style.opacity = '0.6';
+          }
+          if (prevIcon) prevIcon.style.display = 'none';
+          if (prevImg) prevImg.style.display = 'none';
+        }
+
+        if (prevDate) {
+          if (!d.showDateBadge) {
+            prevDate.style.display = 'none';
+          } else {
+            prevDate.style.display = 'inline-flex';
+            if (isSoloDate) {
+              var prevSoloSize = Math.max(18, Math.round(d.fontSize * 0.82));
+              prevDate.style.fontSize = prevSoloSize + 'px';
+              prevDate.style.padding = '4px 12px';
+              prevDate.style.marginLeft = '0';
+              if (prevDateEdit) prevDateEdit.classList.remove('hidden');
+
+              if (prevDateIcon && prevDateImg) {
+                if (d.iconType === 'none') {
+                  prevDateIcon.style.display = 'none';
+                  prevDateImg.style.display = 'none';
+                } else if ((d.iconType === 'preset' || d.iconType === 'image') && d.iconImage) {
+                  prevDateIcon.style.display = 'none';
+                  prevDateImg.src = d.iconImage;
+                  prevDateImg.style.display = 'inline-block';
+                  var pdDim = Math.round(prevSoloSize * 1.22);
+                  prevDateImg.style.width = pdDim + 'px';
+                  prevDateImg.style.height = pdDim + 'px';
+                } else {
+                  prevDateImg.style.display = 'none';
+                  prevDateIcon.textContent = d.iconEmoji || '🐷';
+                  prevDateIcon.style.display = 'inline-flex';
+                }
+              }
+            } else {
+              prevDate.style.fontSize = Math.max(12, Math.round(d.fontSize * 0.6)) + 'px';
+              prevDate.style.padding = '2px 9px';
+              prevDate.style.marginLeft = '4px';
+              if (prevDateEdit) prevDateEdit.classList.add('hidden');
+              if (prevDateIcon) prevDateIcon.style.display = 'none';
+              if (prevDateImg) prevDateImg.style.display = 'none';
+            }
+          }
+        }
+
+        var btnNoIcon = document.getElementById('btnNoIcon');
+        if (btnNoIcon) btnNoIcon.classList.toggle('active', d.iconType === 'none');
+
+        syncModalUploadBar(
+          document.getElementById('titleIconThumb'),
+          document.getElementById('titleIconImgStatus'),
+          document.getElementById('btnClearTitleIconImg'),
+          d.iconType === 'image',
+          d.iconImage,
+          '自訂圖片'
+        );
+
+        var sizeBtns = document.querySelectorAll('.size-btn');
+        for (var i = 0; i < sizeBtns.length; i++) {
+          var sz = Number(sizeBtns[i].getAttribute('data-size'));
+          sizeBtns[i].classList.toggle('active', sz === d.fontSize);
+        }
+
+        var stickerBtns = document.querySelectorAll('.sticker-item');
+        for (var j = 0; j < stickerBtns.length; j++) {
+          var rawIdx = parseInt(stickerBtns[j].getAttribute('data-preset-idx'), 10);
+          stickerBtns[j].classList.toggle('active', d.iconType === 'preset' && d.presetIndex === rawIdx);
+        }
+
+        var hideOpts = document.querySelectorAll('.hide-icon-opt');
+        for (var h1 = 0; h1 < hideOpts.length; h1++) {
+          var hIdx = parseInt(hideOpts[h1].getAttribute('data-preset-idx'), 10);
+          hideOpts[h1].classList.toggle('active', d.hideBtnIconType === 'preset' && d.hideBtnPresetIndex === hIdx);
+        }
+        syncModalUploadBar(
+          document.getElementById('hideBtnThumb'),
+          document.getElementById('hideBtnImgStatus'),
+          document.getElementById('btnClearHideIconImg'),
+          d.hideBtnIconType === 'image',
+          d.hideBtnImageData,
+          '自訂圖片'
+        );
+        syncButtonIconDisplay(
+          document.getElementById('prevHideEmoji'),
+          document.getElementById('prevHideImg'),
+          d.hideBtnIconType,
+          d.hideBtnIcon,
+          d.hideBtnImageData
+        );
+
+        var showOpts = document.querySelectorAll('.show-icon-opt');
+        for (var s1 = 0; s1 < showOpts.length; s1++) {
+          var sIdx = parseInt(showOpts[s1].getAttribute('data-preset-idx'), 10);
+          showOpts[s1].classList.toggle('active', d.showBtnIconType === 'preset' && d.showBtnPresetIndex === sIdx);
+        }
+        syncModalUploadBar(
+          document.getElementById('showBtnThumb'),
+          document.getElementById('showBtnImgStatus'),
+          document.getElementById('btnClearShowIconImg'),
+          d.showBtnIconType === 'image',
+          d.showBtnImageData,
+          '自訂圖片'
+        );
+        syncButtonIconDisplay(
+          document.getElementById('prevShowEmoji'),
+          document.getElementById('prevShowImg'),
+          d.showBtnIconType,
+          d.showBtnIcon,
+          d.showBtnImageData
+        );
+
+        refreshCustomSourceUI();
+      }
+
+      function openTitleModal() {
+        draftSettings = cloneSettings(currentSettings);
+        var inputTitle = document.getElementById('inputTitle');
+        var inputCustomIcon = document.getElementById('inputCustomIcon');
+        var inputHideBtnIcon = document.getElementById('inputHideBtnIcon');
+        var inputShowBtnIcon = document.getElementById('inputShowBtnIcon');
+
+        if (inputTitle) inputTitle.value = draftSettings.text;
+        if (inputCustomIcon) {
+          inputCustomIcon.value = draftSettings.iconType === 'emoji' ? draftSettings.iconEmoji : '';
+        }
+        if (inputHideBtnIcon) {
+          inputHideBtnIcon.value = draftSettings.hideBtnIconType === 'emoji' ? draftSettings.hideBtnIcon : '';
+        }
+        if (inputShowBtnIcon) {
+          inputShowBtnIcon.value = draftSettings.showBtnIconType === 'emoji' ? draftSettings.showBtnIcon : '';
+        }
+
+        updateModalPreview();
+        var modal = document.getElementById('titleModal');
+        if (modal) modal.classList.add('open');
+      }
+
+      function closeTitleModal() {
+        var modal = document.getElementById('titleModal');
+        if (modal) modal.classList.remove('open');
+      }
+
+      function resize() {
+        var vw = Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0, 320);
+        var vh = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0, 480);
+        if (currentSettings && currentSettings.forceLandscape) {
+          W = Math.max(vh, 320);
+          H = Math.max(vw, 320);
+        } else {
+          W = vw;
+          H = vh;
+        }
+        DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+        canvas.width = Math.round(W * DPR);
+        canvas.height = Math.round(H * DPR);
+        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+        getSafeBounds();
+
+        for (var i = 0; i < pigs.length; i++) {
+          pigs[i].x = Math.min(Math.max(pigs[i].x, 24), W - 24);
+          pigs[i].y = Math.min(Math.max(pigs[i].y, 26), H - 36);
+        }
+
+        if (state.gathered && pigs.length > 0) {
+          if (state.heartShowTimer > 0) {
+            dismissEggHelpers(true);
+            layoutColonEggShape(state.activeEggShape);
+          } else {
+            computeClockTargets();
+          }
+        }
+      }
+
+      function processMultiImageUpload(files, onDone) {
+        if (!files || !files.length) return;
+        var loadedSprites = [];
+        var loadedUrls = [];
+        var pending = Math.min(files.length, 16);
+
+        for (var i = 0; i < pending; i++) {
+          (function (file) {
+            var reader = new FileReader();
+            reader.onload = function (ev) {
+              var img = new Image();
+              img.onload = function () {
+                removeBackgroundAndTrim(img, 180, function (spr) {
+                  if (spr) {
+                    loadedSprites.push(spr);
+                    try {
+                      loadedUrls.push(spr.toDataURL('image/png'));
+                    } catch (e) {}
+                  }
+                  pending--;
+                  if (pending <= 0) onDone(loadedSprites, loadedUrls);
+                });
+              };
+              img.onerror = function () {
+                pending--;
+                if (pending <= 0) onDone(loadedSprites, loadedUrls);
+              };
+              img.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+          })(files[i]);
+        }
+      }
+
+      function bindUI() {
+        canvas.addEventListener('pointerdown', function (e) {
+          handlePointerDown(e.clientX, e.clientY);
         });
+        window.addEventListener('pointermove', function (e) {
+          handlePointerMove(e.clientX, e.clientY);
+        });
+        window.addEventListener('pointerup', function (e) {
+          handlePointerUp(e.clientX, e.clientY);
+        });
+
+        document.getElementById('titleTrigger').addEventListener('click', function (e) {
+          e.stopPropagation();
+          openTitleModal();
+        });
+
+        var dateBadgeEl = document.getElementById('dateBadge');
+        dateBadgeEl.addEventListener('click', function (e) {
+          e.stopPropagation();
+          openTitleModal();
+        });
+        dateBadgeEl.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            e.stopPropagation();
+            openTitleModal();
+          }
+        });
+
+        document.getElementById('btnToggleGather').addEventListener('click', function (e) {
+          e.stopPropagation();
+          setGathered(!state.gathered, false);
+        });
+
+        document.getElementById('btnGuestShow').addEventListener('click', function (e) {
+          e.stopPropagation();
+          triggerGuestParade();
+        });
+
+        document.getElementById('btnWakeLock').addEventListener('click', function (e) {
+          e.stopPropagation();
+          var btn = this;
+          if (!('wakeLock' in navigator) || !navigator.wakeLock) return;
+          if (state.wakeLock) {
+            try { state.wakeLock.release(); } catch (err) {}
+            state.wakeLock = null;
+            btn.textContent = '螢幕常亮';
+            btn.classList.remove('primary');
+          } else {
+            navigator.wakeLock.request('screen').then(function (sentinel) {
+              state.wakeLock = sentinel;
+              btn.textContent = '螢幕常亮 (開啟中)';
+              btn.classList.add('primary');
+              sentinel.addEventListener('release', function () {
+                state.wakeLock = null;
+                btn.textContent = '螢幕常亮';
+                btn.classList.remove('primary');
+              });
+            }).catch(function () {});
+          }
+        });
+
+        document.getElementById('btnToggleNight').addEventListener('click', function (e) {
+          e.stopPropagation();
+          state.nightMode = !state.nightMode;
+          document.body.classList.toggle('night', state.nightMode);
+          this.textContent = state.nightMode ? '日間模式' : '夜間模式';
+          var meta = document.getElementById('metaTheme');
+          if (meta) meta.setAttribute('content', state.nightMode ? '#050505' : '#FDF6EC');
+        });
+
+        document.getElementById('btnOpenSettings').addEventListener('click', function (e) {
+          e.stopPropagation();
+          openTitleModal();
+        });
+
+        var bottomBarEl = document.getElementById('bottomBar');
+        var btnShowBar = document.getElementById('btnShowBar');
+
+        document.getElementById('btnHideBar').addEventListener('click', function (e) {
+          e.stopPropagation();
+          state.barHidden = true;
+          bottomBarEl.classList.add('hidden');
+          btnShowBar.classList.remove('hidden');
+          if (state.gathered && state.heartShowTimer <= 0) computeClockTargets();
+        });
+
+        btnShowBar.addEventListener('click', function (e) {
+          e.stopPropagation();
+          state.barHidden = false;
+          btnShowBar.classList.add('hidden');
+          bottomBarEl.classList.remove('hidden');
+          if (state.gathered && state.heartShowTimer <= 0) computeClockTargets();
+        });
+
+        document.getElementById('btnOrientAuto').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.forceLandscape = false;
+          updateModalPreview();
+        });
+
+        document.getElementById('btnOrientForceLandscape').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.forceLandscape = true;
+          updateModalPreview();
+        });
+
+        document.getElementById('btnSizeLarge').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.extraLarge = false;
+          updateModalPreview();
+        });
+
+        document.getElementById('btnSizeExtraLarge').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.extraLarge = true;
+          updateModalPreview();
+        });
+
+        var colonEggOpts = document.querySelectorAll('.colon-egg-opt');
+        for (var ce = 0; ce < colonEggOpts.length; ce++) {
+          colonEggOpts[ce].addEventListener('click', function () {
+            if (!draftSettings) return;
+            var mode = this.getAttribute('data-mode') || 'random5';
+            draftSettings.colonEggMode = mode;
+            updateModalPreview();
+          });
+        }
+
+        var fileRoamerInput = document.getElementById('fileRoamerInput');
+        document.getElementById('btnPickRoamerImgs').addEventListener('click', function () {
+          fileRoamerInput.value = '';
+          fileRoamerInput.click();
+        });
+
+        fileRoamerInput.addEventListener('change', function () {
+          processMultiImageUpload(this.files, function (sprites, urls) {
+            if (sprites.length > 0) {
+              customRoamerSprites = sprites;
+              customRoamerUrls = urls;
+              usingCustomRoamer = true;
+              refreshCustomSourceUI();
+            }
+          });
+        });
+
+        document.getElementById('btnResetRoamerImgs').addEventListener('click', function () {
+          usingCustomRoamer = false;
+          customRoamerSprites = [];
+          customRoamerUrls = [];
+          refreshCustomSourceUI();
+        });
+
+        var fileGuestInput = document.getElementById('fileGuestInput');
+        document.getElementById('btnPickGuestImgs').addEventListener('click', function () {
+          fileGuestInput.value = '';
+          fileGuestInput.click();
+        });
+
+        fileGuestInput.addEventListener('change', function () {
+          processMultiImageUpload(this.files, function (sprites, urls) {
+            if (sprites.length > 0) {
+              customGuestSprites = sprites;
+              customGuestUrls = urls;
+              usingCustomGuest = true;
+              if (!state.gathered) applyWeirdoMix(true);
+              refreshCustomSourceUI();
+            }
+          });
+        });
+
+        document.getElementById('btnResetGuestImgs').addEventListener('click', function () {
+          usingCustomGuest = false;
+          customGuestSprites = [];
+          customGuestUrls = [];
+          if (!state.gathered) applyWeirdoMix(true);
+          refreshCustomSourceUI();
+        });
+
+        var modalEl = document.getElementById('titleModal');
+        var modalBoxEl = modalEl.querySelector('.modal-box');
+        modalBoxEl.addEventListener('click', function (e) {
+          e.stopPropagation();
+        });
+
+        document.getElementById('btnCloseModal').addEventListener('click', closeTitleModal);
+        document.getElementById('btnCancelModal').addEventListener('click', closeTitleModal);
+        modalEl.addEventListener('click', function (e) {
+          if (e.target === modalEl) closeTitleModal();
+        });
+
+        document.getElementById('btnTitleVisibleOn').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.visible = true;
+          updateModalPreview();
+        });
+
+        document.getElementById('btnTitleVisibleOff').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.visible = false;
+          updateModalPreview();
+        });
+
+        document.getElementById('btnDateVisibleOn').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.showDateBadge = true;
+          updateModalPreview();
+        });
+
+        document.getElementById('btnDateVisibleOff').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.showDateBadge = false;
+          updateModalPreview();
+        });
+
+        document.getElementById('inputTitle').addEventListener('input', function () {
+          if (!draftSettings) return;
+          draftSettings.text = this.value;
+          updateModalPreview();
+        });
+
+        document.getElementById('btnClearTitle').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.text = '';
+          document.getElementById('inputTitle').value = '';
+          updateModalPreview();
+        });
+
+        var presetTitles = document.querySelectorAll('.preset-title');
+        for (var i = 0; i < presetTitles.length; i++) {
+          presetTitles[i].addEventListener('click', function () {
+            if (!draftSettings) return;
+            var val = this.getAttribute('data-val') || '';
+            draftSettings.text = val;
+            document.getElementById('inputTitle').value = val;
+            updateModalPreview();
+          });
+        }
+
+        var sizeBtns = document.querySelectorAll('.size-btn');
+        for (var sb = 0; sb < sizeBtns.length; sb++) {
+          sizeBtns[sb].addEventListener('click', function () {
+            if (!draftSettings) return;
+            var sz = parseInt(this.getAttribute('data-size'), 10);
+            draftSettings.fontSize = Math.min(44, Math.max(16, isNaN(sz) ? 26 : sz));
+            updateModalPreview();
+          });
+        }
+
+        document.getElementById('inputFontSize').addEventListener('input', function () {
+          if (!draftSettings) return;
+          var sz = parseInt(this.value, 10);
+          draftSettings.fontSize = Math.min(44, Math.max(16, isNaN(sz) ? 26 : sz));
+          updateModalPreview();
+        });
+
+        document.getElementById('btnNoIcon').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.iconType = 'none';
+          draftSettings.iconImage = '';
+          document.getElementById('inputCustomIcon').value = '';
+          updateModalPreview();
+        });
+
+        document.getElementById('titleStickerGrid').addEventListener('click', function (e) {
+          var target = e.target;
+          while (target && target !== this && !target.classList.contains('sticker-item')) {
+            target = target.parentNode;
+          }
+          if (!target || !target.classList.contains('sticker-item') || !draftSettings) return;
+          var rawIdx = parseInt(target.getAttribute('data-preset-idx'), 10);
+          var idx = isNaN(rawIdx) ? 0 : rawIdx;
+          draftSettings.iconType = 'preset';
+          draftSettings.presetIndex = idx;
+          draftSettings.iconImage = originalCutoutDataURLs[idx] || encodeURI(PIG_FILE_PATHS[idx]);
+          document.getElementById('inputCustomIcon').value = '';
+          updateModalPreview();
+        });
+
+        document.getElementById('inputCustomIcon').addEventListener('input', function () {
+          if (!draftSettings) return;
+          var val = this.value.trim();
+          if (!val) {
+            draftSettings.iconType = 'preset';
+            draftSettings.iconImage = originalCutoutDataURLs[draftSettings.presetIndex] || encodeURI(PIG_FILE_PATHS[draftSettings.presetIndex]);
+          } else {
+            draftSettings.iconType = 'emoji';
+            draftSettings.iconEmoji = val;
+            draftSettings.iconImage = '';
+          }
+          updateModalPreview();
+        });
+
+        var fileIconInput = document.getElementById('fileIconInput');
+        document.getElementById('btnTriggerIconUpload').addEventListener('click', function () {
+          fileIconInput.value = '';
+          fileIconInput.click();
+        });
+
+        fileIconInput.addEventListener('change', function () {
+          var file = this.files && this.files[0];
+          if (!file || !draftSettings) return;
+          var reader = new FileReader();
+          reader.onload = function (ev) {
+            var img = new Image();
+            img.onload = function () {
+              removeBackgroundAndTrim(img, 96, function (spr) {
+                if (spr && draftSettings) {
+                  draftSettings.iconType = 'image';
+                  draftSettings.iconImage = spr.toDataURL('image/png');
+                  updateModalPreview();
+                }
+              });
+            };
+            img.src = ev.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+
+        document.getElementById('btnClearTitleIconImg').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.iconType = 'preset';
+          draftSettings.presetIndex = 0;
+          draftSettings.iconImage = originalCutoutDataURLs[0] || encodeURI(PIG_FILE_PATHS[0]);
+          document.getElementById('inputCustomIcon').value = '';
+          updateModalPreview();
+        });
+
+        document.getElementById('hideIconGroup').addEventListener('click', function (e) {
+          var target = e.target;
+          while (target && target !== this && !target.classList.contains('hide-icon-opt')) {
+            target = target.parentNode;
+          }
+          if (!target || !target.classList.contains('hide-icon-opt') || !draftSettings) return;
+          var rawIdx = parseInt(target.getAttribute('data-preset-idx'), 10);
+          var idx = isNaN(rawIdx) ? 6 : rawIdx;
+          draftSettings.hideBtnIconType = 'preset';
+          draftSettings.hideBtnPresetIndex = idx;
+          draftSettings.hideBtnImageData = originalCutoutDataURLs[idx] || encodeURI(PIG_FILE_PATHS[idx]);
+          var inp = document.getElementById('inputHideBtnIcon');
+          if (inp) inp.value = '';
+          updateModalPreview();
+        });
+
+        document.getElementById('inputHideBtnIcon').addEventListener('input', function () {
+          if (!draftSettings) return;
+          var val = this.value.trim();
+          if (!val) {
+            draftSettings.hideBtnIconType = 'preset';
+            draftSettings.hideBtnImageData = originalCutoutDataURLs[draftSettings.hideBtnPresetIndex] || encodeURI(PIG_FILE_PATHS[draftSettings.hideBtnPresetIndex]);
+          } else {
+            draftSettings.hideBtnIconType = 'emoji';
+            draftSettings.hideBtnIcon = val;
+          }
+          updateModalPreview();
+        });
+
+        var fileHideIconInput = document.getElementById('fileHideIconInput');
+        document.getElementById('btnUploadHideIcon').addEventListener('click', function () {
+          fileHideIconInput.value = '';
+          fileHideIconInput.click();
+        });
+
+        fileHideIconInput.addEventListener('change', function () {
+          var file = this.files && this.files[0];
+          if (!file || !draftSettings) return;
+          var reader = new FileReader();
+          reader.onload = function (ev) {
+            var img = new Image();
+            img.onload = function () {
+              removeBackgroundAndTrim(img, 64, function (spr) {
+                if (spr && draftSettings) {
+                  draftSettings.hideBtnIconType = 'image';
+                  draftSettings.hideBtnImageData = spr.toDataURL('image/png');
+                  updateModalPreview();
+                }
+              });
+            };
+            img.src = ev.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+
+        document.getElementById('btnClearHideIconImg').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.hideBtnIconType = 'preset';
+          draftSettings.hideBtnPresetIndex = 6;
+          draftSettings.hideBtnImageData = originalCutoutDataURLs[6] || encodeURI(PIG_FILE_PATHS[6]);
+          updateModalPreview();
+        });
+
+        document.getElementById('showIconGroup').addEventListener('click', function (e) {
+          var target = e.target;
+          while (target && target !== this && !target.classList.contains('show-icon-opt')) {
+            target = target.parentNode;
+          }
+          if (!target || !target.classList.contains('show-icon-opt') || !draftSettings) return;
+          var rawIdx = parseInt(target.getAttribute('data-preset-idx'), 10);
+          var idx = isNaN(rawIdx) ? 4 : rawIdx;
+          draftSettings.showBtnIconType = 'preset';
+          draftSettings.showBtnPresetIndex = idx;
+          draftSettings.showBtnImageData = originalCutoutDataURLs[idx] || encodeURI(PIG_FILE_PATHS[idx]);
+          var inp = document.getElementById('inputShowBtnIcon');
+          if (inp) inp.value = '';
+          updateModalPreview();
+        });
+
+        document.getElementById('inputShowBtnIcon').addEventListener('input', function () {
+          if (!draftSettings) return;
+          var val = this.value.trim();
+          if (!val) {
+            draftSettings.showBtnIconType = 'preset';
+            draftSettings.showBtnImageData = originalCutoutDataURLs[draftSettings.showBtnPresetIndex] || encodeURI(PIG_FILE_PATHS[draftSettings.showBtnPresetIndex]);
+          } else {
+            draftSettings.showBtnIconType = 'emoji';
+            draftSettings.showBtnIcon = val;
+          }
+          updateModalPreview();
+        });
+
+        var fileShowIconInput = document.getElementById('fileShowIconInput');
+        document.getElementById('btnUploadShowIcon').addEventListener('click', function () {
+          fileShowIconInput.value = '';
+          fileShowIconInput.click();
+        });
+
+        fileShowIconInput.addEventListener('change', function () {
+          var file = this.files && this.files[0];
+          if (!file || !draftSettings) return;
+          var reader = new FileReader();
+          reader.onload = function (ev) {
+            var img = new Image();
+            img.onload = function () {
+              removeBackgroundAndTrim(img, 64, function (spr) {
+                if (spr && draftSettings) {
+                  draftSettings.showBtnIconType = 'image';
+                  draftSettings.showBtnImageData = spr.toDataURL('image/png');
+                  updateModalPreview();
+                }
+              });
+            };
+            img.src = ev.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+
+        document.getElementById('btnClearShowIconImg').addEventListener('click', function () {
+          if (!draftSettings) return;
+          draftSettings.showBtnIconType = 'preset';
+          draftSettings.showBtnPresetIndex = 4;
+          draftSettings.showBtnImageData = originalCutoutDataURLs[4] || encodeURI(PIG_FILE_PATHS[4]);
+          updateModalPreview();
+        });
+
+        document.getElementById('btnResetDefaults').addEventListener('click', function () {
+          draftSettings = getDefaultSettings();
+          document.getElementById('inputTitle').value = draftSettings.text;
+          document.getElementById('inputCustomIcon').value = '';
+          var hInp = document.getElementById('inputHideBtnIcon');
+          var sInp = document.getElementById('inputShowBtnIcon');
+          if (hInp) hInp.value = '';
+          if (sInp) sInp.value = '';
+          updateModalPreview();
+        });
+
+        document.getElementById('btnApplyModal').addEventListener('click', function () {
+          if (draftSettings) {
+            if ((draftSettings.iconType === 'image' || draftSettings.iconType === 'preset') && !draftSettings.iconImage) {
+              draftSettings.iconType = 'preset';
+              draftSettings.presetIndex = 0;
+              draftSettings.iconImage = originalCutoutDataURLs[0] || encodeURI(PIG_FILE_PATHS[0]);
+            }
+            if ((draftSettings.hideBtnIconType === 'image' || draftSettings.hideBtnIconType === 'preset') && !draftSettings.hideBtnImageData) {
+              draftSettings.hideBtnIconType = 'preset';
+              draftSettings.hideBtnPresetIndex = 6;
+              draftSettings.hideBtnImageData = originalCutoutDataURLs[6] || encodeURI(PIG_FILE_PATHS[6]);
+            }
+            if ((draftSettings.showBtnIconType === 'image' || draftSettings.showBtnIconType === 'preset') && !draftSettings.showBtnImageData) {
+              draftSettings.showBtnIconType = 'preset';
+              draftSettings.showBtnPresetIndex = 4;
+              draftSettings.showBtnImageData = originalCutoutDataURLs[4] || encodeURI(PIG_FILE_PATHS[4]);
+            }
+            currentSettings = cloneSettings(draftSettings);
+            saveSettings();
+            applySettingsToScreen();
+          }
+          closeTitleModal();
+        });
+
+        window.addEventListener('resize', resize);
+        if (typeof ResizeObserver !== 'undefined') {
+          try {
+            var ro = new ResizeObserver(resize);
+            ro.observe(document.body);
+          } catch (e) {}
+        }
       }
 
-      // ===== 報時與時鐘更新 =====
-      function triggerChimeWave() {
-        pigMascot.classList.remove('chime-jump');
-        void pigMascot.offsetWidth;
-        pigMascot.classList.add('chime-jump');
+      function bootstrap() {
+        loadSettings();
+        populatePresetPickers();
+        applySettingsToScreen();
+        buildFallbackSprites();
+        initPigs();
+        bindUI();
+        resize();
+        setGathered(true, true);
+        requestAnimationFrame(animate);
+        loadOriginalPigIcons();
+        loadClockAndEasterAssets();
       }
 
-      function updateClock() {
-        const now = new Date();
-        const hours = now.getHours();
-        const minutes = now.getMinutes();
-        const seconds = now.getSeconds();
-
-        const hStr = String(hours).padStart(2, '0');
-        const mStr = String(minutes).padStart(2, '0');
-
-        h1El.textContent = hStr[0];
-        h2El.textContent = hStr[1];
-        m1El.textContent = mStr[0];
-        m2El.textContent = mStr[1];
-
-        // 冒號每秒呼吸閃爍
-        colonBtn.classList.toggle('blink-off', seconds % 2 === 1);
-
-        // 60 秒進度條
-        const pct = ((seconds + now.getMilliseconds() / 1000) / 60) * 100;
-        progressFill.style.width = `${pct.toFixed(2)}%`;
-
-        // 整點／每分鐘報時小豬跳躍
-        if (lastMinute !== -1 && lastMinute !== minutes) {
-          triggerChimeWave();
-        }
-        lastMinute = minutes;
-
-        // 繁體中文日期顯示
-        const weekNames = ['日', '一', '二', '三', '四', '五', '六'];
-        dateSub.textContent = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日（週${weekNames[now.getDay()]}）`;
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bootstrap);
+      } else {
+        bootstrap();
       }
-
-      // ===== 事件繫結 =====
-      // 點擊中央冒號觸發 5 秒陣型秀
-      colonBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (isShowActive) {
-          finishShow(true);
-        } else {
-          triggerHeartDuetShow('auto');
-        }
-      });
-
-      // 陣型秀進行中，觸碰/點擊畫面任意處立即跳回時間顯示
-      formationLayer.addEventListener('pointerdown', (e) => {
-        if (isShowActive && !isExiting) {
-          e.preventDefault();
-          finishShow(true);
-        }
-      });
-
-      // 底部快速測試按鈕
-      document.getElementById('btnHeart').addEventListener('click', () => triggerHeartDuetShow('heart'));
-      document.getElementById('btnDuet').addEventListener('click', () => triggerHeartDuetShow('duet'));
-      document.getElementById('btnShiro').addEventListener('click', () => triggerHeartDuetShow('shiro'));
-      document.getElementById('btnChime').addEventListener('click', triggerChimeWave);
-      pigMascot.addEventListener('click', triggerChimeWave);
-
-      // 視窗大小改變時，若正在顯示陣型則即時重算座標
-      window.addEventListener('resize', () => {
-        if (isShowActive && !isExiting) {
-          const stepIdx = 0;
-          renderPattern(currentMode === 'auto' ? 'heart' : currentMode, formationLabel.textContent);
-        }
-      });
-
-      // 啟動時鐘迴圈
-      updateClock();
-      setInterval(updateClock, 100);
     })();
   </script>
 </body>
