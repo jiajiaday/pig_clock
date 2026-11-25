@@ -2147,90 +2147,119 @@
       }
 
       /* ============================================================================
-         精細手繪彩蛋圖案標準化座標（中心 (0,0)，半徑約 15，標記 1 為銳利折角不磨平）
+         精細手繪彩蛋圖案標準化座標（中心 (0,0)，半徑約 15~16，標記 1 為銳利折角不磨平）
+         依參考圖大幅增加點數與五官特徵
          ============================================================================ */
 
-      /* 1. 小葵捲髮側臉（HIMAWARI）：額前三道立體螺旋捲毛 */
+      /* 1. 小葵捲髮側臉（HIMAWARI）─ 三道明顯螺旋捲毛 + 圓臉 + 右耳 */
       var HIMAWARI_OUTLINE = [
-        [-11.2, -3.2],
-        [-14.2, -4.4], [-15.2, -7.8], [-12.6, -11.0], [-8.8, -10.6], [-7.6, -6.8, 1],
-        [-6.6, -10.6], [-2.8, -12.0], [0.6, -9.8], [1.4, -6.2, 1],
-        [2.6, -9.4], [6.4, -9.8], [9.4, -7.2],
-        [11.4, -3.6], [11.6, 0.2, 1],
-        [14.2, 0.2], [15.6, 3.0], [14.4, 6.2], [11.6, 6.8, 1],
-        [8.4, 8.6], [1.2, 9.6], [-6.8, 9.4], [-12.4, 7.2],
-        [-14.6, 3.6], [-13.6, -0.2], [-11.2, -3.2]
+        /* 左臉頰起點 */
+        [-12.0, -1.5],
+        /* 第1捲（左側最大螺旋） */
+        [-13.8, -3.0], [-15.5, -5.5], [-15.8, -8.5], [-14.0, -11.2],
+        [-11.0, -12.0], [-8.5, -10.5], [-7.8, -7.5, 1],
+        /* 第2捲（中央大螺旋） */
+        [-6.5, -10.0], [-4.0, -12.5], [-0.5, -13.0], [2.0, -11.0],
+        [2.8, -8.0, 1],
+        /* 第3捲（右側螺旋） */
+        [4.0, -10.5], [7.0, -11.5], [10.0, -9.5], [11.5, -6.5],
+        /* 後腦與右耳 */
+        [12.5, -3.0], [13.0, 0.5, 1],
+        [15.0, 0.8], [16.2, 3.5], [15.0, 6.5], [12.5, 7.5, 1],
+        /* 下巴與左臉閉合 */
+        [9.5, 9.0], [4.0, 10.2], [-2.0, 10.5], [-8.0, 9.5],
+        [-12.5, 7.0], [-14.5, 3.5], [-14.0, 0.0], [-12.0, -1.5]
       ];
 
-      /* 2. 蠟筆小新側臉（SIN1） */
+      /* 2. 蠟筆小新側臉（SIN1）─ 馬鈴薯頭 + 鼓臉頰 + 大右耳 */
       var SIN1_OUTLINE = [
-        [-1.8, -12.0], [3.2, -11.8], [7.6, -9.4], [9.6, -5.2], [9.8, -1.0, 1],
-        [12.6, -1.8], [15.2, 0.2], [15.6, 3.8], [13.8, 6.8], [11.0, 7.6],
-        [9.4, 6.8, 1],
-        [6.8, 8.2], [0.6, 9.2], [-7.2, 9.6], [-13.2, 8.6],
-        [-15.6, 5.4], [-15.4, 1.0], [-12.6, -2.0], [-10.8, -3.0],
-        [-9.6, -7.6], [-6.0, -11.0], [-1.8, -12.0]
+        [-2.5, -12.5], [2.5, -12.8], [7.0, -11.0], [10.0, -7.5],
+        [11.0, -3.5], [10.5, 0.0, 1],
+        /* 右大耳 */
+        [13.5, -1.5], [16.0, 0.5], [16.5, 4.0], [14.5, 7.0],
+        [11.5, 8.0], [10.0, 6.5, 1],
+        /* 下巴鼓臉 */
+        [7.5, 8.5], [2.0, 9.8], [-5.0, 10.2], [-11.0, 9.0],
+        [-14.5, 6.0], [-15.5, 2.0], [-14.0, -2.0], [-11.5, -5.0],
+        [-9.5, -8.5], [-6.0, -11.5], [-2.5, -12.5]
       ];
 
-      /* 3. 肥嘟嘟左衛門豬頭（S3） */
+      /* 3. 肥嘟嘟左衛門豬頭（S3）─ 招風耳 + 大豬鼻 */
       var S3_HEAD_OUTLINE = [
-        [-4.2, -8.4], [0.0, -7.4], [4.2, -8.4],
-        [7.8, -12.0, 1], [11.2, -10.6], [11.6, -5.8], [10.6, -2.8, 1],
-        [14.0, -0.4], [14.8, 3.8], [12.4, 7.4], [8.2, 8.6, 1],
-        [4.8, 10.8], [0.0, 10.2], [-4.8, 10.8], [-8.2, 8.6, 1],
-        [-12.4, 7.4], [-14.8, 3.8], [-14.0, -0.4], [-10.6, -2.8, 1],
-        [-11.6, -5.8], [-11.2, -10.6], [-7.8, -12.0, 1], [-4.2, -8.4]
+        [-5.0, -9.0], [0.0, -8.0], [5.0, -9.0],
+        /* 右耳 */
+        [8.5, -13.0, 1], [12.0, -12.0], [13.0, -7.5], [11.5, -3.5, 1],
+        /* 右臉與雙下巴 */
+        [14.5, -0.5], [15.5, 4.0], [13.0, 8.0], [8.5, 9.5, 1],
+        [4.5, 11.5], [0.0, 11.0], [-4.5, 11.5], [-8.5, 9.5, 1],
+        /* 左臉與左耳 */
+        [-13.0, 8.0], [-15.5, 4.0], [-14.5, -0.5], [-11.5, -3.5, 1],
+        [-13.0, -7.5], [-12.0, -12.0], [-8.5, -13.0, 1], [-5.0, -9.0]
       ];
 
       var S3_SNOUT_OUTLINE = [
-        [0.0, 2.0], [4.6, 0.8], [8.6, 2.4], [9.4, 6.2],
-        [6.8, 9.6], [2.6, 9.4], [0.0, 8.6], [-2.6, 9.4],
-        [-6.8, 9.6], [-9.4, 6.2], [-8.6, 2.4], [-4.6, 0.8], [0.0, 2.0]
+        [0.0, 1.5], [5.0, 0.0], [9.0, 2.0], [10.0, 6.0],
+        [7.5, 10.0], [3.0, 10.5], [0.0, 9.5], [-3.0, 10.5],
+        [-7.5, 10.0], [-10.0, 6.0], [-9.0, 2.0], [-5.0, 0.0], [0.0, 1.5]
       ];
 
-      /* 4. 蠟筆小新濃眉嘟嘴（SIN2） */
+      /* 4. 蠟筆小新濃眉嘟嘴（SIN2）─ 粗毛毛蟲眉 + 圓嘟嘴 */
       var SIN2_HEAD_OUTLINE = [
-        [-2.8, -12.8], [2.8, -12.4], [7.4, -9.4], [9.4, -4.6], [9.6, -1.6, 1],
-        [12.4, -2.4], [15.2, -0.2], [15.6, 3.8], [13.6, 6.8], [10.8, 7.6],
-        [9.0, 6.4, 1],
-        [5.2, 8.8], [-2.0, 9.8], [-9.2, 9.4], [-14.2, 6.8],
-        [-15.4, 2.4], [-13.6, -1.6], [-11.2, -2.6], [-10.6, -7.4], [-7.4, -11.4],
-        [-2.8, -12.8]
+        [-3.5, -13.5], [3.0, -13.2], [8.0, -10.5], [10.5, -5.5],
+        [11.0, -1.5, 1],
+        /* 右耳 */
+        [13.5, -2.5], [16.5, 0.0], [16.8, 4.5], [14.5, 7.5],
+        [11.5, 8.5], [9.5, 7.0, 1],
+        /* 下巴 */
+        [6.0, 9.5], [-1.0, 10.5], [-8.5, 10.0], [-13.5, 7.5],
+        [-15.5, 3.0], [-14.5, -1.5], [-12.0, -4.0], [-11.0, -8.0],
+        [-8.0, -11.5], [-3.5, -13.5]
       ];
 
       var SIN2_BROW_LEFT = [
-        [-11.4, -5.8], [-9.4, -8.8], [-6.2, -9.0], [-4.0, -6.4],
-        [-4.6, -5.4], [-6.6, -7.4], [-9.2, -7.2], [-10.8, -5.0]
+        [-12.0, -6.5], [-10.0, -9.5], [-6.5, -10.0], [-3.5, -7.5],
+        [-4.0, -6.0], [-7.0, -8.0], [-10.0, -7.8], [-11.5, -5.5]
       ];
 
       var SIN2_BROW_RIGHT = [
-        [-1.2, -6.4], [1.4, -9.2], [4.8, -9.2], [7.2, -6.2],
-        [6.4, -5.2], [4.4, -7.6], [1.6, -7.6], [-0.4, -5.4]
+        [-1.5, -7.0], [1.5, -10.0], [5.5, -10.2], [8.5, -7.0],
+        [7.5, -5.8], [5.0, -8.2], [1.5, -8.0], [-0.5, -5.8]
       ];
 
-      /* 5. 巧克比鱷魚山先生（Sin4） */
+      /* 5. 巧克比鱷魚山（Sin4）─ 長吻 + 大嘴 + 鋸齒牙 */
       var SIN4_BODY_OUTLINE = [
-        [4.8, -5.2], [9.8, -4.8], [13.4, -2.0], [14.6, 2.4], [13.8, 7.0],
-        [10.2, 9.8], [2.0, 10.0], [-7.2, 9.6], [-9.6, 7.6], [-7.6, 5.4],
-        [2.6, 5.4], [7.0, 3.8], [7.0, 1.4], [2.6, 0.2], [-10.4, 0.2],
-        [-14.4, -1.4], [-15.0, -4.6], [-12.6, -6.6], [-10.6, -5.6],
-        [-8.4, -6.4], [-5.2, -5.4]
+        /* 後腦到右上 */
+        [5.0, -6.0], [10.5, -5.5], [14.0, -2.5], [15.5, 2.0],
+        [14.5, 7.0], [11.0, 10.5], [4.0, 11.0],
+        /* 下顎 */
+        [-2.0, 10.5], [-8.0, 9.5], [-10.5, 7.0], [-8.5, 5.0],
+        /* 嘴巴內側回轉 */
+        [3.0, 5.0], [7.5, 3.5], [7.5, 1.0], [3.0, -0.5],
+        /* 長吻前端 */
+        [-8.0, -0.5], [-13.5, -2.0], [-15.5, -5.0], [-14.0, -7.5],
+        [-11.0, -7.0], [-8.5, -8.0], [-5.0, -6.5]
       ];
 
-      /* 6. 小白（Shiro）頭部+上半身輪廓 */
+      /* 6. 小白（Shiro）─ 完整坐姿輪廓（頭+身體+前腳+尾巴） */
       var SHIRO_OUTLINE = [
-        /* 左耳（向上微捲） */
-        [-10.5, -6.5], [-13.5, -9.5], [-14.8, -13.2], [-11.5, -15.0], [-7.8, -13.8], [-6.5, -10.2, 1],
+        /* 左耳（向上揚起） */
+        [-9.5, -5.0], [-12.5, -8.0], [-14.0, -12.0], [-12.0, -14.5],
+        [-8.5, -13.5], [-6.5, -10.0, 1],
         /* 頭頂 */
-        [-4.0, -11.5], [0.0, -12.2], [4.5, -11.2],
+        [-4.0, -11.5], [0.5, -12.5], [5.0, -11.5],
         /* 右耳（向下垂） */
-        [7.5, -10.8], [11.0, -12.5], [14.0, -11.0], [14.5, -7.5], [12.5, -4.8, 1],
+        [8.0, -10.5], [11.5, -12.0], [14.0, -10.0], [14.5, -6.5],
+        [12.5, -4.0, 1],
         /* 右臉頰與身體右側 */
-        [13.2, -1.5], [12.8, 3.5], [10.5, 7.0], [6.0, 9.0],
-        /* 下巴與身體底部 */
-        [1.5, 9.8], [-3.5, 9.5], [-8.0, 7.8], [-11.5, 4.5],
-        /* 左臉頰閉合 */
-        [-13.0, 0.5], [-12.5, -3.5], [-10.5, -6.5]
+        [13.0, -1.0], [13.5, 3.5], [12.0, 7.5], [9.0, 10.5],
+        /* 右前腳 */
+        [7.0, 12.5], [5.5, 14.5], [3.0, 14.0], [2.5, 12.0],
+        /* 肚子與左前腳 */
+        [-1.0, 13.5], [-4.0, 14.0], [-6.0, 12.5], [-5.5, 10.5],
+        /* 左身體與尾巴起點 */
+        [-9.0, 8.5], [-12.0, 5.0], [-13.5, 1.0], [-12.5, -2.5],
+        /* 左臉閉合 */
+        [-11.0, -4.5], [-9.5, -5.0]
       ];
 
       function buildCirclePts(cx, cy, rx, ry, steps) {
@@ -2413,23 +2442,34 @@
           }
           assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
 
-          // 更多捲毛內渦 + 右耳細節
-          var curlHelperScale = Math.max(0.12, Math.min(0.175, figScale * 0.013));
+          // 大幅增加捲毛內渦、眼睛、嘴巴、右耳細節
+          var curlHelperScale = Math.max(0.11, Math.min(0.165, figScale * 0.0125));
           var curlDetails = [
-            { x: -11.4, y: -7.6, scale: curlHelperScale },
-            { x: -10.2, y: -6.4, scale: curlHelperScale },
-            { x: -9.2, y: -7.6, scale: curlHelperScale },
-            { x: -4.2, y: -8.6, scale: curlHelperScale },
-            { x: -2.8, y: -7.2, scale: curlHelperScale },
-            { x: -1.6, y: -8.4, scale: curlHelperScale },
-            { x: 4.4, y: -6.8, scale: curlHelperScale },
-            { x: 5.8, y: -5.6, scale: curlHelperScale },
-            { x: 12.6, y: 2.6, scale: curlHelperScale },
-            { x: 12.4, y: 4.6, scale: curlHelperScale },
-            // 額外眼睛與嘴巴細節
-            { x: -5.5, y: 1.5, scale: curlHelperScale * 0.9 },
-            { x: 2.0, y: 1.8, scale: curlHelperScale * 0.9 },
-            { x: -1.5, y: 5.5, scale: curlHelperScale * 0.85 }
+            // 第1捲內螺旋
+            { x: -13.0, y: -7.0, scale: curlHelperScale },
+            { x: -12.0, y: -8.5, scale: curlHelperScale },
+            { x: -10.5, y: -7.0, scale: curlHelperScale },
+            { x: -11.5, y: -5.5, scale: curlHelperScale },
+            // 第2捲內螺旋
+            { x: -3.5, y: -10.0, scale: curlHelperScale },
+            { x: -1.5, y: -11.0, scale: curlHelperScale },
+            { x: 0.5, y: -9.5, scale: curlHelperScale },
+            { x: -1.0, y: -8.0, scale: curlHelperScale },
+            // 第3捲內螺旋
+            { x: 5.5, y: -8.5, scale: curlHelperScale },
+            { x: 7.5, y: -9.5, scale: curlHelperScale },
+            { x: 8.5, y: -7.5, scale: curlHelperScale },
+            // 右耳內側
+            { x: 13.5, y: 2.0, scale: curlHelperScale },
+            { x: 14.0, y: 4.5, scale: curlHelperScale },
+            { x: 12.5, y: 5.5, scale: curlHelperScale },
+            // 眼睛
+            { x: -5.0, y: 1.0, scale: curlHelperScale * 1.05 },
+            { x: 2.5, y: 1.5, scale: curlHelperScale * 1.05 },
+            // 嘴巴（小 o 型）
+            { x: -1.0, y: 5.8, scale: curlHelperScale * 0.9 },
+            { x: 0.5, y: 6.2, scale: curlHelperScale * 0.85 },
+            { x: -2.0, y: 6.0, scale: curlHelperScale * 0.85 }
           ];
           spawnDetailHelpers(cx, cy, figScale, curlDetails);
 
@@ -2459,18 +2499,26 @@
           }
           assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
 
-          var sin1DetailScale = Math.max(0.125, Math.min(0.18, figScale * 0.014));
+          var sin1DetailScale = Math.max(0.12, Math.min(0.17, figScale * 0.0135));
           spawnDetailHelpers(cx, cy, figScale, [
-            { x: 12.4, y: 1.6, scale: sin1DetailScale },
-            { x: 12.0, y: 4.0, scale: sin1DetailScale },
-            { x: -7.5, y: -5.8, scale: sin1DetailScale },
-            { x: -5.2, y: -6.4, scale: sin1DetailScale },
-            { x: -1.5, y: -6.2, scale: sin1DetailScale },
-            { x: 1.0, y: -5.6, scale: sin1DetailScale },
-            // 眼睛與嘴巴
-            { x: -4.0, y: 0.5, scale: sin1DetailScale * 0.95 },
-            { x: 3.5, y: 0.8, scale: sin1DetailScale * 0.95 },
-            { x: -0.5, y: 5.2, scale: sin1DetailScale * 0.9 }
+            // 右耳內側
+            { x: 13.5, y: 1.5, scale: sin1DetailScale },
+            { x: 14.0, y: 3.5, scale: sin1DetailScale },
+            { x: 12.5, y: 5.0, scale: sin1DetailScale },
+            // 眉毛
+            { x: -7.0, y: -5.5, scale: sin1DetailScale },
+            { x: -4.5, y: -6.5, scale: sin1DetailScale },
+            { x: -1.5, y: -6.0, scale: sin1DetailScale },
+            { x: 1.5, y: -5.5, scale: sin1DetailScale },
+            // 眼睛
+            { x: -4.5, y: 0.0, scale: sin1DetailScale * 1.1 },
+            { x: 3.0, y: 0.5, scale: sin1DetailScale * 1.1 },
+            // 嘴巴
+            { x: -1.0, y: 5.5, scale: sin1DetailScale * 0.95 },
+            { x: 1.0, y: 5.8, scale: sin1DetailScale * 0.9 },
+            // 臉頰
+            { x: -9.0, y: 2.5, scale: sin1DetailScale * 0.85 },
+            { x: 7.5, y: 3.0, scale: sin1DetailScale * 0.85 }
           ]);
 
         } else if (shape === 's3') {
@@ -2510,18 +2558,28 @@
           }
           assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
 
-          var s3DetailScale = Math.max(0.13, Math.min(0.19, figScale * 0.0145));
+          var s3DetailScale = Math.max(0.12, Math.min(0.18, figScale * 0.014));
           spawnDetailHelpers(cx, cy, figScale, [
-            { x: -6.6, y: -2.4, scale: s3DetailScale },
-            { x: -4.4, y: -2.4, scale: s3DetailScale },
-            { x: 4.4, y: -2.4, scale: s3DetailScale },
-            { x: 6.6, y: -2.4, scale: s3DetailScale },
-            { x: -2.0, y: 11.8, scale: s3DetailScale },
-            { x: 0.0, y: 11.2, scale: s3DetailScale },
-            { x: 2.0, y: 11.8, scale: s3DetailScale },
-            // 額外眉毛與臉頰
-            { x: -5.5, y: -5.5, scale: s3DetailScale * 0.9 },
-            { x: 5.5, y: -5.5, scale: s3DetailScale * 0.9 }
+            // 生氣眉毛（左右各兩點）
+            { x: -7.0, y: -4.5, scale: s3DetailScale },
+            { x: -5.0, y: -5.5, scale: s3DetailScale },
+            { x: 5.0, y: -5.5, scale: s3DetailScale },
+            { x: 7.0, y: -4.5, scale: s3DetailScale },
+            // 眼睛（半月形位置）
+            { x: -5.5, y: -1.5, scale: s3DetailScale * 1.05 },
+            { x: -3.5, y: -1.8, scale: s3DetailScale },
+            { x: 3.5, y: -1.8, scale: s3DetailScale },
+            { x: 5.5, y: -1.5, scale: s3DetailScale * 1.05 },
+            // 鼻孔上方陰影
+            { x: -3.0, y: 3.5, scale: s3DetailScale * 0.9 },
+            { x: 3.0, y: 3.5, scale: s3DetailScale * 0.9 },
+            // 嘴巴
+            { x: -2.5, y: 11.0, scale: s3DetailScale },
+            { x: 0.0, y: 10.5, scale: s3DetailScale },
+            { x: 2.5, y: 11.0, scale: s3DetailScale },
+            // 臉頰紅暈
+            { x: -10.0, y: 2.0, scale: s3DetailScale * 0.85 },
+            { x: 10.0, y: 2.0, scale: s3DetailScale * 0.85 }
           ]);
 
         } else if (shape === 'sin2') {
@@ -2581,10 +2639,19 @@
           assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
 
           spawnDetailHelpers(cx, cy, figScale, [
-            { x: 12.2, y: 1.5, scale: outlineScale },
-            { x: 11.8, y: 3.9, scale: outlineScale },
-            { x: -3.5, y: -1.0, scale: outlineScale * 0.9 },
-            { x: 4.0, y: -0.5, scale: outlineScale * 0.9 }
+            // 右耳內側
+            { x: 13.0, y: 1.0, scale: outlineScale },
+            { x: 13.5, y: 3.5, scale: outlineScale },
+            { x: 12.0, y: 5.5, scale: outlineScale },
+            // 眼睛位置補強
+            { x: -4.0, y: -0.5, scale: outlineScale * 1.05 },
+            { x: 3.5, y: 0.0, scale: outlineScale * 1.05 },
+            // 臉頰
+            { x: -9.5, y: 2.5, scale: outlineScale * 0.85 },
+            { x: 8.0, y: 3.0, scale: outlineScale * 0.85 },
+            // 下巴
+            { x: -2.0, y: 8.5, scale: outlineScale * 0.9 },
+            { x: 1.5, y: 8.8, scale: outlineScale * 0.9 }
           ]);
 
         } else if (shape === 'sin4') {
@@ -2612,10 +2679,10 @@
           }
           assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
 
-          var eyeL = samplePolyline(buildCirclePts(-2.3, -8.4, 2.7, 3.1, 36), 11, 0);
-          var eyeR = samplePolyline(buildCirclePts(3.5, -8.4, 2.7, 3.1, 36), 11, 0);
-          var eyeScale = Math.max(0.13, Math.min(0.19, figScale * 0.0145));
-          var toothScale = Math.max(0.125, Math.min(0.185, figScale * 0.014));
+          var eyeL = samplePolyline(buildCirclePts(-2.5, -8.0, 2.9, 3.3, 40), 12, 0);
+          var eyeR = samplePolyline(buildCirclePts(3.8, -8.0, 2.9, 3.3, 40), 12, 0);
+          var eyeScale = Math.max(0.125, Math.min(0.185, figScale * 0.014));
+          var toothScale = Math.max(0.12, Math.min(0.18, figScale * 0.0135));
           var crocDetails = [];
 
           for (var e1 = 0; e1 < eyeL.length - 1; e1++) {
@@ -2624,24 +2691,31 @@
           for (var e2 = 0; e2 < eyeR.length - 1; e2++) {
             crocDetails.push({ x: eyeR[e2].x, y: eyeR[e2].y, scale: eyeScale });
           }
-          var toothX = [-7.8, -4.0, -0.2, 3.6];
+          // 更密集的鋸齒牙（上下交錯）
+          var toothX = [-8.5, -5.5, -2.5, 0.5, 3.5];
           for (var t = 0; t < toothX.length; t++) {
             var tx = toothX[t];
-            crocDetails.push({ x: tx, y: 1.0, scale: toothScale });
-            crocDetails.push({ x: tx + 0.2, y: 2.8, scale: toothScale });
-            crocDetails.push({ x: tx + 0.4, y: 4.5, scale: toothScale });
+            crocDetails.push({ x: tx, y: 0.8, scale: toothScale });
+            crocDetails.push({ x: tx + 0.3, y: 2.5, scale: toothScale });
+            crocDetails.push({ x: tx + 0.6, y: 4.2, scale: toothScale });
+            if (t % 2 === 0) {
+              crocDetails.push({ x: tx + 0.15, y: 5.5, scale: toothScale * 0.9 });
+            }
           }
+          // 眉毛
+          crocDetails.push({ x: -4.5, y: -11.0, scale: eyeScale * 0.9 });
+          crocDetails.push({ x: 5.5, y: -11.0, scale: eyeScale * 0.9 });
           spawnDetailHelpers(cx, cy, figScale, crocDetails);
 
         } else if (shape === 'shiro') {
-          // 小白：冒號豬當眼睛，輪廓當頭部+身體，小幫手補耳朵內側、鼻子、項圈、嘴巴
-          var shiroEyeScale = Math.max(0.28, Math.min(0.42, figScale * 0.032));
-          var shiroRimScale = Math.max(0.14, Math.min(0.21, figScale * 0.0155));
+          // 小白：冒號豬當大眼睛，輪廓為完整坐姿，大量小幫手補耳朵、鼻子、項圈、前腳、尾巴
+          var shiroEyeScale = Math.max(0.30, Math.min(0.45, figScale * 0.034));
+          var shiroRimScale = Math.max(0.135, Math.min(0.20, figScale * 0.015));
 
           for (var cS = 0; cS < colonPigs.length; cS++) {
-            var eyeOff = cS === 0 ? -3.8 : 3.8;
+            var eyeOff = cS === 0 ? -3.5 : 3.8;
             colonPigs[cS].tx = cx + eyeOff * figScale;
-            colonPigs[cS].ty = cy - 1.5 * figScale;
+            colonPigs[cS].ty = cy - 2.2 * figScale;
             colonPigs[cS].heartBaseX = colonPigs[cS].tx;
             colonPigs[cS].heartBaseY = colonPigs[cS].ty;
             colonPigs[cS].scale = shiroEyeScale;
@@ -2659,26 +2733,37 @@
           }
           assignOrderedPointsToPigs(rimPigs, slots, cx, cy);
 
-          var shiroDetailScale = Math.max(0.12, Math.min(0.175, figScale * 0.0135));
+          var shiroDetailScale = Math.max(0.115, Math.min(0.17, figScale * 0.013));
           spawnDetailHelpers(cx, cy, figScale, [
-            // 左耳內側
-            { x: -10.5, y: -11.5, scale: shiroDetailScale },
-            { x: -9.0, y: -12.8, scale: shiroDetailScale },
-            // 右耳內側
-            { x: 11.5, y: -9.5, scale: shiroDetailScale },
-            { x: 12.8, y: -8.0, scale: shiroDetailScale },
-            // 黑色鼻子
-            { x: 0.0, y: 2.8, scale: shiroDetailScale * 1.15 },
-            { x: -1.2, y: 2.2, scale: shiroDetailScale * 0.9 },
-            { x: 1.2, y: 2.2, scale: shiroDetailScale * 0.9 },
-            // 嘴巴
-            { x: 0.0, y: 5.5, scale: shiroDetailScale * 0.85 },
-            // 藍色項圈
-            { x: -4.5, y: 7.8, scale: shiroDetailScale },
-            { x: 0.0, y: 8.2, scale: shiroDetailScale },
-            { x: 4.5, y: 7.8, scale: shiroDetailScale },
-            // 左臉頰
-            { x: -7.5, y: 1.0, scale: shiroDetailScale * 0.8 }
+            // 左耳內側（向上揚）
+            { x: -11.5, y: -11.0, scale: shiroDetailScale },
+            { x: -10.0, y: -12.5, scale: shiroDetailScale },
+            { x: -8.5, y: -11.5, scale: shiroDetailScale },
+            // 右耳內側（向下垂）
+            { x: 11.0, y: -9.5, scale: shiroDetailScale },
+            { x: 12.5, y: -8.0, scale: shiroDetailScale },
+            { x: 13.0, y: -6.0, scale: shiroDetailScale },
+            // 黑色鼻子（重點）
+            { x: 0.2, y: 2.0, scale: shiroDetailScale * 1.25 },
+            { x: -1.5, y: 1.5, scale: shiroDetailScale * 0.95 },
+            { x: 1.8, y: 1.5, scale: shiroDetailScale * 0.95 },
+            { x: 0.2, y: 3.2, scale: shiroDetailScale * 0.9 },
+            // 嘴巴（一橫）
+            { x: -1.5, y: 5.0, scale: shiroDetailScale * 0.9 },
+            { x: 0.5, y: 5.3, scale: shiroDetailScale * 0.9 },
+            { x: 2.0, y: 5.0, scale: shiroDetailScale * 0.9 },
+            // 藍色項圈（重點特徵）
+            { x: -5.5, y: 7.0, scale: shiroDetailScale },
+            { x: -2.5, y: 7.8, scale: shiroDetailScale },
+            { x: 0.5, y: 8.2, scale: shiroDetailScale },
+            { x: 3.5, y: 7.8, scale: shiroDetailScale },
+            { x: 6.0, y: 7.0, scale: shiroDetailScale },
+            // 前腳細節
+            { x: 5.0, y: 12.5, scale: shiroDetailScale * 0.85 },
+            { x: -3.5, y: 12.8, scale: shiroDetailScale * 0.85 },
+            // 尾巴捲曲提示
+            { x: -11.5, y: 3.5, scale: shiroDetailScale * 0.8 },
+            { x: -12.5, y: 1.0, scale: shiroDetailScale * 0.8 }
           ]);
 
         } else {
